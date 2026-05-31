@@ -19,6 +19,8 @@
     "@trpc/client": "^11.0.0-rc.362",
     "@trpc/react-query": "^11.0.0-rc.362",
     "@trpc/server": "^11.0.0-rc.362",
+    "@types/better-sqlite3": "^7.6.12",
+    "better-sqlite3": "^11.8.1",
     "clsx": "^2.1.0",
     "hono": "^4.1.0",
     "lucide-react": "^0.454.0",

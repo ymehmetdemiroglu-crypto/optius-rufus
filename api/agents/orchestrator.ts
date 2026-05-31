@@ -12,6 +12,7 @@ import type {
   RawListingData,
   ReviewResult,
 } from "./types.js";
+import { ApifyFetcherAgent } from "./agents/apifyFetcher.js";
 import { CompetitorAnalystAgent } from "./agents/competitorAnalyst.js";
 import { ContentOptimizerAgent } from "./agents/contentOptimizer.js";
 import { EmbeddingGeneratorAgent } from "./agents/embeddingGenerator.js";
@@ -21,7 +22,7 @@ import { SemanticAnalyzerAgent } from "./agents/semanticAnalyzer.js";
 import { ReviewerAgent } from "./reviewer.js";
 
 const STAGES: AgentRole[] = [
-  "listing_fetcher",
+  "apify_fetcher",
   "preprocessor",
   "embedding_generator",
   "semantic_analyzer",
@@ -30,6 +31,7 @@ const STAGES: AgentRole[] = [
 ];
 
 const STAGE_NAMES: Record<AgentRole, string> = {
+  apify_fetcher: "ApifyFetcher",
   listing_fetcher: "ListingFetcher",
   preprocessor: "Preprocessor",
   embedding_generator: "EmbeddingGenerator",
@@ -46,6 +48,7 @@ export class OptimizationOrchestrator extends EventEmitter {
   constructor() {
     super();
     this.agents = new Map<AgentRole, Agent>([
+      ["apify_fetcher", new ApifyFetcherAgent()],
       ["listing_fetcher", new ListingFetcherAgent()],
       ["preprocessor", new PreprocessorAgent()],
       ["embedding_generator", new EmbeddingGeneratorAgent()],
@@ -56,7 +59,11 @@ export class OptimizationOrchestrator extends EventEmitter {
     this.reviewer = new ReviewerAgent();
   }
 
-  async runPipeline(asin: string, marketplace: string): Promise<PipelineState> {
+  async runPipeline(
+    asin: string,
+    marketplace: string,
+    overrides?: { listingData?: RawListingData }
+  ): Promise<PipelineState> {
     const state: PipelineState = {
       asin,
       marketplace,
@@ -83,6 +90,37 @@ export class OptimizationOrchestrator extends EventEmitter {
 
         this.emit("stage:start", { stage: i, role, name: STAGE_NAMES[role] });
 
+        // Handle listingData override for apify_fetcher
+        if (overrides?.listingData && role === "apify_fetcher") {
+          rawListing = overrides.listingData;
+          task.status = "completed";
+          task.output = rawListing;
+          task.completedAt = new Date();
+
+          this.emit("stage:complete", {
+            stage: i,
+            role,
+            name: STAGE_NAMES[role],
+            status: task.status,
+            duration: 0,
+          });
+
+          const review = await this.reviewStage(task);
+          state.reviews.push(review);
+
+          this.emit("review:complete", {
+            stage: i,
+            role,
+            name: STAGE_NAMES[role],
+            approved: review.approved,
+            score: review.score,
+            issues: review.issues,
+            suggestions: review.suggestions,
+          });
+
+          continue;
+        }
+
         const input = this.buildInput(role, state, rawListing, cleaned, embedding, analysis);
         const result = await this.executeWithRetry(task, input);
 
@@ -107,6 +145,9 @@ export class OptimizationOrchestrator extends EventEmitter {
 
         // Store output for next stages
         switch (role) {
+          case "apify_fetcher":
+            rawListing = task.output as RawListingData;
+            break;
           case "listing_fetcher":
             rawListing = task.output as RawListingData;
             break;
@@ -182,7 +223,7 @@ export class OptimizationOrchestrator extends EventEmitter {
   private async createTask(
     state: PipelineState,
     role: AgentRole,
-    stageIndex: number
+    _stageIndex: number
   ): Promise<AgentTask> {
     return {
       id: `${state.asin}-${role}-${Date.now()}`,
@@ -206,6 +247,8 @@ export class OptimizationOrchestrator extends EventEmitter {
     analysis?: AnalysisResult
   ): unknown {
     switch (role) {
+      case "apify_fetcher":
+        return { asin: _state.asin, marketplace: _state.marketplace };
       case "listing_fetcher":
         return { asin: _state.asin, marketplace: _state.marketplace };
       case "preprocessor":

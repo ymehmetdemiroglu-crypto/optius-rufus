@@ -4,6 +4,7 @@ import {
   LayoutDashboard, 
   Cpu, 
   BarChart3, 
+  Users,
   Settings as SettingsIcon, 
   ShieldCheck,
   ChevronLeft,
@@ -17,6 +18,7 @@ export default function Sidebar() {
   const links = [
     { to: '/', label: 'OPERATIONS CONTROL', icon: Compass },
     { to: '/dashboard', label: 'AGENT CORES', icon: LayoutDashboard },
+    { to: '/dashboard/prospects', label: 'PROSPECT PIPELINE', icon: Users },
     { to: '/analyzer', label: 'ORCHESTRATION KERNEL', icon: Cpu },
     { to: '/competitors', label: 'INTENT BENCHMARKS', icon: BarChart3 },
     { to: '/settings', label: 'SP-API PROTOCOLS', icon: SettingsIcon },

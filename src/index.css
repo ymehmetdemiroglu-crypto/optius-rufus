@@ -3,91 +3,47 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    color-scheme: dark;
-  }
-  
   body {
-    background-color: #05070A;
-    background-image: 
-      radial-gradient(at 0% 0%, rgba(0, 245, 255, 0.06) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(230, 57, 70, 0.06) 0px, transparent 50%),
-      radial-gradient(at 50% 100%, rgba(224, 225, 221, 0.04) 0px, transparent 50%);
-    background-attachment: fixed;
-  }
-
-  /* Custom premium scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: #05070A;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #1B2330;
-    border-radius: 4px;
-    border: 1px solid #05070A;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #E63946;
+    background: #FFFFFF;
+    color: #000000;
   }
 }
 
 @layer components {
-  /* Glassmorphism card container with Titanium Silver borders */
-  .glass-card {
-    background: rgba(13, 17, 26, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(224, 225, 221, 0.06);
-    border-radius: 1rem;
-    box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.5);
+  .brutalist-card {
+    @apply bg-white border-[3px] border-black p-4 md:p-6;
   }
 
-  .glass-card-hover {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  .brutalist-btn {
+    @apply bg-brutal-red text-white border-[3px] border-black px-8 py-4 font-black text-lg uppercase tracking-wide hover:bg-black hover:text-white transition-colors;
   }
 
-  .glass-card-hover:hover {
-    transform: translateY(-2px);
-    background: rgba(13, 17, 26, 0.85);
-    border-color: rgba(230, 57, 70, 0.2);
-    box-shadow: 
-      0 16px 50px 0 rgba(0, 0, 0, 0.65),
-      0 0 20px rgba(230, 57, 70, 0.05);
+  .brutalist-btn-secondary {
+    @apply bg-white text-black border-[3px] border-black px-6 py-3 font-bold text-sm uppercase tracking-wide hover:bg-black hover:text-white transition-colors;
   }
 
-  /* Buttons in Matrix Crimson */
-  .btn-premium {
-    background: linear-gradient(135deg, #E63946 0%, #B81D24 100%);
-    box-shadow: 0 0 15px rgba(230, 57, 70, 0.3);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  .brutalist-input {
+    @apply bg-white border-[3px] border-black px-4 py-3 text-black placeholder-gray-500 outline-none focus:border-brutal-blue w-full rounded-sm;
   }
 
-  .btn-premium:hover {
-    transform: scale(1.02);
-    box-shadow: 0 0 25px rgba(230, 57, 70, 0.5);
+  .brutalist-table {
+    @apply w-full border-[3px] border-black border-collapse;
   }
 
-  /* Secondary in Active Cyan */
-  .btn-secondary-glow {
-    background: rgba(0, 245, 255, 0.08);
-    border: 1px solid rgba(0, 245, 255, 0.2);
-    box-shadow: 0 0 10px rgba(0, 245, 255, 0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  .brutalist-table th,
+  .brutalist-table td {
+    @apply border-[3px] border-black px-4 py-3 text-left;
   }
 
-  .btn-secondary-glow:hover {
-    background: rgba(0, 245, 255, 0.15);
-    border-color: rgba(0, 245, 255, 0.4);
-    box-shadow: 0 0 20px rgba(0, 245, 255, 0.25);
-    transform: scale(1.02);
+  .brutalist-table th {
+    @apply bg-brutal-black text-white font-mono text-xs uppercase tracking-widest;
   }
 
-  /* Shimmer scanner bar in Crimson */
-  .scanner-glow-bar {
-    background: linear-gradient(to bottom, transparent, #E63946, transparent);
-    box-shadow: 0 0 15px #E63946;
+  .brutalist-table tr:nth-child(even) {
+    @apply bg-brutal-concrete;
+  }
+
+  .brutalist-section {
+    @apply border-t-[3px] border-black py-12 md:py-16;
   }
 }

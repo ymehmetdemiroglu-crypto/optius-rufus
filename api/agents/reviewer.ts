@@ -12,6 +12,8 @@ import type {
 export class ReviewerAgent {
   async review(task: AgentTask): Promise<ReviewResult> {
     switch (task.role) {
+      case "apify_fetcher":
+        return this.reviewListingData(task.output as RawListingData);
       case "listing_fetcher":
         return this.reviewListingData(task.output as RawListingData);
       case "preprocessor":

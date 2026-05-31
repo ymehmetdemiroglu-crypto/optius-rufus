@@ -1,6 +1,7 @@
 export * from "./types.js";
 export { OptimizationOrchestrator } from "./orchestrator.js";
 export { ReviewerAgent } from "./reviewer.js";
+export { ApifyFetcherAgent } from "./agents/apifyFetcher.js";
 export { ListingFetcherAgent } from "./agents/listingFetcher.js";
 export { PreprocessorAgent } from "./agents/preprocessor.js";
 export { EmbeddingGeneratorAgent } from "./agents/embeddingGenerator.js";

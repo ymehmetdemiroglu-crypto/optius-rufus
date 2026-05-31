@@ -1,4 +1,5 @@
 export type AgentRole =
+  | "apify_fetcher"
   | "listing_fetcher"
   | "preprocessor"
   | "embedding_generator"
