@@ -178,11 +178,11 @@ export default function RadarChart({ data = defaultDimensions, size = 320 }: Rad
       <div className="flex gap-6 mt-4 select-none">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 bg-red-500 rounded-full border border-brand-bg" />
-          <span className="text-xs text-slate-400 font-medium">Original ASIN Listing</span>
+          <span className="text-xs text-slate-400 font-bold">Your Old Listing (Keyword-stuffed draft)</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 bg-brand-cyan rounded-full border border-brand-bg animate-pulse" />
-          <span className="text-xs text-slate-400 font-medium">COSMO/Rufus Target Spectrum</span>
+          <span className="text-xs text-brand-cyan font-bold">Optimized Listing (COSMO Intent-aligned offer)</span>
         </div>
       </div>
     </div>

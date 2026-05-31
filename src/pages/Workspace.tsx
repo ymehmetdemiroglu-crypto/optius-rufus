@@ -171,23 +171,24 @@ export default function Workspace() {
         {/* Score comparison card */}
         <div className="glass-card p-6 border-brand-bg-border flex flex-col justify-between relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-brand-orange/5 rounded-full blur-2xl" />
-          <h3 className="font-display font-bold text-sm text-slate-300 uppercase tracking-wider mb-4">
-            COMPATIBILITY SCORE INDEX
+          <h3 className="font-display font-bold text-xs text-brand-orange uppercase tracking-wider mb-4 flex items-center gap-1.5">
+            <Sparkles className="h-4 w-4 text-brand-orange" />
+            <span>THE RUFUS BUY INTENT SCORE</span>
           </h3>
           
           <div className="flex items-center justify-around gap-4 py-4">
-            <ScoreGauge score={58} label="Original" size={110} />
+            <ScoreGauge score={58} label="Invisible to AI" size={110} />
             <div className="flex flex-col items-center justify-center font-bold">
               <span className="text-brand-orange text-lg">+34</span>
-              <span className="text-[10px] text-slate-500 uppercase tracking-widest font-sans">Delta Boost</span>
+              <span className="text-[10px] text-slate-500 uppercase tracking-widest font-sans">Score Boom</span>
               <div className="h-[2px] w-8 bg-slate-800 my-2" />
               <Zap className="h-4 w-4 text-brand-orange animate-pulse" />
             </div>
-            <ScoreGauge score={sandboxScore} label="Optimized" size={110} />
+            <ScoreGauge score={sandboxScore} label="COSMO ALIGNED" size={110} />
           </div>
 
-          <div className="text-center text-xs text-slate-450 border-t border-brand-bg-border pt-4">
-            Optimization has successfully reduced critical intent gaps by <strong className="text-brand-cyan">92%</strong>.
+          <div className="text-center text-xs text-slate-400 border-t border-brand-bg-border pt-4 font-medium leading-relaxed">
+            The Offer Stack: We <strong className="text-brand-cyan">obliterated 92% of your profit leaks</strong>. Rufus can now rank you as the #1 gentle-on-the-stomach solution.
           </div>
         </div>
 
@@ -198,39 +199,39 @@ export default function Workspace() {
       </div>
 
       {/* Mode navigation tabs */}
-      <div className="flex bg-slate-950/60 p-1 border border-brand-bg-border rounded-xl w-fit">
+      <div className="flex bg-slate-950/60 p-1 border border-brand-bg-border rounded-xl w-fit overflow-x-auto max-w-full scrollbar-none">
         <button
           onClick={() => setActiveTab('editor')}
-          className={`flex items-center gap-2 text-xs uppercase font-bold tracking-wider px-5 py-2.5 rounded-lg transition-all ${
+          className={`flex items-center gap-2 text-xs uppercase font-bold tracking-wider px-5 py-2.5 rounded-lg shrink-0 transition-all ${
             activeTab === 'editor'
               ? 'bg-brand-orange/15 text-brand-orange border border-brand-orange/20 shadow-glow-orange'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           <Cpu className="h-4 w-4" />
-          <span>Split Comparison Workspace</span>
+          <span>Listing Re-Engineering Console</span>
         </button>
         <button
           onClick={() => setActiveTab('radar')}
-          className={`flex items-center gap-2 text-xs uppercase font-bold tracking-wider px-5 py-2.5 rounded-lg transition-all ${
+          className={`flex items-center gap-2 text-xs uppercase font-bold tracking-wider px-5 py-2.5 rounded-lg shrink-0 transition-all ${
             activeTab === 'radar'
               ? 'bg-brand-orange/15 text-brand-orange border border-brand-orange/20 shadow-glow-orange'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           <BookOpen className="h-4 w-4" />
-          <span>Detailed Semantic Gaps</span>
+          <span>24-Dimension Gap Analysis (Profit Leaks)</span>
         </button>
         <button
           onClick={() => setActiveTab('simulator')}
-          className={`flex items-center gap-2 text-xs uppercase font-bold tracking-wider px-5 py-2.5 rounded-lg transition-all ${
+          className={`flex items-center gap-2 text-xs uppercase font-bold tracking-wider px-5 py-2.5 rounded-lg shrink-0 transition-all ${
             activeTab === 'simulator'
               ? 'bg-brand-orange/15 text-brand-orange border border-brand-orange/20 shadow-glow-orange'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           <MessageSquare className="h-4 w-4" />
-          <span>Conversational Rufus Simulator</span>
+          <span>Rufus AI Mobile Simulator (Spy Tool)</span>
         </button>
       </div>
 

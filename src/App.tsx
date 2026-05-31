@@ -10,12 +10,12 @@ import Settings from './pages/Settings';
 
 function AppContent() {
   return (
-    <div className="flex min-h-screen bg-brand-bg text-slate-200">
+    <div className="flex h-screen w-screen overflow-hidden bg-brand-bg text-slate-200">
       {/* Premium Sidebar Navigation */}
       <Sidebar />
       
       {/* Main Workspace Frame */}
-      <main className="flex-1 overflow-y-auto px-6 py-8 md:px-10">
+      <main className="flex-1 h-full overflow-y-auto px-6 py-8 md:px-10">
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/dashboard" element={<Dashboard />} />
