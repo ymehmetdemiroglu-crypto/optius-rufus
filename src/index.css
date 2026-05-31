@@ -4,46 +4,81 @@
 
 @layer base {
   body {
-    background: #FFFFFF;
-    color: #000000;
+    background-color: #f5f0e8;
+    color: #1a1a1a;
+    font-family: 'Inter', sans-serif;
   }
 }
 
 @layer components {
   .brutalist-card {
-    @apply bg-white border-[3px] border-black p-4 md:p-6;
+    @apply bg-white border-[3px] border-brand-dark p-6 shadow-brutal transition-all rounded-none;
+  }
+
+  .brutalist-card-hover {
+    @apply hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[8px_8px_0px_#1a1a1a];
   }
 
   .brutalist-btn {
-    @apply bg-brutal-red text-white border-[3px] border-black px-8 py-4 font-black text-lg uppercase tracking-wide hover:bg-black hover:text-white transition-colors;
+    @apply bg-brand-gold text-brand-dark border-[3px] border-brand-dark px-8 py-4 font-display font-black text-lg uppercase tracking-wider shadow-brutal hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[8px_8px_0px_#1a1a1a] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[4px_4px_0px_#1a1a1a] transition-all rounded-none inline-flex items-center justify-center gap-2 select-none;
   }
 
   .brutalist-btn-secondary {
-    @apply bg-white text-black border-[3px] border-black px-6 py-3 font-bold text-sm uppercase tracking-wide hover:bg-black hover:text-white transition-colors;
+    @apply bg-white text-brand-dark border-[3px] border-brand-dark px-6 py-3 font-display font-black text-sm uppercase tracking-wider shadow-brutal hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[8px_8px_0px_#1a1a1a] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[4px_4px_0px_#1a1a1a] transition-all rounded-none inline-flex items-center justify-center gap-2 select-none;
   }
 
   .brutalist-input {
-    @apply bg-white border-[3px] border-black px-4 py-3 text-black placeholder-gray-500 outline-none focus:border-brutal-blue w-full rounded-sm;
+    @apply bg-white border-[3px] border-brand-dark px-4 py-3 text-brand-dark placeholder-gray-500 outline-none focus:border-brand-blue w-full rounded-none;
   }
 
   .brutalist-table {
-    @apply w-full border-[3px] border-black border-collapse;
+    @apply w-full border-[3px] border-brand-dark border-collapse;
   }
 
   .brutalist-table th,
   .brutalist-table td {
-    @apply border-[3px] border-black px-4 py-3 text-left;
+    @apply border-[3px] border-brand-dark px-4 py-3 text-left;
   }
 
   .brutalist-table th {
-    @apply bg-brutal-black text-white font-mono text-xs uppercase tracking-widest;
+    @apply bg-brand-dark text-white font-mono text-xs uppercase tracking-widest;
   }
 
   .brutalist-table tr:nth-child(even) {
-    @apply bg-brutal-concrete;
+    @apply bg-brand-bg;
   }
 
   .brutalist-section {
-    @apply border-t-[3px] border-black py-12 md:py-16;
+    @apply border-t-[3px] border-brand-dark py-12 md:py-16;
+  }
+
+  /* Legacy layout visual mapping to support modern brutalist style */
+  .glass-card {
+    @apply brutalist-card;
+  }
+
+  .glass-card-hover {
+    @apply brutalist-card-hover;
+  }
+
+  .btn-premium {
+    @apply brutalist-btn px-5 py-2.5 text-xs;
+  }
+
+  /* Typography utilities */
+  .display-heading {
+    @apply font-display uppercase leading-[1.05] tracking-tight font-black;
+  }
+
+  .product-title {
+    @apply font-sans font-bold uppercase tracking-wide leading-tight;
+  }
+
+  .price-token {
+    @apply font-display font-black leading-none text-brand-dark;
+  }
+
+  .system-label {
+    @apply font-sans font-medium uppercase tracking-wider text-xs;
   }
 }

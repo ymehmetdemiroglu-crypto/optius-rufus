@@ -26,34 +26,26 @@ export default function Sidebar() {
 
   return (
     <aside 
-      className={`relative z-20 flex flex-col border-r border-brand-bg-border bg-[#05070A]/90 backdrop-blur-2xl transition-all duration-300 ${
+      className={`relative z-20 flex flex-col border-r-[3px] border-brand-dark bg-white transition-all duration-300 ${
         isCollapsed ? 'w-20' : 'w-68'
       }`}
     >
-      {/* Brand Header: Hexagonal Reactor */}
-      <div className="flex h-20 items-center justify-between px-4 border-b border-brand-bg-border">
+      {/* Brand Header: Bauhaus styled */}
+      <div className="flex h-20 items-center justify-between px-4 border-b-[3px] border-brand-dark">
         {!isCollapsed && (
           <div className="flex items-center gap-3">
-            {/* Hexagonal Reactor Frame */}
-            <div className="relative flex h-10 w-10 items-center justify-center shrink-0">
-              {/* Outer Hexagon frame in Titanium Silver */}
-              <svg 
-                viewBox="0 0 100 100" 
-                className="absolute inset-0 h-full w-full stroke-[#E0E1DD] fill-none stroke-[6]"
-              >
-                <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" />
-              </svg>
-              {/* Central glowing red point - The Spark */}
-              <div className="h-2.5 w-2.5 rounded-full bg-[#E63946] shadow-[0_0_12px_#E63946] animate-pulse" />
+            {/* Bauhaus Grid Box Logo */}
+            <div className="h-10 w-10 bg-brand-dark flex items-center justify-center shrink-0 border-[3px] border-brand-dark">
+              <div className="h-4 w-4 bg-brand-gold rotate-45" />
             </div>
             
             <div className="leading-none">
-              <div className="font-display text-xs font-bold text-[#E0E1DD] tracking-[0.2em] uppercase select-none flex items-center">
+              <div className="font-display text-xs font-black text-brand-dark tracking-[0.15em] uppercase select-none flex items-center">
                 <span>OPTIMUS</span>
-                <span className="mx-1 text-[#E63946] font-light">|</span>
+                <span className="mx-1 text-brand-blue font-black">|</span>
                 <span>PRIME</span>
               </div>
-              <div className="text-[8px] tracking-[0.25em] text-[#00F5FF] uppercase font-bold mt-1 font-mono">
+              <div className="text-[8px] tracking-[0.2em] text-brand-blue uppercase font-bold mt-1 font-mono">
                 AI ORCHESTRATION
               </div>
             </div>
@@ -61,20 +53,14 @@ export default function Sidebar() {
         )}
         
         {isCollapsed && (
-          <div className="relative mx-auto flex h-10 w-10 items-center justify-center">
-            <svg 
-              viewBox="0 0 100 100" 
-              className="absolute inset-0 h-full w-full stroke-[#E0E1DD] fill-none stroke-[8]"
-            >
-              <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" />
-            </svg>
-            <div className="h-2.5 w-2.5 rounded-full bg-[#E63946] shadow-[0_0_12px_#E63946] animate-pulse" />
+          <div className="mx-auto h-10 w-10 bg-brand-dark flex items-center justify-center border-[3px] border-brand-dark">
+            <div className="h-4 w-4 bg-brand-gold rotate-45" />
           </div>
         )}
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex-1 space-y-2.5 px-3 py-6 select-none">
+      <nav className="flex-1 space-y-3 px-3 py-6 select-none">
         {links.map((link) => {
           const Icon = link.icon;
           return (
@@ -82,14 +68,14 @@ export default function Sidebar() {
               key={link.to}
               to={link.to}
               className={({ isActive }) =>
-                `flex items-center gap-4 rounded-xl px-4 py-3.5 text-[10px] font-bold tracking-[0.1em] transition-all duration-300 font-display ${
+                `flex items-center gap-4 border-[3px] border-transparent px-4 py-3 text-[10px] font-bold tracking-[0.1em] transition-all duration-200 font-display ${
                   isActive
-                    ? 'bg-gradient-to-r from-brand-crimson/15 to-brand-cyan/5 text-[#E63946] border-l-2 border-[#E63946] shadow-glow-crimson'
-                    : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+                    ? 'bg-white border-brand-dark text-brand-dark shadow-brutal-blue'
+                    : 'text-brand-dark/70 hover:bg-brand-bg/50 hover:text-brand-dark hover:border-brand-dark/20'
                 }`
               }
             >
-              <Icon className="h-4.5 w-4.5 shrink-0" />
+              <Icon className="h-5 w-5 shrink-0 text-brand-dark" />
               {!isCollapsed && <span>{link.label}</span>}
             </NavLink>
           );
@@ -98,16 +84,16 @@ export default function Sidebar() {
 
       {/* Plan Status Card */}
       {!isCollapsed && (
-        <div className="m-4 rounded-2xl bg-gradient-to-br from-[#0D111A] to-brand-bg-card/20 p-4 border border-brand-bg-border">
-          <div className="flex items-center gap-2 text-[#00F5FF] text-[9px] font-bold tracking-widest font-mono mb-1.5">
-            <div className="h-1.5 w-1.5 rounded-full bg-[#00F5FF] animate-ping" />
+        <div className="m-4 bg-[#f5f0e8] p-4 border-[3px] border-brand-dark shadow-brutal-sm">
+          <div className="flex items-center gap-2 text-brand-blue text-[9px] font-bold tracking-widest font-mono mb-1.5">
+            <div className="h-2 w-2 bg-brand-blue animate-pulse" />
             <span>ORCHESTRATOR ONLINE</span>
           </div>
-          <p className="text-[10px] text-slate-400 font-mono">
-            COSMO Index: <strong className="text-slate-200">1536-dim sync</strong>
+          <p className="text-[10px] text-brand-dark font-mono">
+            COSMO Index: <strong className="text-brand-dark font-black">1536-dim sync</strong>
           </p>
-          <div className="mt-3 h-1 w-full rounded-full bg-slate-900 overflow-hidden">
-            <div className="h-full w-[95%] rounded-full bg-gradient-to-r from-[#00F5FF] to-[#E63946]" />
+          <div className="mt-3 h-3 w-full bg-white border-2 border-brand-dark overflow-hidden">
+            <div className="h-full w-[95%] bg-brand-blue" />
           </div>
         </div>
       )}
@@ -115,9 +101,9 @@ export default function Sidebar() {
       {/* Collapse Action Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute bottom-6 -right-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#0D111A] border border-slate-800 text-slate-400 hover:text-slate-200 transition-all hover:bg-slate-800"
+        className="absolute bottom-6 -right-4 flex h-8 w-8 items-center justify-center bg-white border-[3px] border-brand-dark text-brand-dark hover:bg-brand-gold transition-all shadow-brutal-sm hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px]"
       >
-        {isCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
+        {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
       </button>
     </aside>
   );

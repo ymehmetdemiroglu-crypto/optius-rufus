@@ -24,47 +24,37 @@ interface PipelineTrackerProps {
 
 export default function PipelineTracker({ currentStage, status, logs }: PipelineTrackerProps) {
   return (
-    <div className="w-full glass-card p-6 border border-brand-bg-border relative overflow-hidden select-none font-sans text-slate-350">
+    <div className="w-full brutalist-card bg-white p-6 relative select-none font-sans text-brand-dark">
       {/* Structural accent border line */}
-      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-brand-cyan via-[#E63946] to-brand-cyan opacity-80" />
+      <div className="absolute top-0 left-0 w-full h-[6px] bg-brand-gold" />
       
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          {/* Hexagonal Reactor mini icon */}
-          <div className="relative flex h-8 w-8 items-center justify-center shrink-0">
-            <svg 
-              viewBox="0 0 100 100" 
-              className="absolute inset-0 h-full w-full stroke-brand-crimson fill-none stroke-[8]"
-            >
-              <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" />
-            </svg>
-            <div className="h-1.5 w-1.5 rounded-full bg-[#E63946] shadow-[0_0_12px_#E63946] animate-pulse" />
+          {/* Stark Bauhaus Reactor Icon */}
+          <div className="h-8 w-8 bg-brand-dark flex items-center justify-center border-2 border-brand-dark">
+            <div className="h-3 w-3 bg-brand-gold rotate-45" />
           </div>
           <div>
-            <h3 className="font-display font-bold text-xs text-white tracking-[0.05em] uppercase">
+            <h3 className="font-display font-black text-sm text-brand-dark tracking-wide uppercase">
               AGENT ORCHESTRATION SEQUENCER
             </h3>
-            <p className="text-[10px] text-slate-500 font-mono mt-0.5">
+            <p className="text-[10px] text-brand-dark/60 font-bold uppercase tracking-wider mt-0.5 font-mono">
               7 Autonomous Agent cores executing real-time semantic alignment protocol
             </p>
           </div>
         </div>
         
         {status === 'running' && (
-          <div className="flex items-center gap-2 px-3 py-1 bg-brand-crimson/10 border border-brand-crimson/20 rounded-full">
-            <Loader2 className="h-3 w-3 text-brand-crimson animate-spin" />
-            <span className="text-[9px] text-brand-crimson font-bold uppercase tracking-wider font-mono">
-              Pipeline Active
-            </span>
+          <div className="flex items-center gap-2 px-3 py-1 bg-brand-red text-white border-[3px] border-brand-dark shadow-brutal-sm font-mono text-[9px] font-black uppercase">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            <span>Pipeline Active</span>
           </div>
         )}
         
         {status === 'completed' && (
-          <div className="flex items-center gap-2 px-3 py-1 bg-brand-cyan/10 border border-brand-cyan/20 rounded-full">
-            <Check className="h-3 w-3 text-brand-cyan" />
-            <span className="text-[9px] text-brand-cyan font-bold uppercase tracking-wider font-mono">
-              Pipeline Locked
-            </span>
+          <div className="flex items-center gap-2 px-3 py-1 bg-brand-blue text-white border-[3px] border-brand-dark shadow-brutal-sm font-mono text-[9px] font-black uppercase">
+            <Check className="h-3 w-3" />
+            <span>Pipeline Locked</span>
           </div>
         )}
       </div>
@@ -73,11 +63,11 @@ export default function PipelineTracker({ currentStage, status, logs }: Pipeline
       <div className="relative flex justify-between items-center w-full px-4 py-8 overflow-x-auto min-w-[700px] scrollbar-none">
         
         {/* Background track line */}
-        <div className="absolute top-1/2 left-8 right-8 h-1 bg-slate-900 -translate-y-1/2 z-0" />
+        <div className="absolute top-1/2 left-8 right-8 h-1.5 bg-brand-dark/20 -translate-y-1/2 z-0" />
         
-        {/* Dynamic active track line (Cyan to Crimson) */}
+        {/* Dynamic active track line */}
         <div 
-          className="absolute top-1/2 left-8 h-1 bg-gradient-to-r from-brand-cyan to-brand-crimson -translate-y-1/2 z-0 transition-all duration-1000 ease-out" 
+          className="absolute top-1/2 left-8 h-1.5 bg-brand-blue -translate-y-1/2 z-0 transition-all duration-1000 ease-out" 
           style={{ 
             width: `${status === 'completed' ? 'calc(100% - 64px)' : `calc(${(currentStage / (stages.length - 1)) * 100}% - 64px)`}`
           }}
@@ -90,33 +80,33 @@ export default function PipelineTracker({ currentStage, status, logs }: Pipeline
           return (
             <div key={idx} className="relative z-10 flex flex-col items-center group cursor-pointer font-mono">
               <div 
-                className={`flex h-11 w-11 items-center justify-center rounded-full border-2 transition-all duration-500 ${
+                className={`flex h-11 w-11 items-center justify-center border-[3px] transition-all duration-350 ${
                   isCompleted 
-                    ? 'bg-[#05070A] border-brand-cyan text-brand-cyan shadow-glow-cyan' 
+                    ? 'bg-white border-brand-dark text-brand-blue shadow-brutal-sm' 
                     : isCurrent 
-                      ? 'bg-[#05070A] border-brand-crimson text-brand-crimson shadow-glow-crimson scale-110' 
-                      : 'bg-brand-bg-card border-slate-900 text-slate-600'
+                      ? 'bg-brand-gold border-brand-dark text-brand-dark shadow-brutal scale-110' 
+                      : 'bg-brand-bg border-brand-dark/30 text-brand-dark/30'
                 }`}
               >
                 {isCompleted ? (
-                  <Check className="h-5 w-5" />
+                  <Check className="h-5 w-5 stroke-[3]" />
                 ) : isCurrent ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin stroke-[3]" />
                 ) : (
-                  <span className="font-display font-semibold text-xs">{idx + 1}</span>
+                  <span className="font-display font-black text-xs">{idx + 1}</span>
                 )}
               </div>
 
               {/* Label */}
               <div className="mt-3 text-center max-w-[90px]">
                 <div 
-                  className={`text-[8px] font-bold uppercase tracking-wider transition-colors duration-300 ${
-                    isCurrent ? 'text-brand-crimson animate-pulse' : isCompleted ? 'text-slate-350' : 'text-slate-650'
+                  className={`text-[8px] font-black uppercase tracking-wider transition-colors duration-300 ${
+                    isCurrent ? 'text-brand-red animate-pulse' : isCompleted ? 'text-brand-dark' : 'text-brand-dark/40'
                   }`}
                 >
                   {stage.label}
                 </div>
-                <div className="text-[8px] text-slate-550 mt-0.5 line-clamp-1 leading-tight group-hover:line-clamp-none transition-all">
+                <div className="text-[8px] text-brand-dark/50 mt-0.5 line-clamp-1 leading-tight group-hover:line-clamp-none transition-all font-bold">
                   {stage.desc}
                 </div>
               </div>
@@ -125,24 +115,24 @@ export default function PipelineTracker({ currentStage, status, logs }: Pipeline
         })}
       </div>
 
-      {/* Active Agent Log Shell (JetBrains Mono themed) */}
-      <div className="mt-6 rounded-xl border border-brand-bg-border bg-[#05070A]/90 p-4 font-mono text-[10px] leading-relaxed shadow-inner">
-        <div className="flex items-center justify-between border-b border-brand-bg-border pb-2 mb-3">
-          <div className="flex items-center gap-2 text-slate-400 font-bold uppercase tracking-wider text-[9px]">
-            <Terminal className="h-3.5 w-3.5 text-brand-crimson" />
+      {/* Active Agent Log Shell (Space Grotesk & Inter themed) */}
+      <div className="mt-6 border-[3px] border-brand-dark bg-white p-4 font-mono text-[11px] leading-relaxed shadow-brutal-sm">
+        <div className="flex items-center justify-between border-b-[2px] border-brand-dark pb-2 mb-3">
+          <div className="flex items-center gap-2 text-brand-dark font-black uppercase tracking-wider text-[9px]">
+            <Terminal className="h-3.5 w-3.5 text-brand-red" />
             <span>AI Orchestration Kernel Stream</span>
           </div>
-          <span className="text-[8px] text-brand-cyan font-bold font-mono">NODE ACTIVE: {stages[currentStage]?.label}</span>
+          <span className="text-[8px] bg-brand-blue text-white px-2 py-0.5 border border-brand-dark font-black font-mono">NODE ACTIVE: {stages[currentStage]?.label}</span>
         </div>
-        <div className="space-y-1 max-h-40 overflow-y-auto font-mono text-slate-400">
+        <div className="space-y-1.5 max-h-40 overflow-y-auto font-mono text-brand-dark/80">
           {logs.map((log, idx) => (
-            <div key={idx} className={`${idx === logs.length - 1 ? 'text-slate-100 font-bold' : ''}`}>
-              <span className="text-brand-crimson/80 mr-2">&gt;&gt;</span>
+            <div key={idx} className={`${idx === logs.length - 1 ? 'text-brand-dark font-black' : ''}`}>
+              <span className="text-brand-red mr-2 font-black">&gt;&gt;</span>
               {log}
             </div>
           ))}
           {status === 'running' && (
-            <div className="text-brand-crimson animate-pulse flex items-center gap-1.5 mt-1 font-bold">
+            <div className="text-brand-red animate-pulse flex items-center gap-1.5 mt-2 font-black">
               <span>●</span>
               <span className="text-[9px] uppercase tracking-wider">Deploying semantic alignment nodes...</span>
             </div>

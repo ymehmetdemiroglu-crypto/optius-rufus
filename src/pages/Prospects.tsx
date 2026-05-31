@@ -61,11 +61,11 @@ export default function Prospects() {
 
   if (isLoading) {
     return (
-      <div className="bg-white text-black min-h-full space-y-6 p-6">
-        <div className="h-10 w-64 bg-brutal-concrete border-[3px] border-black animate-pulse" />
-        <div className="space-y-2">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-12 bg-brutal-concrete border-[3px] border-black animate-pulse" />
+      <div className="bg-brand-bg text-brand-dark min-h-full space-y-6 p-6 select-none font-sans">
+        <div className="h-12 w-64 bg-white border-[3px] border-brand-dark shadow-brutal-sm animate-pulse" />
+        <div className="space-y-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-16 bg-white border-[3px] border-brand-dark shadow-brutal-sm animate-pulse" />
           ))}
         </div>
       </div>
@@ -73,22 +73,22 @@ export default function Prospects() {
   }
 
   return (
-    <div className="bg-white text-black min-h-full space-y-6">
+    <div className="bg-brand-bg text-brand-dark min-h-full space-y-8 select-none font-sans py-2">
       {/* Header */}
-      <div className="space-y-1">
-        <h1 className="font-sans font-black text-3xl md:text-4xl uppercase tracking-tight">
+      <div className="space-y-2">
+        <h1 className="display-heading text-3xl md:text-4xl text-brand-dark">
           PROSPECT OPS
         </h1>
-        <p className="font-mono text-xs uppercase tracking-widest text-black/60">
+        <p className="font-mono text-[10px] uppercase tracking-widest text-brand-dark/60 font-black">
           Manage outreach pipeline: scrape, analyze, and sequence prospects
         </p>
       </div>
 
       {/* Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <button className="bg-brutal-blue text-white border-[3px] border-black px-4 py-2 font-bold text-sm uppercase hover:bg-black transition-colors inline-flex items-center gap-2 w-fit">
-          <Plus className="h-4 w-4" />
-          + NEW PROSPECT
+        <button className="brutalist-btn flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-black uppercase shadow-brutal hover:-translate-x-[2px] hover:-translate-y-[2px]">
+          <Plus className="h-4 w-4 stroke-[3]" />
+          <span>+ NEW PROSPECT</span>
         </button>
       </div>
 

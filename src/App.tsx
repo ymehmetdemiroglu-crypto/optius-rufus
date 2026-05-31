@@ -24,7 +24,7 @@ function AppContent() {
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-brand-bg text-slate-200">
+    <div className="flex h-screen w-screen overflow-hidden bg-brand-bg text-brand-dark">
       <Sidebar />
       <main className="flex-1 h-full overflow-y-auto px-6 py-8 md:px-10">
         <Routes>

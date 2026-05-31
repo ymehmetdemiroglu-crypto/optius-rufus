@@ -13,15 +13,15 @@ import type { ProspectData } from '../types/prospect';
 
 function SkeletonLoader() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-20 space-y-8 bg-white">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-20 space-y-8 bg-brand-bg select-none font-sans text-brand-dark">
       <div className="animate-pulse space-y-4 text-center w-full max-w-2xl">
-        <div className="h-4 w-32 bg-gray-300 mx-auto" />
-        <div className="h-12 w-full bg-gray-300" />
-        <div className="h-12 w-3/4 bg-gray-300 mx-auto" />
-        <div className="h-6 w-1/2 bg-gray-300 mx-auto" />
+        <div className="h-4 w-32 bg-white border-2 border-brand-dark mx-auto shadow-brutal-sm" />
+        <div className="h-12 w-full bg-white border-[3px] border-brand-dark shadow-brutal" />
+        <div className="h-12 w-3/4 bg-white border-[3px] border-brand-dark mx-auto shadow-brutal" />
+        <div className="h-6 w-1/2 bg-white border-2 border-brand-dark mx-auto shadow-brutal-sm" />
       </div>
-      <div className="border-[3px] border-black w-full max-w-md h-32 bg-gray-200" />
-      <div className="h-10 w-48 bg-gray-300" />
+      <div className="brutalist-card w-full max-w-md h-32 bg-white" />
+      <div className="h-12 w-48 bg-brand-gold border-[3px] border-brand-dark shadow-brutal-sm" />
     </div>
   );
 }
@@ -47,7 +47,7 @@ export default function ProspectLanding() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white text-black">
+      <div className="min-h-screen bg-brand-bg text-brand-dark">
         <SkeletonLoader />
       </div>
     );
@@ -55,12 +55,12 @@ export default function ProspectLanding() {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white text-black px-6">
-        <div className="border-[3px] border-black p-10 text-center max-w-md bg-white">
-          <h2 className="font-sans text-xl font-black text-black mb-2">
+      <div className="min-h-screen flex items-center justify-center bg-brand-bg text-brand-dark px-6 select-none font-sans">
+        <div className="brutalist-card p-10 text-center max-w-md bg-white">
+          <h2 className="display-heading text-xl text-brand-dark mb-3">
             Dossier Unavailable
           </h2>
-          <p className="text-sm text-black">
+          <p className="text-sm font-bold text-brand-dark/70">
             This dossier has expired or does not exist.
           </p>
         </div>
@@ -71,7 +71,7 @@ export default function ProspectLanding() {
   const prospect: ProspectData = mapBackendToProspectData(data);
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="min-h-screen bg-brand-bg text-brand-dark selection:bg-brand-gold selection:text-brand-dark">
       <StageHook
         listing={prospect.listing}
         prospectName={prospect.name}

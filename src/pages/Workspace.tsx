@@ -124,29 +124,29 @@ export default function Workspace() {
   };
 
   return (
-    <div className="space-y-8 select-none py-2 font-sans text-slate-350">
+    <div className="space-y-8 select-none py-2 font-sans text-brand-dark">
       
       {/* Header Panel */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-brand-bg-border pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b-[3px] border-brand-dark pb-6">
         <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate('/dashboard')}
-            className="p-2 border border-brand-bg-border bg-brand-bg-card/60 rounded-xl text-slate-400 hover:text-slate-200 transition-all hover:bg-brand-bg-card"
+            className="p-2.5 border-[3px] border-brand-dark bg-white text-brand-dark hover:bg-brand-gold transition-all shadow-brutal-sm hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px]"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
           
           <div>
-            <div className="flex items-center gap-3">
-              <span className="font-mono text-[10px] font-bold px-2 py-0.5 bg-slate-900 border border-white/5 rounded text-brand-crimson tracking-widest uppercase">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="font-mono text-[10px] font-black px-2 py-0.5 bg-brand-dark text-white border-2 border-brand-dark uppercase tracking-widest">
                 {asin}
               </span>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-brand-cyan/10 border border-brand-cyan/20 rounded text-[9px] font-bold text-brand-cyan uppercase tracking-wider font-mono">
-                <ShieldCheck className="h-3 w-3" />
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-brand-blue text-white border-2 border-brand-dark text-[9px] font-black uppercase tracking-wider font-mono shadow-brutal-sm">
+                <ShieldCheck className="h-3.5 w-3.5" />
                 SP-API PROTOCOL ACTIVE
               </span>
             </div>
-            <h2 className="font-display font-extrabold text-lg md:text-xl text-white tracking-[0.05em] mt-2 uppercase">
+            <h2 className="display-heading text-xl md:text-2xl text-brand-dark mt-2 tracking-wide">
               Liposomal Magnesium L-Threonate Complex Optimization Hub
             </h2>
           </div>
@@ -156,7 +156,7 @@ export default function Workspace() {
           <button 
             onClick={handleSave}
             disabled={isSaving}
-            className="btn-premium flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[10px] uppercase tracking-wider font-bold text-white shadow-glow-crimson disabled:opacity-50"
+            className="brutalist-btn flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-black uppercase shadow-brutal hover:-translate-x-[1px] hover:-translate-y-[1px] disabled:opacity-50"
           >
             <Save className="h-4 w-4" />
             <span>{isSaving ? 'Syncing core...' : 'Publish to SP-API'}</span>
@@ -165,47 +165,47 @@ export default function Workspace() {
       </div>
 
       {/* Main Score Overview & Visual Radar Chart Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* THE BUYER ALIGNMENT SCORE */}
-        <div className="glass-card p-6 border-brand-bg-border flex flex-col justify-between relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-brand-crimson/5 rounded-full blur-2xl" />
+        <div className="brutalist-card p-6 bg-white flex flex-col justify-between relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-[6px] bg-brand-red" />
           
-          <h3 className="font-display font-bold text-[10px] text-brand-crimson uppercase tracking-[0.15em] mb-4 flex items-center gap-1.5 font-mono">
-            <Sparkles className="h-3.5 w-3.5 text-brand-crimson" />
+          <h3 className="font-display font-black text-[10px] text-brand-red uppercase tracking-wider mb-4 flex items-center gap-1.5 font-mono mt-2">
+            <Sparkles className="h-3.5 w-3.5" />
             <span>THE RUFUS BUY INTENT SCORE</span>
           </h3>
           
           <div className="flex items-center justify-around gap-4 py-4">
-            <ScoreGauge score={58} label="Invisible to AI" size={110} />
-            <div className="flex flex-col items-center justify-center font-bold font-mono">
-              <span className="text-brand-crimson text-lg">+34</span>
-              <span className="text-[9px] text-slate-500 uppercase tracking-widest">Score Boom</span>
-              <div className="h-[1px] w-6 bg-slate-800 my-2" />
-              <Zap className="h-3.5 w-3.5 text-brand-crimson animate-pulse" />
+            <ScoreGauge score={58} label="Invisible to AI" size={105} />
+            <div className="flex flex-col items-center justify-center font-black font-mono text-brand-dark">
+              <span className="text-brand-red text-xl font-display font-black">+34</span>
+              <span className="text-[8px] text-brand-dark/50 uppercase tracking-widest">Score Boom</span>
+              <div className="h-[2px] w-6 bg-brand-dark my-2" />
+              <Zap className="h-4 w-4 text-brand-gold animate-bounce" />
             </div>
-            <ScoreGauge score={sandboxScore} label="COSMO ALIGNED" size={110} />
+            <ScoreGauge score={sandboxScore} label="COSMO ALIGNED" size={105} />
           </div>
 
-          <div className="text-center text-xs text-slate-400 border-t border-brand-bg-border pt-4 font-medium leading-relaxed font-sans">
-            The Offer Stack: We <strong className="text-brand-cyan">obliterated 92% of your profit leaks</strong>. Rufus can now rank you as the #1 gentle-on-the-stomach solution.
+          <div className="text-center text-xs text-brand-dark border-t-[2px] border-brand-dark/10 pt-4 font-bold leading-relaxed font-sans mt-2">
+            The Offer Stack: We <strong className="text-brand-blue font-black uppercase">obliterated 92% of your profit leaks</strong>. Rufus can now rank you as the #1 gentle-on-the-stomach solution.
           </div>
         </div>
 
         {/* Custom SVG Radar Chart */}
-        <div className="md:col-span-2">
+        <div className="lg:col-span-2">
           <RadarChart size={300} />
         </div>
       </div>
 
       {/* Mode navigation tabs */}
-      <div className="flex bg-[#05070A]/80 p-1 border border-brand-bg-border rounded-xl w-fit overflow-x-auto max-w-full scrollbar-none select-none">
+      <div className="flex bg-brand-bg p-1 border-[3px] border-brand-dark rounded-none w-fit overflow-x-auto max-w-full scrollbar-none select-none">
         <button
           onClick={() => setActiveTab('editor')}
-          className={`flex items-center gap-2 text-[10px] uppercase font-bold tracking-wider px-5 py-2.5 rounded-lg shrink-0 transition-all font-display ${
+          className={`flex items-center gap-2 text-[9px] uppercase font-black tracking-wider px-5 py-2.5 transition-all border-[2px] font-display ${
             activeTab === 'editor'
-              ? 'bg-brand-crimson/15 text-brand-crimson border border-brand-crimson/20 shadow-glow-crimson'
-              : 'text-slate-450 hover:text-slate-200'
+              ? 'bg-white border-brand-dark text-brand-dark shadow-brutal-sm'
+              : 'border-transparent text-brand-dark/50 hover:text-brand-dark'
           }`}
         >
           <Cpu className="h-4 w-4" />
@@ -213,10 +213,10 @@ export default function Workspace() {
         </button>
         <button
           onClick={() => setActiveTab('radar')}
-          className={`flex items-center gap-2 text-[10px] uppercase font-bold tracking-wider px-5 py-2.5 rounded-lg shrink-0 transition-all font-display ${
+          className={`flex items-center gap-2 text-[9px] uppercase font-black tracking-wider px-5 py-2.5 transition-all border-[2px] font-display ${
             activeTab === 'radar'
-              ? 'bg-brand-crimson/15 text-brand-crimson border border-brand-crimson/20 shadow-glow-crimson'
-              : 'text-slate-455 hover:text-slate-200'
+              ? 'bg-white border-brand-dark text-brand-dark shadow-brutal-sm'
+              : 'border-transparent text-brand-dark/50 hover:text-brand-dark'
           }`}
         >
           <BookOpen className="h-4 w-4" />
@@ -224,10 +224,10 @@ export default function Workspace() {
         </button>
         <button
           onClick={() => setActiveTab('simulator')}
-          className={`flex items-center gap-2 text-[10px] uppercase font-bold tracking-wider px-5 py-2.5 rounded-lg shrink-0 transition-all font-display ${
+          className={`flex items-center gap-2 text-[9px] uppercase font-black tracking-wider px-5 py-2.5 transition-all border-[2px] font-display ${
             activeTab === 'simulator'
-              ? 'bg-brand-crimson/15 text-brand-crimson border border-brand-crimson/20 shadow-glow-crimson'
-              : 'text-slate-455 hover:text-slate-200'
+              ? 'bg-white border-brand-dark text-brand-dark shadow-brutal-sm'
+              : 'border-transparent text-brand-dark/50 hover:text-brand-dark'
           }`}
         >
           <MessageSquare className="h-4 w-4" />
@@ -240,34 +240,34 @@ export default function Workspace() {
         
         {/* TAB 1: SPLIT EDITOR */}
         {activeTab === 'editor' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             
             {/* Left Original Frame */}
-            <div className="glass-card p-6 border-brand-bg-border flex flex-col justify-between">
+            <div className="brutalist-card p-6 bg-white flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between border-b border-brand-bg-border pb-3 mb-4">
-                  <span className="text-[10px] font-bold text-red-500 uppercase tracking-widest flex items-center gap-1.5 font-mono">
+                <div className="flex items-center justify-between border-b-[2px] border-brand-dark pb-3 mb-4">
+                  <span className="text-[10px] font-black text-brand-red uppercase tracking-widest flex items-center gap-1.5 font-mono">
                     <AlertTriangle className="h-4 w-4" />
                     Original Listing Copy
                   </span>
-                  <span className="text-[8px] text-slate-500 font-bold uppercase tracking-wider font-mono">ASIN Source Data</span>
+                  <span className="text-[8px] text-brand-dark/50 font-black uppercase tracking-wider font-mono">ASIN Source Data</span>
                 </div>
                 <div className="space-y-4 font-sans text-xs">
                   <div>
-                    <h5 className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1.5 font-mono">Product Title</h5>
-                    <p className="text-xs text-slate-400 bg-slate-950/40 p-3.5 rounded-lg border border-red-500/10 leading-relaxed">
+                    <h5 className="text-[9px] text-brand-dark/55 font-black uppercase tracking-wider mb-1.5 font-mono">Product Title</h5>
+                    <p className="text-xs text-brand-dark/80 bg-brand-bg/40 p-3.5 border-2 border-brand-dark/20 leading-relaxed">
                       Magnesium L-Threonate capsules, 2000mg complex pill supplement for relaxation, sleep support. High strength magnesium threonate for adults.
                     </p>
                   </div>
                   <div>
-                    <h5 className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1.5 font-mono">Bullet Point 1 (Absorption)</h5>
-                    <p className="text-xs text-slate-400 bg-slate-950/40 p-3.5 rounded-lg border border-red-500/10 leading-relaxed">
+                    <h5 className="text-[9px] text-brand-dark/55 font-black uppercase tracking-wider mb-1.5 font-mono">Bullet Point 1 (Absorption)</h5>
+                    <p className="text-xs text-brand-dark/80 bg-brand-bg/40 p-3.5 border-2 border-brand-dark/20 leading-relaxed">
                       Our magnesium threonate complex pills are high quality supplements. Standard tablets are easy to take and provide daily support for health.
                     </p>
                   </div>
                   <div>
-                    <h5 className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1.5 font-mono">Product Description (Semantic)</h5>
-                    <p className="text-xs text-slate-400 bg-slate-950/40 p-3.5 rounded-lg border border-red-500/10 leading-relaxed">
+                    <h5 className="text-[9px] text-brand-dark/55 font-black uppercase tracking-wider mb-1.5 font-mono">Product Description (Semantic)</h5>
+                    <p className="text-xs text-brand-dark/80 bg-brand-bg/40 p-3.5 border-2 border-brand-dark/20 leading-relaxed">
                       Standard magnesium complex tablets. Formulated for adults seeking magnesium threonate health assistance. Please consult a doctor before using standard pills daily.
                     </p>
                   </div>
@@ -276,55 +276,55 @@ export default function Workspace() {
             </div>
 
             {/* Right Re-Engineered Frame */}
-            <div className="glass-card p-6 border-brand-bg-border flex flex-col justify-between relative">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-brand-cyan/5 rounded-full blur-2xl" />
+            <div className="brutalist-card p-6 bg-white flex flex-col justify-between relative">
+              <div className="absolute top-0 right-0 w-full h-[6px] bg-brand-blue" />
               <div>
-                <div className="flex items-center justify-between border-b border-brand-bg-border pb-3 mb-4">
-                  <span className="text-[10px] font-bold text-brand-cyan uppercase tracking-widest flex items-center gap-1.5 font-mono">
-                    <Sparkles className="h-4 w-4 text-brand-cyan" />
+                <div className="flex items-center justify-between border-b-[2px] border-brand-dark pb-3 mb-4 mt-2">
+                  <span className="text-[10px] font-black text-brand-blue uppercase tracking-widest flex items-center gap-1.5 font-mono">
+                    <Sparkles className="h-4 w-4 text-brand-blue" />
                     AI-Optimized & Re-Engineered Copy
                   </span>
-                  <span className="text-[9px] text-brand-cyan font-bold uppercase tracking-wider font-mono">Predictive Score: {sandboxScore}</span>
+                  <span className="text-[9px] text-brand-blue font-black uppercase tracking-wider font-mono">Predictive Score: {sandboxScore}</span>
                 </div>
                 <div className="space-y-4 font-sans text-xs">
                   <div>
                     <div className="flex justify-between items-center mb-1.5">
-                      <h5 className="text-[9px] text-slate-500 font-bold uppercase tracking-wider font-mono">Optimized Title</h5>
+                      <h5 className="text-[9px] text-brand-dark/60 font-black uppercase tracking-wider font-mono">Optimized Title</h5>
                       <button 
                         onClick={() => handleCopy('Liposomal Magnesium L-Threonate Complex - 2000mg Maximum Cellular Absorption', 'title')}
-                        className="text-slate-500 hover:text-slate-350 p-1 rounded"
+                        className="text-brand-dark/40 hover:text-brand-dark p-1 rounded"
                       >
-                        {copied === 'title' ? <Check className="h-3 w-3 text-brand-cyan" /> : <Copy className="h-3 w-3" />}
+                        {copied === 'title' ? <Check className="h-3.5 w-3.5 text-brand-blue stroke-[3]" /> : <Copy className="h-3.5 w-3.5" />}
                       </button>
                     </div>
-                    <p className="text-xs text-slate-200 bg-slate-950/40 p-3.5 rounded-lg border border-brand-cyan/20 leading-relaxed">
-                      <span className="bg-brand-cyan/15 text-brand-cyan px-1 rounded font-semibold">Liposomal Magnesium L-Threonate Complex</span> - 2000mg <span className="bg-brand-cyan/15 text-brand-cyan px-1 rounded font-semibold">Maximum Cellular Absorption</span> & Cognitive Focus
+                    <p className="text-xs text-brand-dark bg-brand-bg/20 p-3.5 border-[3px] border-brand-dark shadow-brutal-sm leading-relaxed font-bold">
+                      <span className="bg-brand-blue/15 text-brand-blue px-1 border border-brand-blue/20 font-black">Liposomal Magnesium L-Threonate Complex</span> - 2000mg <span className="bg-brand-blue/15 text-brand-blue px-1 border border-brand-blue/20 font-black">Maximum Cellular Absorption</span> & Cognitive Focus
                     </p>
                   </div>
                   <div>
                     <div className="flex justify-between items-center mb-1.5">
-                      <h5 className="text-[9px] text-slate-500 font-bold uppercase tracking-wider font-mono">Optimized Bullet 1 (Encapsulated Bio-availability)</h5>
+                      <h5 className="text-[9px] text-brand-dark/60 font-black uppercase tracking-wider font-mono">Optimized Bullet 1 (Encapsulated Bio-availability)</h5>
                       <button 
                         onClick={() => handleCopy('Premium Liposomal encapsulation delivers up to 5x higher cellular absorption speed directly crossing the blood-brain barrier.', 'bullet')}
-                        className="text-slate-500 hover:text-slate-350 p-1 rounded"
+                        className="text-brand-dark/40 hover:text-brand-dark p-1 rounded"
                       >
-                        {copied === 'bullet' ? <Check className="h-3 w-3 text-brand-cyan" /> : <Copy className="h-3 w-3" />}
+                        {copied === 'bullet' ? <Check className="h-3.5 w-3.5 text-brand-blue stroke-[3]" /> : <Copy className="h-3.5 w-3.5" />}
                       </button>
                     </div>
-                    <p className="text-xs text-slate-200 bg-slate-950/40 p-3.5 rounded-lg border border-brand-cyan/20 leading-relaxed">
-                      <span className="bg-brand-cyan/15 text-brand-cyan px-1 rounded font-semibold">Premium Liposomal encapsulation</span> protects magnesium molecules, delivering up to <span className="bg-brand-cyan/15 text-brand-cyan px-1 rounded font-semibold">5x higher cellular absorption speed</span> directly crossing the blood-brain barrier to satisfy advanced Rufus Q&A bio-availability indexes.
+                    <p className="text-xs text-brand-dark bg-brand-bg/20 p-3.5 border-[3px] border-brand-dark shadow-brutal-sm leading-relaxed font-bold">
+                      <span className="bg-brand-blue/15 text-brand-blue px-1 border border-brand-blue/20 font-black">Premium Liposomal encapsulation</span> protects magnesium molecules, delivering up to <span className="bg-brand-blue/15 text-brand-blue px-1 border border-brand-blue/20 font-black">5x higher cellular absorption speed</span> directly crossing the blood-brain barrier to satisfy advanced Rufus Q&A bio-availability indexes.
                     </p>
                   </div>
                   <div>
                     <div className="flex justify-between items-center mb-1.5">
-                      <h5 className="text-[9px] text-slate-500 font-bold uppercase tracking-wider font-mono">Interactive Sandbox Console</h5>
-                      <span className="text-[8px] text-slate-550 uppercase font-bold tracking-wider italic font-mono">Type below to trigger real-time neural mapping</span>
+                      <h5 className="text-[9px] text-brand-dark/60 font-black uppercase tracking-wider font-mono">Interactive Sandbox Console</h5>
+                      <span className="text-[8px] text-brand-dark/50 uppercase font-black tracking-wider italic font-mono">Type below to trigger real-time neural mapping</span>
                     </div>
                     <textarea
                       rows={4}
                       value={sandboxText}
                       onChange={(e) => handleSandboxChange(e.target.value)}
-                      className="text-xs text-slate-300 bg-slate-950/60 p-3.5 rounded-lg border border-brand-cyan/25 focus:border-brand-crimson/40 leading-relaxed w-full outline-none resize-none font-mono"
+                      className="text-xs text-brand-dark bg-white p-3.5 border-[3px] border-brand-dark focus:border-brand-blue outline-none resize-none font-mono shadow-brutal-sm rounded-none"
                     />
                   </div>
                 </div>
@@ -335,53 +335,53 @@ export default function Workspace() {
 
         {/* TAB 2: SEMANTIC GAPS */}
         {activeTab === 'radar' && (
-          <div className="glass-card border-brand-bg-border overflow-hidden">
-            <div className="border-b border-brand-bg-border p-4 bg-slate-950/40 flex justify-between items-center">
-              <span className="text-[10px] font-bold text-white uppercase tracking-widest font-display">Calculated Semantic Intent Gaps (COSMO Engine)</span>
-              <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider font-mono">Sorted by gap severity</span>
+          <div className="brutalist-card p-0 bg-white overflow-hidden">
+            <div className="border-b-[3px] border-brand-dark p-4 bg-brand-bg flex justify-between items-center">
+              <span className="text-[10px] font-black text-brand-dark uppercase tracking-widest font-display">Calculated Semantic Intent Gaps (COSMO Engine)</span>
+              <span className="text-[9px] text-brand-dark/50 font-black uppercase tracking-wider font-mono">Sorted by gap severity</span>
             </div>
             
-            <div className="divide-y divide-brand-bg-border font-sans text-xs">
+            <div className="divide-y-[3px] divide-brand-dark font-sans text-xs bg-white">
               {semanticGaps.map((gap, idx) => (
-                <div key={idx} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/2 transition-colors">
-                  <div className="space-y-1.5">
+                <div key={idx} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-brand-bg/20 transition-colors">
+                  <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <h4 className="font-display font-bold text-xs tracking-wider text-slate-200 uppercase">{gap.dimension}</h4>
+                      <h4 className="font-display font-black text-sm tracking-wider text-brand-dark uppercase">{gap.dimension}</h4>
                       
                       {gap.priority === 'critical' && (
-                        <span className="px-2 py-0.5 bg-brand-crimson/10 border border-brand-crimson/20 text-[8px] font-bold uppercase tracking-wider text-brand-crimson rounded font-mono">
+                        <span className="px-2 py-0.5 bg-brand-red text-white border-2 border-brand-dark text-[8px] font-black uppercase tracking-wider rounded-none font-mono shadow-brutal-sm">
                           Critical Gap
                         </span>
                       )}
                       {gap.priority === 'high' && (
-                        <span className="px-2 py-0.5 bg-brand-orange/10 border border-brand-orange/20 text-[8px] font-bold uppercase tracking-wider text-brand-orange rounded font-mono">
+                        <span className="px-2 py-0.5 bg-brand-gold text-brand-dark border-2 border-brand-dark text-[8px] font-black uppercase tracking-wider rounded-none font-mono shadow-brutal-sm">
                           High
                         </span>
                       )}
                       {gap.priority === 'medium' && (
-                        <span className="px-2 py-0.5 bg-brand-cyan/10 border border-brand-cyan/20 text-[8px] font-bold uppercase tracking-wider text-brand-cyan rounded font-mono">
+                        <span className="px-2 py-0.5 bg-brand-blue text-white border-2 border-brand-dark text-[8px] font-black uppercase tracking-wider rounded-none font-mono shadow-brutal-sm">
                           Medium
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-450 leading-relaxed max-w-2xl font-medium">
+                    <p className="text-xs text-brand-dark/80 leading-relaxed max-w-2xl font-bold">
                       {gap.recommendation}
                     </p>
                   </div>
                   
                   {/* Stats comparison */}
-                  <div className="flex items-center gap-6 shrink-0 font-mono text-xs">
+                  <div className="flex items-center gap-6 shrink-0 font-mono text-xs border-l-0 sm:border-l-[2px] sm:border-brand-dark/10 sm:pl-6">
                     <div className="text-center w-16">
-                      <div className="text-[8px] text-slate-550 uppercase font-bold tracking-wider">ORIGINAL</div>
-                      <div className="text-xs font-bold text-red-500">{gap.original}%</div>
+                      <div className="text-[8px] text-brand-dark/50 uppercase font-black tracking-wider">ORIGINAL</div>
+                      <div className="text-xs font-black text-brand-red">{gap.original}%</div>
                     </div>
                     <div className="text-center w-16">
-                      <div className="text-[8px] text-slate-550 uppercase font-bold tracking-wider">OPTIMIZED</div>
-                      <div className="text-xs font-bold text-brand-cyan">{gap.optimized}%</div>
+                      <div className="text-[8px] text-brand-dark/50 uppercase font-black tracking-wider">OPTIMIZED</div>
+                      <div className="text-xs font-black text-brand-blue">{gap.optimized}%</div>
                     </div>
                     <div className="text-center w-16">
-                      <div className="text-[8px] text-slate-550 uppercase font-bold tracking-wider">BOOM</div>
-                      <div className="text-xs font-black text-brand-crimson">+{gap.gap}%</div>
+                      <div className="text-[8px] text-brand-dark/50 uppercase font-black tracking-wider">BOOM</div>
+                      <div className="text-xs font-black text-brand-red">+{gap.gap}%</div>
                     </div>
                   </div>
                 </div>
@@ -392,22 +392,22 @@ export default function Workspace() {
 
         {/* TAB 3: SIMULATOR */}
         {activeTab === 'simulator' && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             {/* QA Selector */}
-            <div className="glass-card p-4 border-brand-bg-border h-fit space-y-3">
-              <h4 className="text-[9px] text-slate-500 font-bold uppercase tracking-wider pb-2 border-b border-brand-bg-border font-mono">
+            <div className="brutalist-card p-4 bg-white h-fit space-y-4">
+              <h4 className="text-[9px] text-brand-dark/50 font-black uppercase tracking-wider pb-2 border-b-[2px] border-brand-dark font-mono">
                 RUFUS CONVERSATIONAL TOPICS
               </h4>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {simulatorQAs.map((item, idx) => (
                   <button
                     key={idx}
                     onClick={() => setActiveQA(idx)}
-                    className={`w-full text-left p-3.5 rounded-xl text-xs leading-relaxed transition-all border font-sans ${
+                    className={`w-full text-left p-3.5 border-[3px] transition-all font-sans font-bold text-xs leading-relaxed ${
                       activeQA === idx
-                        ? 'bg-brand-crimson/10 border-brand-crimson/30 text-white font-semibold'
-                        : 'bg-slate-950/20 border-white/5 text-slate-400 hover:text-slate-350 hover:bg-slate-950/40'
+                        ? 'bg-brand-gold border-brand-dark text-brand-dark shadow-brutal-sm'
+                        : 'bg-white border-brand-dark/20 text-brand-dark/65 hover:text-brand-dark hover:border-brand-dark/50'
                     }`}
                   >
                     {item.q}
@@ -417,38 +417,32 @@ export default function Workspace() {
             </div>
 
             {/* Chat Device Simulator */}
-            <div className="md:col-span-2 glass-card border-brand-bg-border rounded-2xl overflow-hidden shadow-2xl relative bg-[#05070A]">
-              <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-brand-crimson to-brand-cyan" />
+            <div className="lg:col-span-2 brutalist-card bg-white p-0 overflow-hidden relative">
+              <div className="absolute top-0 left-0 w-full h-[6px] bg-brand-gold" />
               
               {/* Device Header */}
-              <div className="bg-[#0D111A]/90 p-4 border-b border-brand-bg-border flex items-center justify-between">
+              <div className="bg-brand-bg p-4 border-b-[3px] border-brand-dark flex items-center justify-between mt-[6px]">
                 <div className="flex items-center gap-3">
-                  {/* Hexagonal Reactor Frame */}
-                  <div className="relative flex h-8 w-8 items-center justify-center">
-                    <svg 
-                      viewBox="0 0 100 100" 
-                      className="absolute inset-0 h-full w-full stroke-[#E0E1DD] fill-none stroke-[8]"
-                    >
-                      <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" />
-                    </svg>
-                    <div className="h-2 w-2 rounded-full bg-[#E63946] shadow-[0_0_12px_#E63946] animate-pulse" />
+                  {/* Stark Bauhaus Logo */}
+                  <div className="h-8 w-8 bg-brand-dark flex items-center justify-center border-2 border-brand-dark">
+                    <div className="h-3 w-3 bg-brand-blue rotate-45" />
                   </div>
                   <div>
-                    <h4 className="font-display font-bold text-[10px] text-white tracking-[0.1em] uppercase">OPTIMUS AI CORE</h4>
-                    <p className="text-[8px] text-[#00F5FF] font-bold uppercase tracking-widest font-mono">Conversational Simulator</p>
+                    <h4 className="font-display font-black text-[11px] text-brand-dark tracking-wide uppercase">OPTIMUS AI CORE</h4>
+                    <p className="text-[8px] text-brand-blue font-black uppercase tracking-wider font-mono">Conversational Simulator</p>
                   </div>
                 </div>
                 
-                <span className="text-[8px] text-slate-500 font-bold uppercase font-mono bg-slate-950 px-2 py-0.5 rounded border border-white/5">
+                <span className="text-[8px] text-brand-dark/60 font-black uppercase font-mono bg-white px-2 py-0.5 border-2 border-brand-dark shadow-brutal-sm">
                   SPY TOOL SIMULATION
                 </span>
               </div>
 
               {/* Chat messages pane */}
-              <div className="p-6 space-y-6 min-h-[300px] font-sans text-xs">
+              <div className="p-6 space-y-6 min-h-[300px] font-sans text-xs bg-white">
                 {/* User Bubble */}
                 <div className="flex justify-end">
-                  <div className="bg-brand-crimson/15 border border-brand-crimson/30 rounded-2xl rounded-tr-none px-4 py-3 text-xs text-slate-200 max-w-sm">
+                  <div className="bg-brand-blue text-white border-[3px] border-brand-dark shadow-brutal-sm rounded-none px-4 py-3 text-xs max-w-sm font-bold uppercase tracking-wide">
                     {simulatorQAs[activeQA].q}
                   </div>
                 </div>
@@ -456,25 +450,24 @@ export default function Workspace() {
                 {/* Compare response splits */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Old Response Box */}
-                  <div className="bg-red-500/5 border border-red-500/10 rounded-2xl p-4 space-y-2">
-                    <div className="text-[9px] font-bold text-red-400 uppercase tracking-widest font-mono">Rufus Response (Old Listing)</div>
-                    <p className="text-xs text-slate-400 leading-relaxed italic">
-                      "{simulatorQAs[activeQA].original}"
+                  <div className="bg-brand-red/5 border-[3px] border-brand-dark p-4 space-y-2 relative">
+                    <div className="text-[9px] font-black text-brand-red uppercase tracking-wider font-mono">Rufus Response (Old Listing)</div>
+                    <p className="text-xs text-brand-dark/80 leading-relaxed italic font-bold">
+                      &quot;{simulatorQAs[activeQA].original}&quot;
                     </p>
-                    <div className="text-[9px] text-red-550 font-bold font-mono">Verdict: Suggests competitors instead.</div>
+                    <div className="text-[9px] text-brand-red font-black font-mono uppercase">Verdict: Suggests competitors instead.</div>
                   </div>
 
                   {/* Optimized Response Box */}
-                  <div className="bg-brand-cyan/5 border border-brand-cyan/10 rounded-2xl p-4 space-y-2 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-16 h-16 bg-brand-cyan/5 rounded-full blur-xl" />
-                    <div className="text-[9px] font-bold text-brand-cyan uppercase tracking-widest flex items-center gap-1 font-mono">
-                      <Sparkles className="h-3 w-3 text-brand-cyan" />
+                  <div className="bg-brand-blue/5 border-[3px] border-brand-dark p-4 space-y-2 relative shadow-brutal-sm">
+                    <div className="text-[9px] font-black text-brand-blue uppercase tracking-wider flex items-center gap-1 font-mono">
+                      <Sparkles className="h-3.5 w-3.5 text-brand-blue" />
                       Rufus Response (Optimized Listing)
                     </div>
-                    <p className="text-xs text-slate-200 leading-relaxed">
-                      "{simulatorQAs[activeQA].optimized}"
+                    <p className="text-xs text-brand-dark leading-relaxed font-bold">
+                      &quot;{simulatorQAs[activeQA].optimized}&quot;
                     </p>
-                    <div className="text-[9px] text-brand-cyan font-bold font-mono">Verdict: Direct Product Recommendation & Citation lock.</div>
+                    <div className="text-[9px] text-brand-blue font-black font-mono uppercase">Verdict: Direct Product Recommendation &amp; Citation lock.</div>
                   </div>
                 </div>
               </div>

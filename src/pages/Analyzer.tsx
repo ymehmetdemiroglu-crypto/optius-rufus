@@ -97,29 +97,22 @@ export default function Analyzer() {
   }, [asin, navigate]);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 select-none py-8 font-sans text-slate-350">
+    <div className="max-w-4xl mx-auto space-y-8 select-none py-8 font-sans text-brand-dark">
       
       {/* Header HUD */}
-      <div className="text-center space-y-3">
-        <div className="relative inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-bg-card border border-brand-bg-border shadow-glow-crimson animate-pulse">
-          {/* Hexagonal Reactor Icon */}
-          <svg 
-            viewBox="0 0 100 100" 
-            className="absolute inset-0 h-full w-full stroke-brand-crimson fill-none stroke-[8]"
-          >
-            <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" />
-          </svg>
-          <Cpu className="h-4.5 w-4.5 text-brand-cyan" />
+      <div className="text-center space-y-4">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center border-[3px] border-brand-dark bg-white shadow-brutal">
+          <Cpu className="h-6 w-6 text-brand-blue" />
         </div>
         
         <div>
-          <h2 className="font-display font-bold text-xs text-white tracking-[0.2em] uppercase">
+          <h2 className="display-heading text-xl md:text-2xl text-brand-dark">
             ORCHESTRATION PIPELINE ENGAGED
           </h2>
-          <p className="text-[9px] text-slate-500 font-mono mt-1 uppercase">
-            Core Target: <span className="font-bold text-brand-crimson font-mono tracking-widest">{asin}</span> 
+          <p className="text-[10px] font-mono mt-2 uppercase text-brand-dark/70 font-black">
+            Core Target: <span className="font-mono bg-brand-dark text-white px-2 py-0.5 border border-brand-dark">{asin}</span> 
             <span className="mx-2">•</span> 
-            Marketplace Domain: <span className="font-bold text-brand-cyan font-mono">{marketplace}</span>
+            Marketplace Domain: <span className="text-brand-blue font-bold font-mono">{marketplace}</span>
           </p>
         </div>
       </div>
@@ -130,9 +123,6 @@ export default function Analyzer() {
         status={status}
         logs={logs}
       />
-
-      {/* Visual background atmospheric effects */}
-      <div className="absolute top-1/4 left-1/2 w-64 h-64 bg-brand-crimson/5 rounded-full blur-3xl -translate-x-1/2 -z-10" />
     </div>
   );
 }
