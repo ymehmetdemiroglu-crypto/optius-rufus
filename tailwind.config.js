@@ -4,14 +4,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        brutal: {
-          black: "#000000",
-          white: "#FFFFFF",
-          concrete: "#F0F0F0",
-          red: "#FF1A1A",
-          blue: "#0055FF",
-          yellow: "#FFCC00",
-        },
+        "brutal-black": "#000000",
+        "brutal-white": "#FFFFFF",
+        "brutal-concrete": "#F0F0F0",
+        "brutal-red": "#FF1A1A",
+        "brutal-blue": "#0055FF",
+        "brutal-yellow": "#FFCC00",
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
