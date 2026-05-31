@@ -10,7 +10,7 @@
     "dev": "vite",
     "build:server": "tsc -p tsconfig.server.json",
     "build:client": "vite build",
-    "build": "tsc -p tsconfig.app.json && vite build",
+    "build": "vite build",
     "check": "tsc --noEmit",
     "lint": "eslint ."
   },
