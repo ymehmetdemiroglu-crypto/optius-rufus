@@ -17,7 +17,6 @@ export default function ScoreGauge({ score, label, size = 160, showGlow = true }
     const animate = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // Ease out cubic
       const easeProgress = 1 - Math.pow(1 - progress, 3);
       setAnimatedScore(Math.round(easeProgress * score));
 
@@ -34,21 +33,21 @@ export default function ScoreGauge({ score, label, size = 160, showGlow = true }
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (animatedScore / 100) * circumference;
 
-  // Determine color theme based on score value
+  // Determine color theme based on score value (Active Cyan vs Matrix Crimson)
   const getColorClass = (val: number) => {
     if (val >= 80) return 'stroke-brand-cyan';
-    if (val >= 50) return 'stroke-brand-orange';
+    if (val >= 50) return 'stroke-brand-crimson';
     return 'stroke-red-500';
   };
 
   const getGlowColorClass = (val: number) => {
-    if (val >= 80) return 'shadow-[0_0_30px_rgba(6,182,212,0.3)] border-brand-cyan/20';
-    if (val >= 50) return 'shadow-[0_0_30px_rgba(255,107,0,0.3)] border-brand-orange/20';
-    return 'shadow-[0_0_30px_rgba(239,68,68,0.3)] border-red-500/20';
+    if (val >= 80) return 'shadow-[0_0_30px_rgba(0,245,255,0.25)] border-brand-cyan/20';
+    if (val >= 50) return 'shadow-[0_0_30px_rgba(230,57,70,0.25)] border-brand-crimson/20';
+    return 'shadow-[0_0_30px_rgba(239,68,68,0.25)] border-red-500/20';
   };
 
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center justify-center select-none">
       <div 
         className={`relative rounded-full border bg-brand-bg-card/40 flex items-center justify-center transition-all duration-700 ${getGlowColorClass(animatedScore)}`}
         style={{ width: size + 20, height: size + 20 }}
@@ -63,7 +62,7 @@ export default function ScoreGauge({ score, label, size = 160, showGlow = true }
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            className="stroke-slate-800"
+            className="stroke-slate-900"
             strokeWidth={strokeWidth}
             fill="transparent"
           />
@@ -81,11 +80,11 @@ export default function ScoreGauge({ score, label, size = 160, showGlow = true }
         </svg>
 
         {/* Central Text HUD overlay */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center select-none">
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className="font-display text-4xl font-extrabold tracking-tight text-white animate-pulse-glow">
             {animatedScore}
           </span>
-          <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mt-0.5">
+          <span className="text-[8px] tracking-[0.15em] uppercase font-bold text-slate-500 mt-1 font-mono">
             {label}
           </span>
         </div>

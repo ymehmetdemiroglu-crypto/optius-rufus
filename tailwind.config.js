@@ -9,36 +9,35 @@ export default {
     extend: {
       colors: {
         brand: {
-          orange: {
-            DEFAULT: '#FF6B00',
-            glow: '#FF8533',
-            muted: '#4A270D',
-          },
-          violet: {
-            DEFAULT: '#8B5CF6',
-            glow: '#A78BFA',
-            muted: '#2E1E5B',
+          crimson: {
+            DEFAULT: '#E63946',
+            glow: '#FF5E6C',
+            muted: '#4A121A',
           },
           cyan: {
-            DEFAULT: '#06B6D4',
-            glow: '#22D3EE',
-            muted: '#0F3C4B',
+            DEFAULT: '#00F5FF',
+            glow: '#5CFAFF',
+            muted: '#003C40',
+          },
+          silver: {
+            DEFAULT: '#E0E1DD',
+            muted: '#8D99AE',
           },
           bg: {
-            DEFAULT: '#0A0D14',
-            card: '#151B26',
-            border: 'rgba(255, 255, 255, 0.08)',
+            DEFAULT: '#05070A',
+            card: '#0D111A',
+            border: 'rgba(224, 225, 221, 0.08)',
           }
         }
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Outfit', 'sans-serif'],
+        display: ['Michroma', 'Space Grotesk', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
       },
       boxShadow: {
-        'glow-orange': '0 0 15px rgba(255, 107, 0, 0.4)',
-        'glow-violet': '0 0 15px rgba(139, 92, 246, 0.4)',
-        'glow-cyan': '0 0 15px rgba(6, 182, 212, 0.4)',
+        'glow-crimson': '0 0 15px rgba(230, 57, 70, 0.4)',
+        'glow-cyan': '0 0 15px rgba(0, 245, 255, 0.4)',
       },
       keyframes: {
         'pulse-glow': {

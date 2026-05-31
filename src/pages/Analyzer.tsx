@@ -1,50 +1,50 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import PipelineTracker from '../components/PipelineTracker';
-import { Cpu, Terminal, RefreshCw, Sparkles } from 'lucide-react';
+import { Cpu } from 'lucide-react';
 
 const mockLogs: Record<number, string[]> = {
   0: [
-    '[Listing Fetcher] Connection initialized to Amazon SP-API OAuth channel...',
-    '[Listing Fetcher] Requesting endpoint GET /catalog/2022-04-01/items/B0C8XYZ123...',
-    '[Listing Fetcher] Successfully retrieved title: "Liposomal Magnesium L-Threonate Complex..."',
-    '[Listing Fetcher] Pulled 5 bullet points, 1 product description, and 3 active images.'
+    '[SP-API Retrieval] Connection initialized to Amazon SP-API OAuth protocols...',
+    '[SP-API Retrieval] Staging GET /catalog/2022-04-01/items/B0C8XYZ123...',
+    '[SP-API Retrieval] Metadata lock: Title "Liposomal Magnesium L-Threonate Complex..." successfully retrieved.',
+    '[SP-API Retrieval] Pulled raw listing attributes, 5 bullet points, and 3 image OCR buffers.'
   ],
   1: [
-    '[Preprocessor] Executing regex tag stripper and character normalizer...',
-    '[Preprocessor] Normalizing category metadata to "Health & Supplements"...',
-    '[Preprocessor] Cleaned raw text content of 1,280 words.',
-    '[Preprocessor] Data formatted and pushed to context stack.'
+    '[Preprocessor] Compressing string patterns and stripping junk character nodes...',
+    '[Preprocessor] Standardizing catalog domain categories to "Health & Supplements"...',
+    '[Preprocessor] Formatted raw text index of 1,280 words.',
+    '[Preprocessor] Staging payload structures to active local context stack.'
   ],
   2: [
-    '[Neural Embedder] Generating text embeddings via OpenAI API text-embedding-3-small...',
-    '[Neural Embedder] Vector output structured to 1536-dimensional float space.',
-    '[Neural Embedder] Successfully populated embedding_generator context.',
-    '[Neural Embedder] Pushed intent embeddings to self-hosted Qdrant Vector database.'
+    '[Neural Embedder] Generating high-dimensional vector representations via OpenAI embedding models...',
+    '[Neural Embedder] Mapping catalog attributes to 1536-dimensional float arrays...',
+    '[Neural Embedder] Connecting semantic embeddings to self-hosted Qdrant Vector base...',
+    '[Neural Embedder] Core representation successfully indexed.'
   ],
   3: [
-    '[Semantic Gap Analyst] Calculating cosine similarity against COSMO knowledge graph spokes...',
-    '[Semantic Gap Analyst] Evaluating 24 dimensions of buyer intents...',
-    '[Semantic Gap Analyst] Critical Gaps found in: [Cellular Absorption Rate], [Clinical Proof], [Routine Integration].',
-    '[Semantic Gap Analyst] Compatibility Score computed: 58/100.'
+    '[Semantic Domain Evaluation] Calculating cosine similarity indices against COSMO knowledge clusters...',
+    '[Semantic Domain Evaluation] Evaluating 24 dimensions of human buyer behaviors...',
+    '[Semantic Domain Evaluation] Profit Gaps identified: [Cellular Absorption Speed], [Clinical Proof], [Routine Context].',
+    '[Semantic Domain Evaluation] Rufus Intent Alignment computed: 58/100.'
   ],
   4: [
-    '[Content Optimizer] Initiating Title Engineering sequence...',
-    '[Content Optimizer] Title re-engineered to capture cellular bio-availability intent.',
-    '[Content Optimizer] Re-structuring 5-Bullet Framework addressing top objections...',
-    '[Content Optimizer] Bullet 1 rewritten: Focus on Liposomal encapsulation absorption.'
+    '[AI Syntax Orchestration] Staging Title and Bullet Re-Engineering sequence...',
+    '[AI Syntax Orchestration] Applying Alex Hormozi copywriting frameworks...',
+    '[AI Syntax Orchestration] Bullet 1 rewritten: Focus on encapsulated liposomal absorption value.',
+    '[AI Syntax Orchestration] Optimized copy block packaged.'
   ],
   5: [
-    '[Benchmark Analyst] Crawling top 5 competitor listings within Magnesium niche...',
-    '[Benchmark Analyst] Evaluating competitor vector cosine profiles...',
-    '[Benchmark Analyst] Benchmark computed: Competitor "MagEnhanced" leads with 88 score.',
-    '[Benchmark Analyst] Calculated gap offset delta: -30 score gap identified.'
+    '[Competitive Map Alignment] Crawling top 5 niche competitors inside Magnesium domain...',
+    '[Competitive Map Alignment] Mapping competitor vector alignment grids...',
+    '[Competitive Map Alignment] Benchmark locked: Competitor "MagEnhanced" leads domain with 88 score.',
+    '[Competitive Map Alignment] Calculated gap delta offset: -30 pts.'
   ],
   6: [
-    '[AI Reviewer] Validating re-engineered copy against compliance criteria...',
-    '[AI Reviewer] Evaluating optimization score projection: +34 score uplift.',
-    '[AI Reviewer] APPROVED: Zero SP-API warnings found. Ready to export.',
-    '[System Orchestrator] Execution sequence complete. Packing report...'
+    '[Elite Core Compliance] Initiating syntax integrity and SP-API restriction check...',
+    '[Elite Core Compliance] Projecting post-optimization score boost: +34 score uplift.',
+    '[Elite Core Compliance] APPROVED: Zero compliance breaches. Core unlocked.',
+    '[System Orchestrator] Staging target optimization files. Initiating compilation...'
   ]
 };
 
@@ -57,28 +57,22 @@ export default function Analyzer() {
   
   const asin = searchParams.get('asin') || 'B0C8XYZ123';
   const marketplace = searchParams.get('marketplace') || 'US';
-  const isDemo = searchParams.get('demo') === 'true';
 
   useEffect(() => {
     let timer: any;
     
-    // Simulate each stage sequentially
     const runStage = (stageNum: number) => {
       if (stageNum >= 7) {
         setStatus('completed');
         timer = setTimeout(() => {
-          // Redirect to workspace page
           navigate(`/workspace/${asin}`);
         }, 1500);
         return;
       }
 
       setCurrentStage(stageNum);
-      
-      // Accumulate logs
       const stageLogs = mockLogs[stageNum] || [];
       
-      // Typewriter-like staggered entry of logs
       let logIndex = 0;
       const addLog = () => {
         if (logIndex < stageLogs.length) {
@@ -86,7 +80,6 @@ export default function Analyzer() {
           logIndex++;
           timer = setTimeout(addLog, 400);
         } else {
-          // Go to next stage
           timer = setTimeout(() => {
             runStage(stageNum + 1);
           }, 800);
@@ -104,21 +97,29 @@ export default function Analyzer() {
   }, [asin, navigate]);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 select-none py-8">
+    <div className="max-w-4xl mx-auto space-y-8 select-none py-8 font-sans text-slate-350">
+      
       {/* Header HUD */}
       <div className="text-center space-y-3">
-        <div className="relative inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-brand-orange to-brand-violet shadow-glow-orange animate-pulse">
-          <Cpu className="h-6 w-6 text-white" />
+        <div className="relative inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-bg-card border border-brand-bg-border shadow-glow-crimson animate-pulse">
+          {/* Hexagonal Reactor Icon */}
+          <svg 
+            viewBox="0 0 100 100" 
+            className="absolute inset-0 h-full w-full stroke-brand-crimson fill-none stroke-[8]"
+          >
+            <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" />
+          </svg>
+          <Cpu className="h-4.5 w-4.5 text-brand-cyan" />
         </div>
         
         <div>
-          <h2 className="font-display font-extrabold text-2xl text-white tracking-tight">
-            Running Intent Scanner Sequence
+          <h2 className="font-display font-bold text-xs text-white tracking-[0.2em] uppercase">
+            ORCHESTRATION PIPELINE ENGAGED
           </h2>
-          <p className="text-xs text-slate-400">
-            ASIN: <span className="font-mono text-brand-orange font-bold uppercase tracking-widest">{asin}</span> 
+          <p className="text-[9px] text-slate-500 font-mono mt-1 uppercase">
+            Core Target: <span className="font-bold text-brand-crimson font-mono tracking-widest">{asin}</span> 
             <span className="mx-2">•</span> 
-            Marketplace: <span className="font-bold text-brand-cyan">{marketplace}</span>
+            Marketplace Domain: <span className="font-bold text-brand-cyan font-mono">{marketplace}</span>
           </p>
         </div>
       </div>
@@ -131,7 +132,7 @@ export default function Analyzer() {
       />
 
       {/* Visual background atmospheric effects */}
-      <div className="absolute top-1/4 left-1/2 w-64 h-64 bg-brand-orange/5 rounded-full blur-3xl -translate-x-1/2" />
+      <div className="absolute top-1/4 left-1/2 w-64 h-64 bg-brand-crimson/5 rounded-full blur-3xl -translate-x-1/2 -z-10" />
     </div>
   );
 }

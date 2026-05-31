@@ -10,8 +10,6 @@ import {
   Cpu, 
   MessageSquare, 
   Save, 
-  Share2, 
-  Terminal, 
   Zap, 
   BookOpen, 
   ShieldCheck, 
@@ -116,7 +114,6 @@ export default function Workspace() {
 
   const handleSandboxChange = (text: string) => {
     setSandboxText(text);
-    // Simple mock logic: if user removes "Liposomal", score drops!
     if (!text.toLowerCase().includes('liposomal')) {
       setSandboxScore(72);
     } else if (text.toLowerCase().includes('clinical') && text.toLowerCase().includes('absorption')) {
@@ -127,28 +124,29 @@ export default function Workspace() {
   };
 
   return (
-    <div className="space-y-8 select-none py-2">
+    <div className="space-y-8 select-none py-2 font-sans text-slate-350">
+      
       {/* Header Panel */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-brand-bg-border pb-6">
         <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate('/dashboard')}
-            className="p-2 border border-brand-bg-border bg-[#151B26]/60 rounded-xl text-slate-400 hover:text-slate-200 transition-all hover:bg-[#151B26]"
+            className="p-2 border border-brand-bg-border bg-brand-bg-card/60 rounded-xl text-slate-400 hover:text-slate-200 transition-all hover:bg-brand-bg-card"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
           
           <div>
             <div className="flex items-center gap-3">
-              <span className="font-mono text-xs font-bold px-2 py-0.5 bg-slate-800 rounded text-brand-orange tracking-widest">
+              <span className="font-mono text-[10px] font-bold px-2 py-0.5 bg-slate-900 border border-white/5 rounded text-brand-crimson tracking-widest uppercase">
                 {asin}
               </span>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-brand-cyan/10 border border-brand-cyan/20 rounded text-[10px] font-bold text-brand-cyan uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-brand-cyan/10 border border-brand-cyan/20 rounded text-[9px] font-bold text-brand-cyan uppercase tracking-wider font-mono">
                 <ShieldCheck className="h-3 w-3" />
-                SP-API Connected
+                SP-API PROTOCOL ACTIVE
               </span>
             </div>
-            <h2 className="font-display font-extrabold text-2xl text-white tracking-tight mt-1 leading-snug">
+            <h2 className="font-display font-extrabold text-lg md:text-xl text-white tracking-[0.05em] mt-2 uppercase">
               Liposomal Magnesium L-Threonate Complex Optimization Hub
             </h2>
           </div>
@@ -158,36 +156,38 @@ export default function Workspace() {
           <button 
             onClick={handleSave}
             disabled={isSaving}
-            className="btn-premium flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white shadow-glow-orange disabled:opacity-50"
+            className="btn-premium flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[10px] uppercase tracking-wider font-bold text-white shadow-glow-crimson disabled:opacity-50"
           >
             <Save className="h-4 w-4" />
-            <span>{isSaving ? 'Syncing to Amazon...' : 'Publish to SP-API'}</span>
+            <span>{isSaving ? 'Syncing core...' : 'Publish to SP-API'}</span>
           </button>
         </div>
       </div>
 
       {/* Main Score Overview & Visual Radar Chart Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Score comparison card */}
+        
+        {/* THE BUYER ALIGNMENT SCORE */}
         <div className="glass-card p-6 border-brand-bg-border flex flex-col justify-between relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-brand-orange/5 rounded-full blur-2xl" />
-          <h3 className="font-display font-bold text-xs text-brand-orange uppercase tracking-wider mb-4 flex items-center gap-1.5">
-            <Sparkles className="h-4 w-4 text-brand-orange" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-brand-crimson/5 rounded-full blur-2xl" />
+          
+          <h3 className="font-display font-bold text-[10px] text-brand-crimson uppercase tracking-[0.15em] mb-4 flex items-center gap-1.5 font-mono">
+            <Sparkles className="h-3.5 w-3.5 text-brand-crimson" />
             <span>THE RUFUS BUY INTENT SCORE</span>
           </h3>
           
           <div className="flex items-center justify-around gap-4 py-4">
             <ScoreGauge score={58} label="Invisible to AI" size={110} />
-            <div className="flex flex-col items-center justify-center font-bold">
-              <span className="text-brand-orange text-lg">+34</span>
-              <span className="text-[10px] text-slate-500 uppercase tracking-widest font-sans">Score Boom</span>
-              <div className="h-[2px] w-8 bg-slate-800 my-2" />
-              <Zap className="h-4 w-4 text-brand-orange animate-pulse" />
+            <div className="flex flex-col items-center justify-center font-bold font-mono">
+              <span className="text-brand-crimson text-lg">+34</span>
+              <span className="text-[9px] text-slate-500 uppercase tracking-widest">Score Boom</span>
+              <div className="h-[1px] w-6 bg-slate-800 my-2" />
+              <Zap className="h-3.5 w-3.5 text-brand-crimson animate-pulse" />
             </div>
             <ScoreGauge score={sandboxScore} label="COSMO ALIGNED" size={110} />
           </div>
 
-          <div className="text-center text-xs text-slate-400 border-t border-brand-bg-border pt-4 font-medium leading-relaxed">
+          <div className="text-center text-xs text-slate-400 border-t border-brand-bg-border pt-4 font-medium leading-relaxed font-sans">
             The Offer Stack: We <strong className="text-brand-cyan">obliterated 92% of your profit leaks</strong>. Rufus can now rank you as the #1 gentle-on-the-stomach solution.
           </div>
         </div>
@@ -199,13 +199,13 @@ export default function Workspace() {
       </div>
 
       {/* Mode navigation tabs */}
-      <div className="flex bg-slate-950/60 p-1 border border-brand-bg-border rounded-xl w-fit overflow-x-auto max-w-full scrollbar-none">
+      <div className="flex bg-[#05070A]/80 p-1 border border-brand-bg-border rounded-xl w-fit overflow-x-auto max-w-full scrollbar-none select-none">
         <button
           onClick={() => setActiveTab('editor')}
-          className={`flex items-center gap-2 text-xs uppercase font-bold tracking-wider px-5 py-2.5 rounded-lg shrink-0 transition-all ${
+          className={`flex items-center gap-2 text-[10px] uppercase font-bold tracking-wider px-5 py-2.5 rounded-lg shrink-0 transition-all font-display ${
             activeTab === 'editor'
-              ? 'bg-brand-orange/15 text-brand-orange border border-brand-orange/20 shadow-glow-orange'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-brand-crimson/15 text-brand-crimson border border-brand-crimson/20 shadow-glow-crimson'
+              : 'text-slate-450 hover:text-slate-200'
           }`}
         >
           <Cpu className="h-4 w-4" />
@@ -213,10 +213,10 @@ export default function Workspace() {
         </button>
         <button
           onClick={() => setActiveTab('radar')}
-          className={`flex items-center gap-2 text-xs uppercase font-bold tracking-wider px-5 py-2.5 rounded-lg shrink-0 transition-all ${
+          className={`flex items-center gap-2 text-[10px] uppercase font-bold tracking-wider px-5 py-2.5 rounded-lg shrink-0 transition-all font-display ${
             activeTab === 'radar'
-              ? 'bg-brand-orange/15 text-brand-orange border border-brand-orange/20 shadow-glow-orange'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-brand-crimson/15 text-brand-crimson border border-brand-crimson/20 shadow-glow-crimson'
+              : 'text-slate-455 hover:text-slate-200'
           }`}
         >
           <BookOpen className="h-4 w-4" />
@@ -224,10 +224,10 @@ export default function Workspace() {
         </button>
         <button
           onClick={() => setActiveTab('simulator')}
-          className={`flex items-center gap-2 text-xs uppercase font-bold tracking-wider px-5 py-2.5 rounded-lg shrink-0 transition-all ${
+          className={`flex items-center gap-2 text-[10px] uppercase font-bold tracking-wider px-5 py-2.5 rounded-lg shrink-0 transition-all font-display ${
             activeTab === 'simulator'
-              ? 'bg-brand-orange/15 text-brand-orange border border-brand-orange/20 shadow-glow-orange'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-brand-crimson/15 text-brand-crimson border border-brand-crimson/20 shadow-glow-crimson'
+              : 'text-slate-455 hover:text-slate-200'
           }`}
         >
           <MessageSquare className="h-4 w-4" />
@@ -246,28 +246,28 @@ export default function Workspace() {
             <div className="glass-card p-6 border-brand-bg-border flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between border-b border-brand-bg-border pb-3 mb-4">
-                  <span className="text-xs font-bold text-red-400 uppercase tracking-widest flex items-center gap-1.5">
+                  <span className="text-[10px] font-bold text-red-500 uppercase tracking-widest flex items-center gap-1.5 font-mono">
                     <AlertTriangle className="h-4 w-4" />
                     Original Listing Copy
                   </span>
-                  <span className="text-[10px] text-slate-500 font-semibold">ASIN Source Data</span>
+                  <span className="text-[8px] text-slate-500 font-bold uppercase tracking-wider font-mono">ASIN Source Data</span>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-4 font-sans text-xs">
                   <div>
-                    <h5 className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1.5">Product Title</h5>
-                    <p className="text-xs text-slate-300 bg-slate-950/40 p-3 rounded-lg border border-red-500/10 leading-relaxed font-sans">
+                    <h5 className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1.5 font-mono">Product Title</h5>
+                    <p className="text-xs text-slate-400 bg-slate-950/40 p-3.5 rounded-lg border border-red-500/10 leading-relaxed">
                       Magnesium L-Threonate capsules, 2000mg complex pill supplement for relaxation, sleep support. High strength magnesium threonate for adults.
                     </p>
                   </div>
                   <div>
-                    <h5 className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1.5">Bullet Point 1 (Absorption)</h5>
-                    <p className="text-xs text-slate-350 bg-slate-950/40 p-3 rounded-lg border border-red-500/10 leading-relaxed font-sans">
+                    <h5 className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1.5 font-mono">Bullet Point 1 (Absorption)</h5>
+                    <p className="text-xs text-slate-400 bg-slate-950/40 p-3.5 rounded-lg border border-red-500/10 leading-relaxed">
                       Our magnesium threonate complex pills are high quality supplements. Standard tablets are easy to take and provide daily support for health.
                     </p>
                   </div>
                   <div>
-                    <h5 className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1.5">Product Description (Semantic)</h5>
-                    <p className="text-xs text-slate-400 bg-slate-950/40 p-3 rounded-lg border border-red-500/10 leading-relaxed font-sans">
+                    <h5 className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1.5 font-mono">Product Description (Semantic)</h5>
+                    <p className="text-xs text-slate-400 bg-slate-950/40 p-3.5 rounded-lg border border-red-500/10 leading-relaxed">
                       Standard magnesium complex tablets. Formulated for adults seeking magnesium threonate health assistance. Please consult a doctor before using standard pills daily.
                     </p>
                   </div>
@@ -280,51 +280,51 @@ export default function Workspace() {
               <div className="absolute top-0 right-0 w-40 h-40 bg-brand-cyan/5 rounded-full blur-2xl" />
               <div>
                 <div className="flex items-center justify-between border-b border-brand-bg-border pb-3 mb-4">
-                  <span className="text-xs font-bold text-brand-cyan uppercase tracking-widest flex items-center gap-1.5">
+                  <span className="text-[10px] font-bold text-brand-cyan uppercase tracking-widest flex items-center gap-1.5 font-mono">
                     <Sparkles className="h-4 w-4 text-brand-cyan" />
                     AI-Optimized & Re-Engineered Copy
                   </span>
-                  <span className="text-[10px] text-brand-cyan font-bold uppercase tracking-wider">Predictive Score: {sandboxScore}</span>
+                  <span className="text-[9px] text-brand-cyan font-bold uppercase tracking-wider font-mono">Predictive Score: {sandboxScore}</span>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-4 font-sans text-xs">
                   <div>
                     <div className="flex justify-between items-center mb-1.5">
-                      <h5 className="text-[10px] text-slate-450 font-bold uppercase tracking-wider">Optimized Title</h5>
+                      <h5 className="text-[9px] text-slate-500 font-bold uppercase tracking-wider font-mono">Optimized Title</h5>
                       <button 
                         onClick={() => handleCopy('Liposomal Magnesium L-Threonate Complex - 2000mg Maximum Cellular Absorption', 'title')}
-                        className="text-slate-500 hover:text-slate-300 p-1 rounded"
+                        className="text-slate-500 hover:text-slate-350 p-1 rounded"
                       >
-                        {copied === 'title' ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}
+                        {copied === 'title' ? <Check className="h-3 w-3 text-brand-cyan" /> : <Copy className="h-3 w-3" />}
                       </button>
                     </div>
-                    <p className="text-xs text-slate-100 bg-slate-950/40 p-3 rounded-lg border border-brand-cyan/20 leading-relaxed font-sans">
+                    <p className="text-xs text-slate-200 bg-slate-950/40 p-3.5 rounded-lg border border-brand-cyan/20 leading-relaxed">
                       <span className="bg-brand-cyan/15 text-brand-cyan px-1 rounded font-semibold">Liposomal Magnesium L-Threonate Complex</span> - 2000mg <span className="bg-brand-cyan/15 text-brand-cyan px-1 rounded font-semibold">Maximum Cellular Absorption</span> & Cognitive Focus
                     </p>
                   </div>
                   <div>
                     <div className="flex justify-between items-center mb-1.5">
-                      <h5 className="text-[10px] text-slate-450 font-bold uppercase tracking-wider">Optimized Bullet 1 (Encapsulated Bio-availability)</h5>
+                      <h5 className="text-[9px] text-slate-500 font-bold uppercase tracking-wider font-mono">Optimized Bullet 1 (Encapsulated Bio-availability)</h5>
                       <button 
                         onClick={() => handleCopy('Premium Liposomal encapsulation delivers up to 5x higher cellular absorption speed directly crossing the blood-brain barrier.', 'bullet')}
-                        className="text-slate-500 hover:text-slate-300 p-1 rounded"
+                        className="text-slate-500 hover:text-slate-350 p-1 rounded"
                       >
-                        {copied === 'bullet' ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}
+                        {copied === 'bullet' ? <Check className="h-3 w-3 text-brand-cyan" /> : <Copy className="h-3 w-3" />}
                       </button>
                     </div>
-                    <p className="text-xs text-slate-200 bg-slate-950/40 p-3 rounded-lg border border-brand-cyan/20 leading-relaxed font-sans">
+                    <p className="text-xs text-slate-200 bg-slate-950/40 p-3.5 rounded-lg border border-brand-cyan/20 leading-relaxed">
                       <span className="bg-brand-cyan/15 text-brand-cyan px-1 rounded font-semibold">Premium Liposomal encapsulation</span> protects magnesium molecules, delivering up to <span className="bg-brand-cyan/15 text-brand-cyan px-1 rounded font-semibold">5x higher cellular absorption speed</span> directly crossing the blood-brain barrier to satisfy advanced Rufus Q&A bio-availability indexes.
                     </p>
                   </div>
                   <div>
                     <div className="flex justify-between items-center mb-1.5">
-                      <h5 className="text-[10px] text-slate-450 font-bold uppercase tracking-wider">Interactive Sandbox Sandbox (Predictive Local Model)</h5>
-                      <span className="text-[9px] text-slate-550 uppercase font-bold tracking-wider italic">Type below to see score shifts</span>
+                      <h5 className="text-[9px] text-slate-500 font-bold uppercase tracking-wider font-mono">Interactive Sandbox Console</h5>
+                      <span className="text-[8px] text-slate-550 uppercase font-bold tracking-wider italic font-mono">Type below to trigger real-time neural mapping</span>
                     </div>
                     <textarea
                       rows={4}
                       value={sandboxText}
                       onChange={(e) => handleSandboxChange(e.target.value)}
-                      className="text-xs text-slate-300 bg-slate-950/60 p-3 rounded-lg border border-brand-violet/20 focus:border-brand-orange/40 leading-relaxed w-full outline-none resize-none font-sans"
+                      className="text-xs text-slate-300 bg-slate-950/60 p-3.5 rounded-lg border border-brand-cyan/25 focus:border-brand-crimson/40 leading-relaxed w-full outline-none resize-none font-mono"
                     />
                   </div>
                 </div>
@@ -337,51 +337,51 @@ export default function Workspace() {
         {activeTab === 'radar' && (
           <div className="glass-card border-brand-bg-border overflow-hidden">
             <div className="border-b border-brand-bg-border p-4 bg-slate-950/40 flex justify-between items-center">
-              <span className="text-xs font-bold text-white uppercase tracking-widest">Calculated Semantic Intent Gaps (COSMO Engine)</span>
-              <span className="text-[10px] text-slate-450 font-semibold">Sorted by gap severity</span>
+              <span className="text-[10px] font-bold text-white uppercase tracking-widest font-display">Calculated Semantic Intent Gaps (COSMO Engine)</span>
+              <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider font-mono">Sorted by gap severity</span>
             </div>
             
-            <div className="divide-y divide-brand-bg-border">
+            <div className="divide-y divide-brand-bg-border font-sans text-xs">
               {semanticGaps.map((gap, idx) => (
                 <div key={idx} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/2 transition-colors">
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-3">
-                      <h4 className="font-display font-bold text-sm text-slate-200">{gap.dimension}</h4>
+                      <h4 className="font-display font-bold text-xs tracking-wider text-slate-200 uppercase">{gap.dimension}</h4>
                       
                       {gap.priority === 'critical' && (
-                        <span className="px-2 py-0.5 bg-red-500/10 border border-red-500/20 text-[8px] font-bold uppercase tracking-wider text-red-400 rounded">
+                        <span className="px-2 py-0.5 bg-brand-crimson/10 border border-brand-crimson/20 text-[8px] font-bold uppercase tracking-wider text-brand-crimson rounded font-mono">
                           Critical Gap
                         </span>
                       )}
                       {gap.priority === 'high' && (
-                        <span className="px-2 py-0.5 bg-brand-orange/10 border border-brand-orange/20 text-[8px] font-bold uppercase tracking-wider text-brand-orange rounded">
+                        <span className="px-2 py-0.5 bg-brand-orange/10 border border-brand-orange/20 text-[8px] font-bold uppercase tracking-wider text-brand-orange rounded font-mono">
                           High
                         </span>
                       )}
                       {gap.priority === 'medium' && (
-                        <span className="px-2 py-0.5 bg-brand-violet/10 border border-brand-violet/20 text-[8px] font-bold uppercase tracking-wider text-brand-violet rounded">
+                        <span className="px-2 py-0.5 bg-brand-cyan/10 border border-brand-cyan/20 text-[8px] font-bold uppercase tracking-wider text-brand-cyan rounded font-mono">
                           Medium
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-450 leading-relaxed max-w-2xl">
+                    <p className="text-xs text-slate-450 leading-relaxed max-w-2xl font-medium">
                       {gap.recommendation}
                     </p>
                   </div>
                   
                   {/* Stats comparison */}
-                  <div className="flex items-center gap-6 shrink-0">
+                  <div className="flex items-center gap-6 shrink-0 font-mono text-xs">
                     <div className="text-center w-16">
-                      <div className="text-[9px] text-slate-550 uppercase font-bold tracking-wider">ORIGINAL</div>
-                      <div className="text-sm font-bold text-red-500">{gap.original}%</div>
+                      <div className="text-[8px] text-slate-550 uppercase font-bold tracking-wider">ORIGINAL</div>
+                      <div className="text-xs font-bold text-red-500">{gap.original}%</div>
                     </div>
                     <div className="text-center w-16">
-                      <div className="text-[9px] text-slate-550 uppercase font-bold tracking-wider">OPTIMIZED</div>
-                      <div className="text-sm font-bold text-brand-cyan">{gap.optimized}%</div>
+                      <div className="text-[8px] text-slate-550 uppercase font-bold tracking-wider">OPTIMIZED</div>
+                      <div className="text-xs font-bold text-brand-cyan">{gap.optimized}%</div>
                     </div>
                     <div className="text-center w-16">
-                      <div className="text-[9px] text-slate-550 uppercase font-bold tracking-wider">DELTA</div>
-                      <div className="text-sm font-black text-brand-orange">+{gap.gap}%</div>
+                      <div className="text-[8px] text-slate-550 uppercase font-bold tracking-wider">BOOM</div>
+                      <div className="text-xs font-black text-brand-crimson">+{gap.gap}%</div>
                     </div>
                   </div>
                 </div>
@@ -396,17 +396,17 @@ export default function Workspace() {
             
             {/* QA Selector */}
             <div className="glass-card p-4 border-brand-bg-border h-fit space-y-3">
-              <h4 className="text-[10px] text-slate-450 font-bold uppercase tracking-wider pb-2 border-b border-brand-bg-border">
-                COMMON RUFUS CONVERSATION TOPICS
+              <h4 className="text-[9px] text-slate-500 font-bold uppercase tracking-wider pb-2 border-b border-brand-bg-border font-mono">
+                RUFUS CONVERSATIONAL TOPICS
               </h4>
               <div className="space-y-2">
                 {simulatorQAs.map((item, idx) => (
                   <button
                     key={idx}
                     onClick={() => setActiveQA(idx)}
-                    className={`w-full text-left p-3.5 rounded-xl text-xs leading-relaxed transition-all border ${
+                    className={`w-full text-left p-3.5 rounded-xl text-xs leading-relaxed transition-all border font-sans ${
                       activeQA === idx
-                        ? 'bg-brand-orange/10 border-brand-orange/30 text-white font-semibold'
+                        ? 'bg-brand-crimson/10 border-brand-crimson/30 text-white font-semibold'
                         : 'bg-slate-950/20 border-white/5 text-slate-400 hover:text-slate-350 hover:bg-slate-950/40'
                     }`}
                   >
@@ -417,31 +417,38 @@ export default function Workspace() {
             </div>
 
             {/* Chat Device Simulator */}
-            <div className="md:col-span-2 glass-card border-brand-bg-border rounded-2xl overflow-hidden shadow-2xl relative bg-[#090D15]">
-              <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-brand-orange to-brand-violet" />
+            <div className="md:col-span-2 glass-card border-brand-bg-border rounded-2xl overflow-hidden shadow-2xl relative bg-[#05070A]">
+              <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-brand-crimson to-brand-cyan" />
               
               {/* Device Header */}
-              <div className="bg-slate-950/70 p-4 border-b border-brand-bg-border flex items-center justify-between">
+              <div className="bg-[#0D111A]/90 p-4 border-b border-brand-bg-border flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-brand-orange flex items-center justify-center text-white shadow-glow-orange">
-                    <Sparkles className="h-4 w-4" />
+                  {/* Hexagonal Reactor Frame */}
+                  <div className="relative flex h-8 w-8 items-center justify-center">
+                    <svg 
+                      viewBox="0 0 100 100" 
+                      className="absolute inset-0 h-full w-full stroke-[#E0E1DD] fill-none stroke-[8]"
+                    >
+                      <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" />
+                    </svg>
+                    <div className="h-2 w-2 rounded-full bg-[#E63946] shadow-[0_0_12px_#E63946] animate-pulse" />
                   </div>
                   <div>
-                    <h4 className="font-display font-bold text-xs text-white">Amazon Rufus AI</h4>
-                    <p className="text-[9px] text-brand-orange font-semibold uppercase tracking-widest">Conversational Shopping Assistant</p>
+                    <h4 className="font-display font-bold text-[10px] text-white tracking-[0.1em] uppercase">OPTIMUS AI CORE</h4>
+                    <p className="text-[8px] text-[#00F5FF] font-bold uppercase tracking-widest font-mono">Conversational Simulator</p>
                   </div>
                 </div>
                 
-                <span className="text-[10px] text-slate-500 font-bold uppercase font-mono bg-slate-900 px-2 py-0.5 rounded border border-white/5">
-                  Device Emulator
+                <span className="text-[8px] text-slate-500 font-bold uppercase font-mono bg-slate-950 px-2 py-0.5 rounded border border-white/5">
+                  SPY TOOL SIMULATION
                 </span>
               </div>
 
               {/* Chat messages pane */}
-              <div className="p-6 space-y-6 min-h-[300px]">
+              <div className="p-6 space-y-6 min-h-[300px] font-sans text-xs">
                 {/* User Bubble */}
                 <div className="flex justify-end">
-                  <div className="bg-brand-violet/20 border border-brand-violet/30 rounded-2xl rounded-tr-none px-4 py-3 text-xs text-slate-200 max-w-sm">
+                  <div className="bg-brand-crimson/15 border border-brand-crimson/30 rounded-2xl rounded-tr-none px-4 py-3 text-xs text-slate-200 max-w-sm">
                     {simulatorQAs[activeQA].q}
                   </div>
                 </div>
@@ -450,24 +457,24 @@ export default function Workspace() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Old Response Box */}
                   <div className="bg-red-500/5 border border-red-500/10 rounded-2xl p-4 space-y-2">
-                    <div className="text-[9px] font-bold text-red-400 uppercase tracking-widest">Rufus Response (Old Listing)</div>
-                    <p className="text-xs text-slate-400 leading-relaxed font-sans italic">
+                    <div className="text-[9px] font-bold text-red-400 uppercase tracking-widest font-mono">Rufus Response (Old Listing)</div>
+                    <p className="text-xs text-slate-400 leading-relaxed italic">
                       "{simulatorQAs[activeQA].original}"
                     </p>
-                    <div className="text-[9px] text-red-550 font-bold">Verdict: Suggests competitors instead.</div>
+                    <div className="text-[9px] text-red-550 font-bold font-mono">Verdict: Suggests competitors instead.</div>
                   </div>
 
                   {/* Optimized Response Box */}
                   <div className="bg-brand-cyan/5 border border-brand-cyan/10 rounded-2xl p-4 space-y-2 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-16 h-16 bg-brand-cyan/5 rounded-full blur-xl" />
-                    <div className="text-[9px] font-bold text-brand-cyan uppercase tracking-widest flex items-center gap-1">
+                    <div className="text-[9px] font-bold text-brand-cyan uppercase tracking-widest flex items-center gap-1 font-mono">
                       <Sparkles className="h-3 w-3 text-brand-cyan" />
                       Rufus Response (Optimized Listing)
                     </div>
-                    <p className="text-xs text-slate-200 leading-relaxed font-sans">
+                    <p className="text-xs text-slate-200 leading-relaxed">
                       "{simulatorQAs[activeQA].optimized}"
                     </p>
-                    <div className="text-[9px] text-brand-cyan font-bold">Verdict: Direct Product Recommendation & Citation lock.</div>
+                    <div className="text-[9px] text-brand-cyan font-bold font-mono">Verdict: Direct Product Recommendation & Citation lock.</div>
                   </div>
                 </div>
               </div>

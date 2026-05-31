@@ -64,12 +64,12 @@ export default function RadarChart({ data = defaultDimensions, size = 320 }: Rad
   const gridLevels = [25, 50, 75, 100];
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 bg-brand-bg-card/30 rounded-2xl border border-brand-bg-border relative overflow-hidden">
+    <div className="flex flex-col items-center justify-center p-4 bg-brand-bg-card/40 rounded-2xl border border-brand-bg-border relative overflow-hidden select-none">
       {/* Visual background atmospheric shine */}
-      <div className="absolute top-0 right-0 h-40 w-40 bg-brand-violet/5 rounded-full blur-3xl" />
+      <div className="absolute top-0 right-0 h-40 w-40 bg-brand-crimson/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 h-40 w-40 bg-brand-cyan/5 rounded-full blur-3xl" />
 
-      <h4 className="font-display font-bold text-sm tracking-wide text-slate-300 mb-4 select-none">
+      <h4 className="font-display font-bold text-[10px] tracking-[0.15em] text-slate-400 mb-4 uppercase">
         SEMANTIC TARGET VS ORIGINAL SPECTRUM
       </h4>
 
@@ -85,7 +85,7 @@ export default function RadarChart({ data = defaultDimensions, size = 320 }: Rad
               key={level}
               points={levelPoints}
               fill="none"
-              className="stroke-slate-800"
+              className="stroke-slate-900"
               strokeWidth="1.5"
               strokeDasharray="4,4"
             />
@@ -111,14 +111,14 @@ export default function RadarChart({ data = defaultDimensions, size = 320 }: Rad
                 y1={center}
                 x2={endCoords.x}
                 y2={endCoords.y}
-                className="stroke-slate-800"
+                className="stroke-slate-900"
                 strokeWidth="1.5"
               />
               <text
                 x={textX}
                 y={textY + 4}
                 textAnchor={textAnchor}
-                className="fill-slate-400 font-sans font-medium text-[10px] uppercase tracking-wider"
+                className="fill-slate-500 font-sans font-medium text-[9px] uppercase tracking-wider"
               >
                 {p.name}
               </text>
@@ -126,22 +126,22 @@ export default function RadarChart({ data = defaultDimensions, size = 320 }: Rad
           );
         })}
 
-        {/* Original Intent Shape */}
+        {/* Original Intent Shape - Matrix Crimson */}
         <polygon
           points={originalPath}
-          fill="rgba(239, 68, 68, 0.08)"
-          className="stroke-red-500"
+          fill="rgba(230, 57, 70, 0.06)"
+          className="stroke-brand-crimson"
           strokeWidth="2.5"
-          style={{ filter: 'drop-shadow(0 0 5px rgba(239, 68, 68, 0.2))' }}
+          style={{ filter: 'drop-shadow(0 0 5px rgba(230, 57, 70, 0.2))' }}
         />
 
-        {/* AI-Optimized Target Shape */}
+        {/* AI-Optimized Target Shape - Active Cyan */}
         <polygon
           points={optimizedPath}
-          fill="rgba(6, 182, 212, 0.12)"
+          fill="rgba(0, 245, 255, 0.1)"
           className="stroke-brand-cyan"
           strokeWidth="3"
-          style={{ filter: 'drop-shadow(0 0 10px rgba(6, 182, 212, 0.4))' }}
+          style={{ filter: 'drop-shadow(0 0 10px rgba(0, 245, 255, 0.3))' }}
         />
 
         {/* Draw active nodes for Original shape */}
@@ -153,7 +153,7 @@ export default function RadarChart({ data = defaultDimensions, size = 320 }: Rad
               cx={coords.x}
               cy={coords.y}
               r="4.5"
-              className="fill-red-500 stroke-brand-bg-card"
+              className="fill-brand-crimson stroke-brand-bg-card"
               strokeWidth="2"
             />
           );
@@ -177,12 +177,12 @@ export default function RadarChart({ data = defaultDimensions, size = 320 }: Rad
 
       <div className="flex gap-6 mt-4 select-none">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-red-500 rounded-full border border-brand-bg" />
-          <span className="text-xs text-slate-400 font-bold">Your Old Listing (Keyword-stuffed draft)</span>
+          <div className="w-2.5 h-2.5 bg-brand-crimson rounded-full border border-brand-bg" />
+          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Your Old Listing (Keyword-stuffed draft)</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-brand-cyan rounded-full border border-brand-bg animate-pulse" />
-          <span className="text-xs text-brand-cyan font-bold">Optimized Listing (COSMO Intent-aligned offer)</span>
+          <div className="w-2.5 h-2.5 bg-brand-cyan rounded-full border border-brand-bg animate-pulse" />
+          <span className="text-[10px] text-brand-cyan font-bold uppercase tracking-wider">Optimized Listing (COSMO Intent-aligned offer)</span>
         </div>
       </div>
     </div>
