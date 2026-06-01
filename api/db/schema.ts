@@ -52,10 +52,45 @@ export function initSchema() {
       strengths TEXT,
       opportunities TEXT,
       aiAnalysisRaw TEXT,
+
+      -- Legacy copy columns (kept for backward compat)
       copyPersonalizedHook TEXT,
       copyProblemNarrative TEXT,
       copySolutionPitch TEXT,
       copyUrgencyCTA TEXT,
+
+      -- Stage 1: Hero
+      copyHeroHeadline TEXT,
+      copyHeroSubheadline TEXT,
+
+      -- Stage 2: Autopsy Report
+      copyAutopsyHeadline TEXT,
+      copyAutopsyBody TEXT,
+
+      -- Stage 3: Bleed Calculator
+      copyBleedHeadline TEXT,
+      copyBleedBody TEXT,
+
+      -- Stage 4: Rufus Simulator
+      copySimulatorIntro TEXT,
+      copySimulatorScenarios TEXT,
+
+      -- Stage 5: Transformation Preview
+      copyTransformHeadline TEXT,
+      copyTransformBefore TEXT,
+      copyTransformAfter TEXT,
+
+      -- Stage 6: Roadmap
+      copyRoadmapHeadline TEXT,
+      copyRoadmapBody TEXT,
+
+      -- Stage 7: Social Proof
+      copySocialProofHeadline TEXT,
+
+      -- Stage 8: Book Call CTA
+      copyCtaHeadline TEXT,
+      copyCtaGuarantee TEXT,
+
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (listingId) REFERENCES listings(id),
       FOREIGN KEY (prospectId) REFERENCES prospects(id)
@@ -75,6 +110,35 @@ export function initSchema() {
       FOREIGN KEY (prospectId) REFERENCES prospects(id)
     );
   `);
+
+  // Migration: add new columns to existing listing_analyses tables
+  const newColumns = [
+    "copyHeroHeadline TEXT",
+    "copyHeroSubheadline TEXT",
+    "copyAutopsyHeadline TEXT",
+    "copyAutopsyBody TEXT",
+    "copyBleedHeadline TEXT",
+    "copyBleedBody TEXT",
+    "copySimulatorIntro TEXT",
+    "copySimulatorScenarios TEXT",
+    "copyTransformHeadline TEXT",
+    "copyTransformBefore TEXT",
+    "copyTransformAfter TEXT",
+    "copyRoadmapHeadline TEXT",
+    "copyRoadmapBody TEXT",
+    "copySocialProofHeadline TEXT",
+    "copyCtaHeadline TEXT",
+    "copyCtaGuarantee TEXT",
+  ];
+
+  for (const col of newColumns) {
+    const colName = col.split(" ")[0];
+    try {
+      db.exec(`ALTER TABLE listing_analyses ADD COLUMN ${col}`);
+    } catch {
+      // Column already exists — skip silently
+    }
+  }
 }
 
 initSchema();

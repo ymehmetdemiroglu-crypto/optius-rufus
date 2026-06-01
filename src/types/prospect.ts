@@ -1,3 +1,5 @@
+// ── Listing ──
+
 export interface ProspectListing {
   asin: string;
   title: string;
@@ -7,7 +9,22 @@ export interface ProspectListing {
   rating: number;
   reviewCount: number;
   image?: string;
+  bullets?: string[];
+  description?: string;
 }
+
+// ── Scores ──
+
+export interface ProspectScoreBreakdown {
+  overallScore: number;
+  rufusScore: number;
+  cosmoScore: number;
+  semanticScore: number;
+  contentScore: number;
+  categoryAverage?: number;
+}
+
+// ── Issues & Opportunities ──
 
 export interface ProspectIssue {
   title: string;
@@ -23,14 +40,53 @@ export interface ProspectOpportunity {
   after: string;
 }
 
-export interface ProspectScoreBreakdown {
-  overallScore: number;
-  rufusScore: number;
-  cosmoScore: number;
-  semanticScore: number;
-  contentScore: number;
-  categoryAverage?: number;
+// ── Rufus Simulator ──
+
+export interface SimulatorScenario {
+  buyerQuestion: string;
+  rufusAnswer: string;
+  competitorName: string;
+  failReason: string;
 }
+
+// ── Transformation Preview ──
+
+export interface TransformSnippet {
+  section: string;
+  content: string;
+}
+
+// ── Stage Copy (All 8 stages) ──
+
+export interface StageCopyData {
+  // Stage 1: Hero
+  heroHeadline: string;
+  heroSubheadline: string;
+  // Stage 2: Autopsy
+  autopsyHeadline: string;
+  autopsyBody: string;
+  // Stage 3: Bleed Calculator
+  bleedHeadline: string;
+  bleedBody: string;
+  // Stage 4: Rufus Simulator
+  simulatorIntro: string;
+  simulatorScenarios: SimulatorScenario[];
+  // Stage 5: Transformation
+  transformHeadline: string;
+  transformBefore: TransformSnippet[];
+  transformAfter: TransformSnippet[];
+  // Stage 6: Roadmap
+  roadmapHeadline: string;
+  roadmapBody: string;
+  // Stage 7: Social Proof
+  socialProofHeadline: string;
+  urgencyCTA: string;
+  // Stage 8: CTA
+  ctaHeadline: string;
+  ctaGuarantee: string;
+}
+
+// ── Prospect Data (complete landing page data) ──
 
 export interface ProspectData {
   id: number;
@@ -43,10 +99,13 @@ export interface ProspectData {
   topIssues: ProspectIssue[];
   narrative: string;
   opportunities: ProspectOpportunity[];
+  stageCopy: StageCopyData;
   status: 'new' | 'scraped' | 'analyzed' | 'emailed' | 'visited' | 'booked';
   views: number;
   createdAt: string;
 }
+
+// ── Booking ──
 
 export interface BookingFormData {
   name: string;
@@ -55,6 +114,8 @@ export interface BookingFormData {
   revenue: string;
   notes: string;
 }
+
+// ── Pipeline (admin) ──
 
 export interface PipelineProspect {
   id: number;

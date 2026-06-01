@@ -48,18 +48,18 @@ export class ApifyFetcherAgent implements Agent {
     }
 
     return {
-      asin: row.asin,
-      title: row.title || "",
-      bullets: safeJsonParse(row.bullets, []),
-      description: row.description || "",
-      brand: row.brand || "",
-      category: row.category || "",
-      subcategory: row.category || "",
-      images: safeJsonParse(row.images, []),
-      price: row.price || 0,
-      rating: row.rating || 0,
-      reviewCount: row.reviewCount || 0,
-      attributes: safeJsonParse(row.rawScrapeData, {}),
+      asin: row.asin as string,
+      title: (row.title as string) || "",
+      bullets: safeJsonParse((row.bullets as string), []),
+      description: (row.description as string) || "",
+      brand: (row.brand as string) || "",
+      category: (row.category as string) || "",
+      subcategory: (row.category as string) || "",
+      images: safeJsonParse((row.images as string), []),
+      price: (row.price as number) || 0,
+      rating: (row.rating as number) || 0,
+      reviewCount: (row.reviewCount as number) || 0,
+      attributes: safeJsonParse((row.rawScrapeData as string), {}),
     };
   }
 }
