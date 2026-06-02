@@ -5,7 +5,7 @@ import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { appRouter } from "./router.js";
 import "./db/schema.js";
 
-const app = new Hono();
+export const app = new Hono();
 
 // CORS
 app.use("*", cors({ origin: "*" }));
@@ -76,7 +76,9 @@ function getBody(req: import("http").IncomingMessage): Promise<Buffer> {
   });
 }
 
-httpServer.listen(port, () => {
-  console.log(`🚀 Server listening on http://localhost:${port}`);
-  console.log(`📡 tRPC endpoint: http://localhost:${port}/api/trpc`);
-});
+if (!process.env.VERCEL) {
+  httpServer.listen(port, () => {
+    console.log(`🚀 Server listening on http://localhost:${port}`);
+    console.log(`📡 tRPC endpoint: http://localhost:${port}/api/trpc`);
+  });
+}

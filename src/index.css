@@ -1,8 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @layer base {
   body {
@@ -27,29 +27,57 @@
 @layer components {
   /* ── Brutalist Cards ── */
   .brutalist-card {
-    @apply bg-white border-[3px] border-brand-dark p-6 shadow-brutal transition-all rounded-none;
+    @apply bg-white border-[3px] border-brand-dark p-6 shadow-brutal transition-all duration-200 ease-out rounded-none;
   }
 
   .brutalist-card-hover {
-    @apply hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[8px_8px_0px_#1a1a1a];
+    @apply hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[9px_9px_0px_#1a1a1a];
   }
 
   /* ── Buttons ── */
   .brutalist-btn {
-    @apply bg-brand-gold text-brand-dark border-[3px] border-brand-dark px-8 py-4 font-display font-black text-lg uppercase tracking-wider shadow-brutal hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[8px_8px_0px_#1a1a1a] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[4px_4px_0px_#1a1a1a] transition-all rounded-none inline-flex items-center justify-center gap-2 select-none cursor-pointer;
+    @apply bg-brand-gold text-brand-dark border-[3px] border-brand-dark px-8 py-4 font-display font-black text-lg uppercase tracking-wider shadow-brutal transition-all duration-150 ease-out rounded-none inline-flex items-center justify-center gap-2 select-none cursor-pointer;
+  }
+  .brutalist-btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 4px 4px 0px #1a1a1a;
+  }
+  .brutalist-btn:active {
+    transform: translate(6px, 6px);
+    box-shadow: 0px 0px 0px #1a1a1a;
   }
 
   .brutalist-btn-secondary {
-    @apply bg-white text-brand-dark border-[3px] border-brand-dark px-6 py-3 font-display font-black text-sm uppercase tracking-wider shadow-brutal hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[8px_8px_0px_#1a1a1a] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[4px_4px_0px_#1a1a1a] transition-all rounded-none inline-flex items-center justify-center gap-2 select-none cursor-pointer;
+    @apply bg-white text-brand-dark border-[3px] border-brand-dark px-6 py-3 font-display font-black text-sm uppercase tracking-wider shadow-brutal transition-all duration-150 ease-out rounded-none inline-flex items-center justify-center gap-2 select-none cursor-pointer;
+  }
+  .brutalist-btn-secondary:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 4px 4px 0px #1a1a1a;
+  }
+  .brutalist-btn-secondary:active {
+    transform: translate(6px, 6px);
+    box-shadow: 0px 0px 0px #1a1a1a;
   }
 
   .brutalist-btn-danger {
-    @apply bg-brutal-red text-white border-[3px] border-brand-dark px-8 py-4 font-display font-black text-lg uppercase tracking-wider shadow-brutal hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[8px_8px_0px_#1a1a1a] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[4px_4px_0px_#1a1a1a] transition-all rounded-none inline-flex items-center justify-center gap-2 select-none cursor-pointer;
+    @apply bg-brutal-red text-white border-[3px] border-brand-dark px-8 py-4 font-display font-black text-lg uppercase tracking-wider shadow-brutal transition-all duration-150 ease-out rounded-none inline-flex items-center justify-center gap-2 select-none cursor-pointer;
+  }
+  .brutalist-btn-danger:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 4px 4px 0px #1a1a1a;
+  }
+  .brutalist-btn-danger:active {
+    transform: translate(6px, 6px);
+    box-shadow: 0px 0px 0px #1a1a1a;
   }
 
   /* ── Inputs ── */
   .brutalist-input {
-    @apply bg-white border-[3px] border-brand-dark px-4 py-3 text-brand-dark placeholder-gray-500 outline-none focus:border-brand-blue w-full rounded-none;
+    @apply bg-white border-[3px] border-brand-dark px-4 py-3 text-brand-dark placeholder-gray-500 outline-none transition-all duration-150 w-full rounded-none;
+  }
+  .brutalist-input:focus {
+    @apply border-brand-blue;
+    box-shadow: 4px 4px 0px #0055ff;
   }
 
   /* ── Table ── */
@@ -111,6 +139,13 @@
   /* ── Score Gauge ── */
   .gauge-bar {
     @apply h-3 bg-brand-dark/10 border-[2px] border-brand-dark relative overflow-hidden;
+  }
+
+  .gauge-bar::after {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent;
+    background-size: 200% 100%;
+    animation: shimmer 3s infinite linear;
   }
 
   .gauge-bar-fill {
@@ -197,7 +232,7 @@
 
   /* ── Transform Toggle ── */
   .transform-toggle {
-    @apply relative inline-flex items-center border-[3px] border-brand-dark bg-white cursor-pointer select-none overflow-hidden;
+    @apply relative inline-flex items-center border-[3px] border-brand-dark bg-white shadow-brutal-sm cursor-pointer select-none overflow-hidden;
   }
 
   .transform-toggle-option {

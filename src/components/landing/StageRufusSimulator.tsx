@@ -95,10 +95,10 @@ export default function StageRufusSimulator({ intro, scenarios, visible }: Stage
             <button
               key={i}
               onClick={() => handleSelect(i)}
-              className={`font-mono text-xs uppercase tracking-widest font-black px-4 py-2 border-[3px] border-brand-dark transition-all ${
+              className={`font-mono text-xs uppercase tracking-widest font-black px-5 py-2.5 border-[3px] border-brand-dark cursor-pointer transition-all duration-150 ease-out select-none ${
                 i === activeScenario
-                  ? 'bg-brand-dark text-white shadow-brutal-sm'
-                  : 'bg-white text-brand-dark hover:bg-brand-bg'
+                  ? 'bg-brand-dark text-white translate-x-[2px] translate-y-[2px] shadow-none'
+                  : 'bg-white text-brand-dark shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none'
               }`}
             >
               Scenario {i + 1}

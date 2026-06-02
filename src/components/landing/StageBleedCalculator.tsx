@@ -66,7 +66,7 @@ export default function StageBleedCalculator({
         {/* Sliders */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Traffic */}
-          <div className="border-[3px] border-white/20 bg-white/5 p-5 space-y-3">
+          <div className="border-[3px] border-white bg-brand-dark p-5 space-y-3 shadow-brutal-gold hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[8px_8px_0px_#ff9900] transition-all duration-200 ease-out">
             <label className="font-mono text-xs uppercase tracking-widest text-white/50 font-black block">
               Monthly Visitors
             </label>
@@ -85,7 +85,7 @@ export default function StageBleedCalculator({
           </div>
 
           {/* AOV */}
-          <div className="border-[3px] border-white/20 bg-white/5 p-5 space-y-3">
+          <div className="border-[3px] border-white bg-brand-dark p-5 space-y-3 shadow-brutal-gold hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[8px_8px_0px_#ff9900] transition-all duration-200 ease-out">
             <label className="font-mono text-xs uppercase tracking-widest text-white/50 font-black block">
               Average Order Value
             </label>
@@ -104,7 +104,7 @@ export default function StageBleedCalculator({
           </div>
 
           {/* Conversion Gap */}
-          <div className="border-[3px] border-white/20 bg-white/5 p-5 space-y-3">
+          <div className="border-[3px] border-white bg-brand-dark p-5 space-y-3 shadow-brutal-gold hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[8px_8px_0px_#ff9900] transition-all duration-200 ease-out">
             <label className="font-mono text-xs uppercase tracking-widest text-white/50 font-black block">
               Conversion Gap vs Leader
             </label>
@@ -124,7 +124,7 @@ export default function StageBleedCalculator({
         </div>
 
         {/* Loss Display */}
-        <div className="border-[3px] border-brutal-red bg-brutal-red/10 p-8 md:p-10 text-center space-y-4">
+        <div className="border-[3px] border-brutal-red bg-brutal-red/10 p-8 md:p-10 text-center space-y-4 shadow-brutal-red hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[8px_8px_0px_#e63b2e] transition-all duration-200 ease-out">
           <div className="flex items-center justify-center gap-3">
             <TrendingDown className="h-8 w-8 text-brutal-red" />
             <p className="font-mono text-xs uppercase tracking-widest text-brutal-red font-black">

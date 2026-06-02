@@ -58,7 +58,7 @@ function AnimatedScore({ label, score, description, delay, animate }: AnimatedSc
   }, [animate, score, delay]);
 
   return (
-    <div className="border-[3px] border-brand-dark bg-white p-5 md:p-6 space-y-3 shadow-brutal-sm">
+    <div className="brutalist-card brutalist-card-hover space-y-3">
       <p className="font-mono text-xs uppercase tracking-widest text-brand-dark/50 font-black">
         {label}
       </p>
