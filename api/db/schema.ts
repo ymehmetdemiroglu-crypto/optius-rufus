@@ -1,6 +1,10 @@
 import { db } from "./client.js";
 
 export function initSchema() {
+  if (process.env.VERCEL) {
+    console.log("⚠️ Skipping schema init on Vercel (read-only)");
+    return;
+  }
   db.exec(`
     CREATE TABLE IF NOT EXISTS prospects (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

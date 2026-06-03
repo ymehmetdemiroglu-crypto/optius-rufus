@@ -137,7 +137,9 @@ export const prospectsRouter = {
     type: "mutation" as const,
     input: z.object({ slug: z.string() }),
     resolve: ({ input }: { input: { slug: string } }) => {
-      db.prepare("UPDATE prospects SET landingPageViews = landingPageViews + 1 WHERE slug = ?").run(input.slug);
+      if (!db.readonly) {
+        db.prepare("UPDATE prospects SET landingPageViews = landingPageViews + 1 WHERE slug = ?").run(input.slug);
+      }
       return db.prepare("SELECT * FROM prospects WHERE slug = ?").get(input.slug);
     },
   },

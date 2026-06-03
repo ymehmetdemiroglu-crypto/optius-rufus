@@ -1,7 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { TRPCProvider } from './providers/trpc';
 import ProspectLanding from './pages/ProspectLanding';
-import InvitationOnly from './pages/InvitationOnly';
 
 export default function App() {
   return (
@@ -11,11 +10,11 @@ export default function App() {
           {/* Personalized prospect landing pages */}
           <Route path="/p/:slug" element={<ProspectLanding />} />
 
-          {/* Root: Shows the invitation page by default */}
-          <Route path="/" element={<InvitationOnly />} />
+          {/* Root: Redirect to mock-prospect */}
+          <Route path="/" element={<Navigate to="/p/mock-prospect" replace />} />
 
-          {/* Catch-all: redirect to root */}
-          <Route path="*" element={<InvitationOnly />} />
+          {/* Catch-all: redirect to mock-prospect */}
+          <Route path="*" element={<Navigate to="/p/mock-prospect" replace />} />
         </Routes>
       </Router>
     </TRPCProvider>

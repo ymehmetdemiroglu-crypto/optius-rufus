@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": "data/optimus.db"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/:path*",

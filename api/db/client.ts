@@ -16,5 +16,10 @@ if (!fs.existsSync(dbDir)) {
 }
 
 console.log(`🔌 Connecting to SQLite database at: ${dbPath}`);
-export const db = new Database(dbPath);
-db.pragma("journal_mode = WAL");
+const isVercel = !!process.env.VERCEL;
+
+export const db = new Database(dbPath, { readonly: isVercel });
+
+if (!isVercel) {
+  db.pragma("journal_mode = WAL");
+}

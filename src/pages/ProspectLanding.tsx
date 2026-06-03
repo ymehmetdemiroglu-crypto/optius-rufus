@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { trpc } from '../providers/trpc';
 import { mapBackendToProspectData } from '../lib/prospectMapper';
 import type { ProspectData } from '../types/prospect';
+import { MOCK_PROSPECT_DATA } from '../lib/mockProspectData';
 
 import ProgressBar from '../components/landing/ProgressBar';
 import StageHero from '../components/landing/StageHero';
@@ -44,19 +45,21 @@ export default function ProspectLanding() {
   const [currentStage, setCurrentStage] = useState(0);
   const hasIncremented = useRef(false);
 
+  const isMock = slug === 'mock-prospect';
+
   const { data, isLoading } = trpc.prospects?.getBySlug?.useQuery(
     { slug: slug || '' },
-    { enabled: !!slug }
+    { enabled: !!slug && !isMock }
   );
 
   const incrementViews = trpc.prospects?.incrementViews?.useMutation();
 
   useEffect(() => {
-    if (slug && incrementViews && !hasIncremented.current) {
+    if (slug && !isMock && incrementViews && !hasIncremented.current) {
       hasIncremented.current = true;
       incrementViews.mutate({ slug });
     }
-  }, [slug, incrementViews]);
+  }, [slug, incrementViews, isMock]);
 
   // Track scroll position to determine current stage
   useEffect(() => {
@@ -103,11 +106,11 @@ export default function ProspectLanding() {
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
-  if (isLoading) {
+  if (isLoading && !isMock) {
     return <SkeletonLoader />;
   }
 
-  if (!data) {
+  if (!data && !isMock) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6 py-20 bg-brand-dark select-none font-sans text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.03]" style={{
@@ -146,7 +149,7 @@ export default function ProspectLanding() {
     );
   }
 
-  const prospect: ProspectData = mapBackendToProspectData(data);
+  const prospect: ProspectData = isMock ? MOCK_PROSPECT_DATA : mapBackendToProspectData(data);
   const { stageCopy } = prospect;
 
   // Calculate bleed calculator defaults
