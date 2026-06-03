@@ -195,28 +195,45 @@
 
   /* ── Slider (Bleed Calculator) ── */
   .bleed-slider {
-    @apply w-full h-4 bg-brand-bg border-[3px] border-brand-dark appearance-none cursor-pointer outline-none transition-all duration-150;
+    -webkit-appearance: none;
+    appearance: none;
+    @apply w-full h-8 bg-transparent cursor-pointer outline-none;
+  }
+
+  /* Webkit / Chrome / Safari / Edge Track */
+  .bleed-slider::-webkit-slider-runnable-track {
+    @apply w-full h-4 bg-brand-bg border-[3px] border-brand-dark transition-all duration-150;
     box-shadow: inset 3px 3px 0px rgba(0, 0, 0, 0.2);
   }
 
+  /* Webkit / Chrome / Safari / Edge Thumb */
   .bleed-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
+    appearance: none;
     @apply w-7 h-7 bg-brand-gold border-[3px] border-brand-dark cursor-grab rounded-none transition-all duration-100 ease-out;
     box-shadow: 3px 3px 0px #1a1a1a, inset -2px -2px 0px rgba(0, 0, 0, 0.45), inset 2px 2px 0px rgba(255, 255, 255, 0.6);
+    margin-top: -10px; /* Centers the 28px thumb on the 16px track */
   }
 
   .bleed-slider::-webkit-slider-thumb:hover {
     @apply bg-[#ffaa22];
     box-shadow: 4px 4px 0px #1a1a1a, inset -2px -2px 0px rgba(0, 0, 0, 0.45), inset 2px 2px 0px rgba(255, 255, 255, 0.6);
-    transform: translateY(-2px);
+    margin-top: -12px; /* Pull thumb up to simulate lift */
   }
 
   .bleed-slider::-webkit-slider-thumb:active {
     cursor: grabbing;
     box-shadow: 1px 1px 0px #1a1a1a, inset -1px -1px 0px rgba(0, 0, 0, 0.45), inset 1px 1px 0px rgba(255, 255, 255, 0.6);
-    transform: translateY(1px);
+    margin-top: -8px; /* Press thumb down */
   }
 
+  /* Mozilla / Firefox Track */
+  .bleed-slider::-moz-range-track {
+    @apply w-full h-4 bg-brand-bg border-[3px] border-brand-dark transition-all duration-150;
+    box-shadow: inset 3px 3px 0px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Mozilla / Firefox Thumb */
   .bleed-slider::-moz-range-thumb {
     @apply w-7 h-7 bg-brand-gold border-[3px] border-brand-dark cursor-grab rounded-none transition-all duration-100 ease-out;
     box-shadow: 3px 3px 0px #1a1a1a, inset -2px -2px 0px rgba(0, 0, 0, 0.45), inset 2px 2px 0px rgba(255, 255, 255, 0.6);
