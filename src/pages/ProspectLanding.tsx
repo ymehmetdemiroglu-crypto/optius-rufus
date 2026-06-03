@@ -34,133 +34,6 @@ function SkeletonLoader() {
   );
 }
 
-const MOCK_PROSPECT: ProspectData = {
-  id: 4,
-  slug: 'mock-prospect',
-  name: 'Alex Hormozi',
-  company: 'Acme Greens',
-  email: 'founder@acmegreens.com',
-  listing: {
-    asin: 'B08GREEN88',
-    title: 'Acme Premium Organic Supergreens Powder — 30 Servings | Gut Health & Natural Energy',
-    brand: 'Acme Greens',
-    category: 'Supergreens Powder',
-    price: 34.95,
-    rating: 4.1,
-    reviewCount: 245,
-    image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999',
-    bullets: [
-      "DAILY NUTRIENT BOOST: Contains organic spirulina, chlorella, wheatgrass, and barley grass for all-day cellular vitality.",
-      "DIGESTION & GUT HEALTH: Enhanced with natural prebiotics and digestive enzymes for optimal nutrient absorption without bloating.",
-      "100% USDA ORGANIC & VEGAN: Pure, clean, plant-based greens with zero artificial sweeteners, soy, dairy, or gluten."
-    ],
-    description: 'Get your daily greens in one delicious scoop. Powered by clean, organic greens.'
-  },
-  scores: {
-    overallScore: 68,
-    rufusScore: 48,
-    cosmoScore: 42,
-    semanticScore: 43,
-    contentScore: 46,
-    categoryAverage: 54
-  },
-  topIssues: [
-    {
-      title: 'Safety Information',
-      severity: 'critical',
-      description: 'Lacks explicit statements on daily dosage limits and safety warning callouts.',
-      impact: 'Gap: 62%'
-    },
-    {
-      title: 'Usage Instructions',
-      severity: 'warning',
-      description: 'Fails to detail optimal consumption timing and routine integration.',
-      impact: 'Gap: 55%'
-    }
-  ],
-  narrative: 'Your Acme Greens listing is bleeding invisible sales. Amazon\'s AI — Rufus and COSMO — are rewriting the rules of search. Your current listing scores 48/100 for semantic depth. That means qualified buyers are seeing your competitors first.',
-  opportunities: [
-    {
-      title: 'Safety Information',
-      description: 'Your listing is missing semantic coverage for safety information.',
-      before: 'Current content lacks safety information signals.',
-      after: 'Optimized content with targeted safety information messaging.'
-    },
-    {
-      title: 'Usage Instructions',
-      description: 'Your listing is missing semantic coverage for usage instructions.',
-      before: 'Current content lacks usage instructions signals.',
-      after: 'Optimized content with targeted usage instructions messaging.'
-    }
-  ],
-  stageCopy: {
-    heroHeadline: 'Alex, Your Acme Greens Listing is Invisible to 73% of Buyers',
-    heroSubheadline: 'We ran B08GREEN88 through our 7-agent AI engine — scanning Rufus compatibility, COSMO intent mapping, and semantic coverage across 24 dimensions. What we found should concern you.',
-    autopsyHeadline: 'Alex, Your Listing Has 3 Untreated Wounds',
-    autopsyBody: 'Your Rufus compatibility score is 48/100 — that means Amazon\'s AI can only answer 48% of buyer questions using your listing. The category leader in Supergreens Powder scores 87. Your biggest gaps: safety information, usage instructions, ingredient purity.',
-    bleedHeadline: 'Every Day You Wait, You\'re Writing a Check to Your Competitors',
-    bleedBody: 'Based on your category\'s average conversion gap, an unoptimized listing in Supergreens Powder loses between $2,000 and $8,000 per month in missed sales. That\'s money going directly to competitors who\'ve already optimized for Rufus.',
-    simulatorIntro: 'This is happening right now. Every time a buyer asks Amazon\'s AI a question your listing can\'t answer, Rufus recommends your competitor instead. Watch it happen:',
-    simulatorScenarios: [
-      {
-        buyerQuestion: 'Is this supergreens powder safe to use daily?',
-        rufusAnswer: 'Based on available product information, I cannot determine daily usage safety for this product. Here are products with detailed safety information:',
-        competitorName: 'Supergreens Premium Plus',
-        failReason: 'Your listing has no specific daily usage or safety information.'
-      },
-      {
-        buyerQuestion: 'When is the best time to use this product?',
-        rufusAnswer: 'This listing doesn\'t specify optimal timing or usage schedule. However, Supergreens Premium Plus recommends specific timing for best results.',
-        competitorName: 'Supergreens Premium Plus',
-        failReason: 'Your listing lacks usage timing and routine integration details.'
-      },
-      {
-        buyerQuestion: 'How does this compare to other supergreens powders?',
-        rufusAnswer: 'I don\'t have enough differentiation data for this product. Here are alternatives with detailed comparison information:',
-        competitorName: 'Supergreens Elite',
-        failReason: 'Your listing doesn\'t address competitive differentiation or unique value proposition.'
-      }
-    ],
-    transformHeadline: 'Here\'s What a Rufus-Optimized Listing Looks Like',
-    transformBefore: [
-      {
-        section: 'Title',
-        content: 'Acme Premium Organic Supergreens Powder — 30 Servings | Gut Health & Natural Energy'
-      },
-      {
-        section: 'Bullet 1',
-        content: 'DAILY NUTRIENT BOOST: Contains organic spirulina, chlorella, wheatgrass, and barley grass for all-day cellular vitality.'
-      },
-      {
-        section: 'Bullet 2',
-        content: 'DIGESTION & GUT HEALTH: Enhanced with natural prebiotics and digestive enzymes for optimal nutrient absorption without bloating.'
-      }
-    ],
-    transformAfter: [
-      {
-        section: 'Title',
-        content: 'Acme Premium Organic Supergreens Powder — Clinically-Formulated for Daily Use | Safe With Medications | 90-Day Supply'
-      },
-      {
-        section: 'Bullet 1',
-        content: '✅ SAFE FOR DAILY USE: Specifically formulated for daily consumption. Third-party tested for purity. No known allergen interactions — gluten-free, soy-free, and vegan.'
-      },
-      {
-        section: 'Bullet 2',
-        content: '⏰ OPTIMAL TIMING: Take 30 minutes before bed or first thing in the morning for maximum absorption. Integrates seamlessly into your daily wellness routine.'
-      }
-    ],
-    roadmapHeadline: '3 Steps. 48 Hours. Fully Optimized Listing.',
-    roadmapBody: 'No software to learn. No APIs to connect. No recurring subscriptions. We do the heavy lifting — you get a ready-to-paste optimized listing file delivered to your inbox.',
-    socialProofHeadline: 'Sellers Who Fixed This in the Last 30 Days',
-    urgencyCTA: '⚡ We only take 8 new listings per week to maintain quality. 3 slots remaining.',
-    ctaHeadline: 'Book Your Free 15-Minute Listing Audit, Alex',
-    ctaGuarantee: 'If we can\'t find at least $5,000/year in hidden revenue in your listing during our call, we\'ll send you $100 for wasting your time. No credit card. No commitment. Just clarity.'
-  },
-  status: 'analyzed',
-  views: 0,
-  createdAt: ''
-};
 
 export default function ProspectLanding() {
   const { slug } = useParams<{ slug: string }>();
@@ -224,11 +97,50 @@ export default function ProspectLanding() {
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
-  if (isLoading && slug) {
+  if (isLoading) {
     return <SkeletonLoader />;
   }
 
-  const prospect: ProspectData = data ? mapBackendToProspectData(data) : MOCK_PROSPECT;
+  if (!data) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-6 py-20 bg-brand-dark select-none font-sans text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.03]" style={{
+          backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+        }} />
+        
+        <div className="relative z-10 text-center space-y-8 max-w-lg">
+          <div className="inline-flex items-center justify-center h-16 w-16 bg-brand-red border-[3px] border-white/20 mx-auto">
+            <span className="text-2xl font-black text-brand-dark font-mono">?</span>
+          </div>
+          
+          <div className="space-y-4">
+            <h1 className="display-heading text-3xl md:text-5xl text-white">
+              REPORT NOT FOUND
+            </h1>
+            <p className="font-mono text-xs uppercase tracking-widest text-white/40">
+              INVALID OR EXPIRED DIAGNOSTIC LINK
+            </p>
+          </div>
+
+          <div className="border-[3px] border-white/10 bg-white/5 p-6 md:p-8 space-y-3 backdrop-blur-sm">
+            <p className="text-sm text-white/70 font-medium leading-relaxed">
+              We couldn't find a listing analysis for this link. If this is a mistake, please verify the URL or contact us to request an audit.
+            </p>
+          </div>
+
+          <a 
+            href="/"
+            className="inline-block bg-brand-gold text-brand-dark font-bold px-6 py-3 border-[3px] border-brand-dark shadow-brutal hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-brutal-hover active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-100 uppercase font-mono text-xs tracking-wider"
+          >
+            Go to Home
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  const prospect: ProspectData = mapBackendToProspectData(data);
   const { stageCopy } = prospect;
 
   // Calculate bleed calculator defaults

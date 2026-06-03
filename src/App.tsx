@@ -11,11 +11,11 @@ export default function App() {
           {/* Personalized prospect landing pages */}
           <Route path="/p/:slug" element={<ProspectLanding />} />
 
-          {/* Root: Shows the prospect landing page directly for preview */}
-          <Route path="/" element={<ProspectLanding />} />
+          {/* Root: Shows the invitation page by default */}
+          <Route path="/" element={<InvitationOnly />} />
 
           {/* Catch-all: redirect to root */}
-          <Route path="*" element={<ProspectLanding />} />
+          <Route path="*" element={<InvitationOnly />} />
         </Routes>
       </Router>
     </TRPCProvider>

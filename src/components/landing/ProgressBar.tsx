@@ -29,9 +29,9 @@ export default function ProgressBar({ currentStage, totalStages, visible }: Prog
         </span>
 
         {/* Progress bar */}
-        <div className="flex-1 h-1.5 bg-white/10 relative overflow-hidden">
+        <div className="flex-1 h-3.5 bg-brand-dark border-[2px] border-white/20 relative overflow-hidden">
           <div
-            className="h-full bg-brand-gold transition-all duration-700 ease-out"
+            className="h-full bg-brand-gold transition-all duration-700 ease-out border-r-[2px] border-brand-dark"
             style={{ width: `${progress}%` }}
           />
         </div>

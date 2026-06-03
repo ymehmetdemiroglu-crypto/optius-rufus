@@ -138,19 +138,22 @@
 
   /* ── Score Gauge ── */
   .gauge-bar {
-    @apply h-3 bg-brand-dark/10 border-[2px] border-brand-dark relative overflow-hidden;
+    @apply h-5 bg-brand-bg border-[3px] border-brand-dark relative overflow-hidden;
+    background-image: repeating-linear-gradient(45deg, rgba(26,26,26,0.1), rgba(26,26,26,0.1) 4px, transparent 4px, transparent 8px);
+    box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.15);
   }
 
   .gauge-bar::after {
     content: '';
-    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent;
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent;
     background-size: 200% 100%;
     animation: shimmer 3s infinite linear;
   }
 
   .gauge-bar-fill {
-    @apply absolute inset-y-0 left-0;
+    @apply absolute inset-y-0 left-0 border-r-[3px] border-brand-dark;
     animation: gauge-fill 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    box-shadow: inset 0 3px 3px rgba(255, 255, 255, 0.4), inset 0 -3px 3px rgba(0, 0, 0, 0.35);
   }
 
   .gauge-bar-fill.score-critical {
@@ -192,16 +195,43 @@
 
   /* ── Slider (Bleed Calculator) ── */
   .bleed-slider {
-    @apply w-full h-2 bg-brand-dark/10 border border-brand-dark appearance-none cursor-pointer;
+    @apply w-full h-4 bg-brand-bg border-[3px] border-brand-dark appearance-none cursor-pointer outline-none transition-all duration-150;
+    box-shadow: inset 3px 3px 0px rgba(0, 0, 0, 0.2);
   }
 
   .bleed-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    @apply w-6 h-6 bg-brand-gold border-[3px] border-brand-dark cursor-grab active:cursor-grabbing;
+    @apply w-7 h-7 bg-brand-gold border-[3px] border-brand-dark cursor-grab rounded-none transition-all duration-100 ease-out;
+    box-shadow: 3px 3px 0px #1a1a1a, inset -2px -2px 0px rgba(0, 0, 0, 0.45), inset 2px 2px 0px rgba(255, 255, 255, 0.6);
+  }
+
+  .bleed-slider::-webkit-slider-thumb:hover {
+    @apply bg-[#ffaa22];
+    box-shadow: 4px 4px 0px #1a1a1a, inset -2px -2px 0px rgba(0, 0, 0, 0.45), inset 2px 2px 0px rgba(255, 255, 255, 0.6);
+    transform: translateY(-2px);
+  }
+
+  .bleed-slider::-webkit-slider-thumb:active {
+    cursor: grabbing;
+    box-shadow: 1px 1px 0px #1a1a1a, inset -1px -1px 0px rgba(0, 0, 0, 0.45), inset 1px 1px 0px rgba(255, 255, 255, 0.6);
+    transform: translateY(1px);
   }
 
   .bleed-slider::-moz-range-thumb {
-    @apply w-6 h-6 bg-brand-gold border-[3px] border-brand-dark cursor-grab active:cursor-grabbing rounded-none;
+    @apply w-7 h-7 bg-brand-gold border-[3px] border-brand-dark cursor-grab rounded-none transition-all duration-100 ease-out;
+    box-shadow: 3px 3px 0px #1a1a1a, inset -2px -2px 0px rgba(0, 0, 0, 0.45), inset 2px 2px 0px rgba(255, 255, 255, 0.6);
+  }
+
+  .bleed-slider::-moz-range-thumb:hover {
+    @apply bg-[#ffaa22];
+    box-shadow: 4px 4px 0px #1a1a1a, inset -2px -2px 0px rgba(0, 0, 0, 0.45), inset 2px 2px 0px rgba(255, 255, 255, 0.6);
+    transform: translateY(-2px);
+  }
+
+  .bleed-slider::-moz-range-thumb:active {
+    cursor: grabbing;
+    box-shadow: 1px 1px 0px #1a1a1a, inset -1px -1px 0px rgba(0, 0, 0, 0.45), inset 1px 1px 0px rgba(255, 255, 255, 0.6);
+    transform: translateY(1px);
   }
 
   /* ── Progress Bar ── */
