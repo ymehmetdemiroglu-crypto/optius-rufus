@@ -121,8 +121,9 @@ async function run() {
       copyRoadmapHeadline, copyRoadmapBody,
       copySocialProofHeadline,
       copyCtaHeadline, copyCtaGuarantee,
+      copyFreeQAs, copyReviewSentiment, copyCompetitorAudit, copyPpcKeywords, copyCosmoBundling, copyCosmoGraphData,
       createdAt
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
   `).run(
     listingId,
     prospectId,
@@ -165,7 +166,82 @@ async function run() {
     stageCopy.socialProofHeadline,
     // Stage 8: CTA
     stageCopy.ctaHeadline,
-    stageCopy.ctaGuarantee
+    stageCopy.ctaGuarantee,
+    // Advanced upgrades
+    JSON.stringify([
+      {
+        question: "Is Acme Supergreens powder safe to take daily?",
+        answer: "Yes, it is formulated with organic, clean plants and is entirely safe for daily consumption. Standard dosage is 1 scoop mixed with water or smoothies daily.",
+        dimension: "safety_information"
+      },
+      {
+        question: "Does this contain real wheatgrass, and is it gluten-free?",
+        answer: "Yes, it contains organic wheatgrass. However, it is harvested before the wheat grain develops, making it completely gluten-free and third-party certified.",
+        dimension: "ingredient_purity"
+      },
+      {
+        question: "How do I take this for best results?",
+        answer: "For maximum nutrient absorption and natural morning energy, mix 1 scoop into 8-12 oz of cold water on an empty stomach every morning.",
+        dimension: "usage_instructions"
+      }
+    ]),
+    JSON.stringify([
+      { aspect: "Solubility & Clumping", status: "good", feedback: "88% of customers report it dissolves perfectly in cold water without needing a blender.", percentage: 88 },
+      { aspect: "Morning Energy Boost", status: "good", feedback: "92% of reviews state they feel a clean morning energy surge within 30 minutes of drinking.", percentage: 92 },
+      { aspect: "Taste Profile", status: "warning", feedback: "16% of users mention a grassy/earthy taste. Rufus flags this warning for buyers searching for sweet options.", percentage: 16 },
+      { aspect: "Packaging & Bag Seal", status: "critical", feedback: "8% of buyers mention zip-lock failure causing spilling. Rufus actively warns conversational shoppers about potential packaging issues.", percentage: 8 }
+    ]),
+    JSON.stringify([
+      {
+        query: "best organic greens powder for bloating relief",
+        competitorName: "Athletic Greens AG1",
+        competitorAdvantage: "Explicitly details 7.2 billion CFU lactobacillus and prebiotic inulin in listing bullets and images.",
+        yourGap: "Your listing mentions 'gut health' but fails to specify the exact probiotic strains or CFU dosage."
+      },
+      {
+        query: "pure vegan wheatgrass drink without soy",
+        competitorName: "Organifi Green Juice",
+        competitorAdvantage: "Presents prominent USDA Organic certification badges in all main images and specifies allergen-free credentials.",
+        yourGap: "Your organic claims are only in secondary bullet text, which fails to trigger high relevance for Rufus queries."
+      }
+    ]),
+    JSON.stringify([
+      { intent: "Bloating Relief", keyword: "organic supergreens powder for bloating", difficulty: "Low", searchVolume: 1850, bidEstimate: 1.15 },
+      { intent: "Gluten-Free Purity", keyword: "certified gluten free greens drink powder", difficulty: "Low", searchVolume: 620, bidEstimate: 0.85 },
+      { intent: "Daily Vitality", keyword: "daily organic greens powder supplement", difficulty: "Medium", searchVolume: 5100, bidEstimate: 2.30 },
+      { intent: "Morning Routine", keyword: "morning energy super greens mix", difficulty: "Medium", searchVolume: 1400, bidEstimate: 1.45 }
+    ]),
+    JSON.stringify([
+      {
+        title: "The Morning Gut-Health Stack",
+        products: ["Acme Premium Organic Supergreens Powder", "Acme Organic Apple Cider Vinegar Capsules"],
+        rationale: "COSMO purchase histories reveal a high correlation for morning digestive health boosters. Bundling these two products establishes a powerful co-purchase association in the COSMO graph."
+      },
+      {
+        title: "Complete Plant-Based Vitality Kit",
+        products: ["Acme Premium Organic Supergreens Powder", "Acme Vegan Plant Protein Powder"],
+        rationale: "Vegan athletes frequently combine daily micronutrient greens with plant protein post-workout. Captures the active lifestyle co-purchase link."
+      }
+    ]),
+    JSON.stringify({
+      nodes: [
+        { id: "1", label: "Acme Supergreens", group: "core" },
+        { id: "2", label: "USDA Organic", group: "connected" },
+        { id: "3", label: "Vegan Diet", group: "connected" },
+        { id: "4", label: "Prebiotics", group: "connected" },
+        { id: "5", label: "Bloating Relief", group: "gap" },
+        { id: "6", label: "Daily Safety Warning", group: "gap" },
+        { id: "7", label: "Morning Energy", group: "gap" }
+      ],
+      edges: [
+        { from: "1", to: "2", active: true },
+        { from: "1", to: "3", active: true },
+        { from: "1", to: "4", active: true },
+        { from: "1", to: "5", active: false },
+        { from: "1", to: "6", active: false },
+        { from: "1", to: "7", active: false }
+      ]
+    })
   );
 
   console.log("\n🚀 Success! Mock prospect is completely configured and saved in SQLite database.");

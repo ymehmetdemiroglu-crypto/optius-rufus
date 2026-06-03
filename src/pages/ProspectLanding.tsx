@@ -10,12 +10,15 @@ import StageAutopsy from '../components/landing/StageAutopsy';
 import StageBleedCalculator from '../components/landing/StageBleedCalculator';
 import StageRufusSimulator from '../components/landing/StageRufusSimulator';
 import StageTransformPreview from '../components/landing/StageTransformPreview';
+import StageFreeQAs from '../components/landing/StageFreeQAs';
+import StagePPCPlanner from '../components/landing/StagePPCPlanner';
+import StageBundlingBlueprint from '../components/landing/StageBundlingBlueprint';
 import StageRoadmap from '../components/landing/StageRoadmap';
 import StageProofWall from '../components/landing/StageProofWall';
 import StageBookCall from '../components/landing/StageBookCall';
 import FloatingCTA from '../components/landing/FloatingCTA';
 
-const TOTAL_STAGES = 8;
+const TOTAL_STAGES = 11;
 
 function SkeletonLoader() {
   return (
@@ -65,6 +68,9 @@ export default function ProspectLanding() {
       'stage-bleed',
       'stage-simulator',
       'stage-transform',
+      'stage-free-qas',
+      'stage-ppc-planner',
+      'stage-bundling',
       'stage-roadmap',
       'stage-proof',
       'stage-book',
@@ -175,6 +181,8 @@ export default function ProspectLanding() {
             body={stageCopy.autopsyBody}
             category={prospect.listing.category}
             visible={scanComplete}
+            cosmoGraphData={stageCopy.cosmoGraphData}
+            reviewSentiment={stageCopy.reviewSentiment}
           />
 
           {/* Stage 3: Bleed Calculator */}
@@ -192,6 +200,7 @@ export default function ProspectLanding() {
             intro={stageCopy.simulatorIntro}
             scenarios={stageCopy.simulatorScenarios}
             visible={currentStage >= 3}
+            competitorAudit={stageCopy.competitorAudit}
           />
 
           {/* Stage 5: Transformation Preview */}
@@ -199,38 +208,57 @@ export default function ProspectLanding() {
             headline={stageCopy.transformHeadline}
             before={stageCopy.transformBefore}
             after={stageCopy.transformAfter}
+            contentScore={prospect.scores.contentScore}
             visible={currentStage >= 4}
           />
 
-          {/* Stage 6: Roadmap */}
+          {/* Stage 6: Free QAs */}
+          <StageFreeQAs
+            freeQAs={stageCopy.freeQAs}
+            visible={currentStage >= 5}
+          />
+
+          {/* Stage 7: Conversational PPC Planner */}
+          <StagePPCPlanner
+            ppcKeywords={stageCopy.ppcKeywords}
+            visible={currentStage >= 6}
+          />
+
+          {/* Stage 8: COSMO Bundling Blueprint */}
+          <StageBundlingBlueprint
+            cosmoBundling={stageCopy.cosmoBundling}
+            visible={currentStage >= 7}
+          />
+
+          {/* Stage 9: Roadmap */}
           <StageRoadmap
             headline={stageCopy.roadmapHeadline}
             body={stageCopy.roadmapBody}
             prospectName={prospect.name}
-            visible={currentStage >= 5}
+            visible={currentStage >= 8}
           />
 
-          {/* Stage 7: Social Proof */}
+          {/* Stage 10: Social Proof */}
           <StageProofWall
             headline={stageCopy.socialProofHeadline}
             urgencyCTA={stageCopy.urgencyCTA}
             onOpenBooking={scrollToBooking}
-            visible={currentStage >= 6}
+            visible={currentStage >= 9}
           />
 
-          {/* Stage 8: Book Call */}
+          {/* Stage 11: Book Call */}
           <StageBookCall
             headline={stageCopy.ctaHeadline}
             guarantee={stageCopy.ctaGuarantee}
             prospectId={prospect.id}
             prospectName={prospect.name}
             prospectEmail={prospect.email || ''}
-            visible={currentStage >= 7}
+            visible={currentStage >= 10}
           />
 
           {/* Floating CTA (mobile) */}
           <FloatingCTA
-            visible={currentStage >= 1 && currentStage < 7}
+            visible={currentStage >= 1 && currentStage < 10}
             onClick={scrollToBooking}
           />
         </>

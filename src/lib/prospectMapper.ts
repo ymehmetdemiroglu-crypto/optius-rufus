@@ -7,6 +7,12 @@ import type {
   StageCopyData,
   SimulatorScenario,
   TransformSnippet,
+  FreeQAItem,
+  ReviewSentimentProfile,
+  CompetitorComparison,
+  PPCKeywordItem,
+  BundlingItem,
+  CosmoNodeData,
 } from '../types/prospect';
 
 function safeJsonParse<T>(str: string | null | undefined, fallback: T): T {
@@ -195,6 +201,120 @@ export function mapBackendToProspectData(data: {
     ctaGuarantee:
       (analysis?.copyCtaGuarantee as string) ||
       `If we can't find at least $5,000/year in hidden revenue, we'll send you $100 for wasting your time.`,
+
+    // Advanced upgrades mapping with fallbacks
+    freeQAs: safeJsonParse<FreeQAItem[]>(
+      analysis?.copyFreeQAs as string,
+      [
+        {
+          question: `Is this ${mappedListing.category.toLowerCase() || 'product'} safe for daily use?`,
+          answer: `Yes! Our organic supergreens powder is formulated for daily cellular vitality and nutrient support. Take one scoop daily in water or your favorite smoothie.`,
+          dimension: 'daily_usage_safety',
+        },
+        {
+          question: `Does this contain any artificial sweeteners or gluten?`,
+          answer: `No. It is 100% USDA Organic, Vegan, and Gluten-Free. There are zero artificial ingredients, soy, dairy, or binders.`,
+          dimension: 'ingredient_purity',
+        },
+        {
+          question: `When is the best time of day to consume this?`,
+          answer: `We recommend drinking it in the morning on an empty stomach for maximum nutrient absorption and sustained energy throughout the day.`,
+          dimension: 'usage_timing',
+        },
+      ]
+    ),
+    reviewSentiment: safeJsonParse<ReviewSentimentProfile[]>(
+      analysis?.copyReviewSentiment as string,
+      [
+        {
+          aspect: 'Mixing & Solubility',
+          status: 'good',
+          feedback: '82% of reviews mention it dissolves easily without clumping compared to industry averages.',
+          percentage: 82,
+        },
+        {
+          aspect: 'Taste & Texture',
+          status: 'warning',
+          feedback: '14% of buyers note an earthy/chalky taste. Rufus may advise buyers seeking sweet options to look elsewhere.',
+          percentage: 14,
+        },
+        {
+          aspect: 'Energy Levels',
+          status: 'good',
+          feedback: '94% of buyers report sustained morning energy levels within a week of consistent daily use.',
+          percentage: 94,
+        },
+        {
+          aspect: 'Packaging Seal',
+          status: 'critical',
+          feedback: '9% of buyers report defects with the zip-lock bag sealing. Rufus actively flags packaging reliability concerns.',
+          percentage: 9,
+        },
+      ]
+    ),
+    competitorAudit: safeJsonParse<CompetitorComparison[]>(
+      analysis?.copyCompetitorAudit as string,
+      [
+        {
+          query: `Best organic ${mappedListing.category.toLowerCase() || 'product'} with prebiotics for bloating`,
+          competitorName: 'Greens Champion Plus',
+          competitorAdvantage: 'Explicitly lists clinical prebiotic strains (Inulin) and digestive enzymes in its bullet points and Q&A.',
+          yourGap: 'Your listing mentions "prebiotics" but fails to specify the source or explain why it reduces bloating.',
+        },
+        {
+          query: `Gluten-free daily ${mappedListing.category.toLowerCase() || 'greens'} for morning energy`,
+          competitorName: 'Organifi Pure Greens',
+          competitorAdvantage: 'Highlights "morning ritual integration" and "GFCO Certified gluten-free" labels in its top images and title.',
+          yourGap: 'Your gluten-free claim is buried at the end of the third bullet point, which Rufus ranks as low relevance.',
+        },
+      ]
+    ),
+    ppcKeywords: safeJsonParse<PPCKeywordItem[]>(
+      analysis?.copyPpcKeywords as string,
+      [
+        { intent: 'Digestive Health', keyword: `organic ${mappedListing.category.toLowerCase() || 'greens'} powder for bloating`, difficulty: 'Low', searchVolume: 1240, bidEstimate: 1.25 },
+        { intent: 'Daily Vitality', keyword: `daily USDA organic ${mappedListing.category.toLowerCase() || 'greens'} powder`, difficulty: 'Medium', searchVolume: 4200, bidEstimate: 2.10 },
+        { intent: 'Dietary Purity', keyword: `gluten free vegan ${mappedListing.category.toLowerCase() || 'supergreens'} drink`, difficulty: 'Low', searchVolume: 850, bidEstimate: 0.95 },
+        { intent: 'Energy Support', keyword: `morning energy ${mappedListing.category.toLowerCase() || 'greens'} powder drink`, difficulty: 'Medium', searchVolume: 1800, bidEstimate: 1.65 },
+      ]
+    ),
+    cosmoBundling: safeJsonParse<BundlingItem[]>(
+      analysis?.copyCosmoBundling as string,
+      [
+        {
+          title: 'The Morning Synergy Bundle',
+          products: [`${mappedListing.brand || 'Acme'} Supergreens Powder`, `${mappedListing.brand || 'Acme'} Organic Apple Cider Vinegar Capsules`],
+          rationale: 'COSMO purchase history graphs show a strong co-purchase correlation for gut-health boosters in the morning. Bundling these forces a direct relationship path.',
+        },
+        {
+          title: 'Ultimate Daily Vitality Pack',
+          products: [`${mappedListing.brand || 'Acme'} Supergreens Powder`, `${mappedListing.brand || 'Acme'} Vegan Vitamin D3 + K2 Drops`],
+          rationale: 'Sellers purchasing daily plant-based nutrients frequently add fat-soluble vitamin droplets. Combines immunity and gut health.',
+        },
+      ]
+    ),
+    cosmoGraphData: safeJsonParse<CosmoNodeData>(
+      analysis?.copyCosmoGraphData as string,
+      {
+        nodes: [
+          { id: '1', label: mappedListing.brand || 'Your Brand', group: 'core' },
+          { id: '2', label: 'USDA Organic', group: 'connected' },
+          { id: '3', label: 'Vegan Gut Health', group: 'connected' },
+          { id: '4', label: 'Daily Vitality', group: 'connected' },
+          { id: '5', label: 'Bloating Relief', group: 'gap' },
+          { id: '6', label: 'Daily Dosage Safety', group: 'gap' },
+          { id: '7', label: 'Morning Energy Boost', group: 'gap' },
+        ],
+        edges: [
+          { from: '1', to: '2', active: true },
+          { from: '1', to: '3', active: true },
+          { from: '1', to: '4', active: true },
+          { from: '1', to: '5', active: false },
+          { from: '1', to: '6', active: false },
+          { from: '1', to: '7', active: false },
+        ],
+      }
+    ),
   };
 
   return {

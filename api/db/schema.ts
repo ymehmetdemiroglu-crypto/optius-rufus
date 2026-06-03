@@ -91,6 +91,14 @@ export function initSchema() {
       copyCtaHeadline TEXT,
       copyCtaGuarantee TEXT,
 
+      -- Advanced Features
+      copyFreeQAs TEXT,
+      copyReviewSentiment TEXT,
+      copyCompetitorAudit TEXT,
+      copyPpcKeywords TEXT,
+      copyCosmoBundling TEXT,
+      copyCosmoGraphData TEXT,
+
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (listingId) REFERENCES listings(id),
       FOREIGN KEY (prospectId) REFERENCES prospects(id)
@@ -129,10 +137,15 @@ export function initSchema() {
     "copySocialProofHeadline TEXT",
     "copyCtaHeadline TEXT",
     "copyCtaGuarantee TEXT",
+    "copyFreeQAs TEXT",
+    "copyReviewSentiment TEXT",
+    "copyCompetitorAudit TEXT",
+    "copyPpcKeywords TEXT",
+    "copyCosmoBundling TEXT",
+    "copyCosmoGraphData TEXT",
   ];
 
   for (const col of newColumns) {
-    const colName = col.split(" ")[0];
     try {
       db.exec(`ALTER TABLE listing_analyses ADD COLUMN ${col}`);
     } catch {

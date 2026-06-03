@@ -56,6 +56,47 @@ export interface TransformSnippet {
   content: string;
 }
 
+// ── Advanced Upgrades ──
+
+export interface FreeQAItem {
+  question: string;
+  answer: string;
+  dimension: string;
+}
+
+export interface ReviewSentimentProfile {
+  aspect: string;
+  status: 'critical' | 'warning' | 'good';
+  feedback: string;
+  percentage: number;
+}
+
+export interface CompetitorComparison {
+  query: string;
+  competitorName: string;
+  competitorAdvantage: string;
+  yourGap: string;
+}
+
+export interface PPCKeywordItem {
+  intent: string;
+  keyword: string;
+  difficulty: 'Low' | 'Medium' | 'High';
+  searchVolume: number;
+  bidEstimate: number;
+}
+
+export interface BundlingItem {
+  title: string;
+  products: string[];
+  rationale: string;
+}
+
+export interface CosmoNodeData {
+  nodes: Array<{ id: string; label: string; group: 'core' | 'connected' | 'gap' }>;
+  edges: Array<{ from: string; to: string; active: boolean }>;
+}
+
 // ── Stage Copy (All 8 stages) ──
 
 export interface StageCopyData {
@@ -84,6 +125,14 @@ export interface StageCopyData {
   // Stage 8: CTA
   ctaHeadline: string;
   ctaGuarantee: string;
+
+  // Advanced features
+  freeQAs: FreeQAItem[];
+  reviewSentiment: ReviewSentimentProfile[];
+  competitorAudit: CompetitorComparison[];
+  ppcKeywords: PPCKeywordItem[];
+  cosmoBundling: BundlingItem[];
+  cosmoGraphData: CosmoNodeData;
 }
 
 // ── Prospect Data (complete landing page data) ──

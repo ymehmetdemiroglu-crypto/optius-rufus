@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Bot, AlertCircle, ChevronRight } from 'lucide-react';
-import type { SimulatorScenario } from '../../types/prospect';
+import { MessageCircle, Bot, AlertCircle, ChevronRight, ArrowRightLeft } from 'lucide-react';
+import type { SimulatorScenario, CompetitorComparison } from '../../types/prospect';
 
 interface StageRufusSimulatorProps {
   intro: string;
   scenarios: SimulatorScenario[];
   visible: boolean;
+  competitorAudit: CompetitorComparison[];
 }
 
 function TypewriterText({ text, speed = 25, onComplete }: { text: string; speed?: number; onComplete?: () => void }) {
@@ -36,12 +37,12 @@ function TypewriterText({ text, speed = 25, onComplete }: { text: string; speed?
   );
 }
 
-export default function StageRufusSimulator({ intro, scenarios, visible }: StageRufusSimulatorProps) {
+export default function StageRufusSimulator({ intro, scenarios, visible, competitorAudit }: StageRufusSimulatorProps) {
   const [activeScenario, setActiveScenario] = useState(0);
   const [phase, setPhase] = useState<'question' | 'typing' | 'answer' | 'fail'>('question');
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   const current = scenarios[activeScenario];
+  const audit = competitorAudit[activeScenario];
 
   useEffect(() => {
     if (!visible) return;
@@ -107,7 +108,7 @@ export default function StageRufusSimulator({ intro, scenarios, visible }: Stage
         </div>
 
         {/* Chat Simulator */}
-        <div className="chat-phone-frame">
+        <div className="chat-phone-frame max-w-lg mx-auto">
           {/* Phone Header */}
           <div className="chat-header">
             <Bot className="h-4 w-4" />
@@ -175,9 +176,32 @@ export default function StageRufusSimulator({ intro, scenarios, visible }: Stage
           </div>
         </div>
 
+        {/* Side-by-Side Competitor Audit Panel */}
+        {phase === 'fail' && audit && (
+          <div className="max-w-2xl mx-auto border-[3px] border-brand-dark bg-white p-5 shadow-brutal animate-slide-up mt-6 space-y-4">
+            <div className="flex items-center gap-2 text-brand-blue font-black font-display text-lg uppercase border-b-2 border-brand-dark pb-2">
+              <ArrowRightLeft className="h-5 w-5 text-brand-blue" />
+              <span>Competitor Loss Audit vs. {audit.competitorName}</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+              <div className="border-2 border-brutal-red bg-brutal-red/5 p-3 space-y-2">
+                <p className="font-black text-brutal-red uppercase text-[10px] tracking-widest">YOUR SEMANTIC GAP:</p>
+                <p className="text-brand-dark leading-relaxed font-bold">{audit.yourGap}</p>
+              </div>
+              <div className="border-2 border-green-500 bg-green-500/5 p-3 space-y-2">
+                <p className="font-black text-green-700 uppercase text-[10px] tracking-widest">COMPETITOR ADVANTAGE:</p>
+                <p className="text-brand-dark leading-relaxed font-bold">{audit.competitorAdvantage}</p>
+              </div>
+            </div>
+            <div className="text-[10px] font-mono font-bold text-brand-dark/50 text-center">
+              Target Query: "{audit.query}"
+            </div>
+          </div>
+        )}
+
         {/* Next Button */}
         {phase === 'fail' && activeScenario < scenarios.length - 1 && (
-          <div className="text-center animate-fade-in">
+          <div className="text-center animate-fade-in mt-6">
             <button
               onClick={handleNext}
               className="brutalist-btn-secondary inline-flex items-center gap-2"
@@ -190,7 +214,7 @@ export default function StageRufusSimulator({ intro, scenarios, visible }: Stage
 
         {/* Summary after all scenarios */}
         {phase === 'fail' && activeScenario === scenarios.length - 1 && (
-          <div className="border-[3px] border-brutal-red bg-brutal-red/5 p-6 text-center animate-fade-in">
+          <div className="border-[3px] border-brutal-red bg-brutal-red/5 p-6 text-center animate-fade-in max-w-lg mx-auto">
             <p className="text-lg font-black text-brand-dark">
               Your listing failed <span className="text-brutal-red">{scenarios.length} out of {scenarios.length}</span> common buyer questions.
               <br />
