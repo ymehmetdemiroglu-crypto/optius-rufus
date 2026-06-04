@@ -1,33 +1,30 @@
 import { z } from "zod";
 import { db } from "../db/client.js";
+import type { ListingRecord } from "../db/client.js";
 import { triggerScrape, getRunStatus, getDatasetItems } from "../services/apify.js";
+import { router, publicProcedure } from "../trpc.js";
 
 // In-memory store for Apify runs
 const runStore = new Map<string, { prospectId: number; datasetId: string }>();
 
-export const scraperRouter = {
-  trigger: {
-    type: "mutation" as const,
-    input: z.object({
-      prospectId: z.number().int(),
-      asin: z.string(),
-      marketplace: z.string().optional().default("US"),
-    }),
-    resolve: async ({
-      input,
-    }: {
-      input: { prospectId: number; asin: string; marketplace: string };
-    }) => {
+export const scraperRouter = router({
+  trigger: publicProcedure
+    .input(
+      z.object({
+        prospectId: z.number().int(),
+        asin: z.string(),
+        marketplace: z.string().optional().default("US"),
+      })
+    )
+    .mutation(async ({ input }) => {
       const { runId, datasetId } = await triggerScrape(input.asin, input.marketplace);
       runStore.set(runId, { prospectId: input.prospectId, datasetId });
       return { runId };
-    },
-  },
+    }),
 
-  poll: {
-    type: "mutation" as const,
-    input: z.object({ runId: z.string() }),
-    resolve: async ({ input }: { input: { runId: string } }) => {
+  poll: publicProcedure
+    .input(z.object({ runId: z.string() }))
+    .mutation(async ({ input }) => {
       const runInfo = runStore.get(input.runId);
       if (!runInfo) {
         throw new Error(`Run not found: ${input.runId}`);
@@ -68,7 +65,7 @@ export const scraperRouter = {
             JSON.stringify(item)
           );
 
-        const listing = db.prepare("SELECT * FROM listings WHERE id = ?").get(result.lastInsertRowid);
+        const listing = db.prepare("SELECT * FROM listings WHERE id = ?").get(result.lastInsertRowid) as ListingRecord | undefined;
 
         db.prepare("UPDATE prospects SET status = 'scraped' WHERE id = ?").run(runInfo.prospectId);
 
@@ -76,22 +73,18 @@ export const scraperRouter = {
       }
 
       return { status, listing: null };
-    },
-  },
-
-  ingestDirect: {
-    type: "mutation" as const,
-    input: z.object({
-      prospectId: z.number().int(),
-      asin: z.string(),
-      marketplace: z.string().optional().default("US"),
-      data: z.record(z.unknown()),
     }),
-    resolve: ({
-      input,
-    }: {
-      input: { prospectId: number; asin: string; marketplace: string; data: Record<string, unknown> };
-    }) => {
+
+  ingestDirect: publicProcedure
+    .input(
+      z.object({
+        prospectId: z.number().int(),
+        asin: z.string(),
+        marketplace: z.string().optional().default("US"),
+        data: z.record(z.unknown()),
+      })
+    )
+    .mutation(({ input }) => {
       const item = input.data;
       const bullets = Array.isArray(item.bullets) ? JSON.stringify(item.bullets) : item.bullets || "[]";
       const images = Array.isArray(item.images) ? JSON.stringify(item.images) : item.images || "[]";
@@ -118,10 +111,10 @@ export const scraperRouter = {
           JSON.stringify(item)
         );
 
-      const listing = db.prepare("SELECT * FROM listings WHERE id = ?").get(result.lastInsertRowid);
+      const listing = db.prepare("SELECT * FROM listings WHERE id = ?").get(result.lastInsertRowid) as ListingRecord | undefined;
       db.prepare("UPDATE prospects SET status = 'scraped' WHERE id = ?").run(input.prospectId);
 
       return listing;
-    },
-  },
-};
+    }),
+});
+

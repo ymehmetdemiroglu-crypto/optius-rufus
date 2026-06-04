@@ -1,8 +1,10 @@
 import { z } from "zod";
 import { db } from "../db/client.js";
+import type { ListingRecord, ProspectRecord } from "../db/client.js";
 import { OptimizationOrchestrator } from "../agents/orchestrator.js";
 import { generateAllStageCopy } from "../services/copywriter.js";
 import type { RawListingData, AnalysisResult, SemanticGap } from "../agents/types.js";
+import { router, publicProcedure } from "../trpc.js";
 
 const orchestrator = new OptimizationOrchestrator();
 
@@ -16,32 +18,32 @@ function safeJsonParse<T>(str: string | null | undefined, fallback: T): T {
 }
 
 async function runAnalysis(listingId: number) {
-  const listing = db.prepare("SELECT * FROM listings WHERE id = ?").get(listingId) as Record<string, unknown> | undefined;
+  const listing = db.prepare("SELECT * FROM listings WHERE id = ?").get(listingId) as ListingRecord | undefined;
   if (!listing) {
     throw new Error(`Listing not found: ${listingId}`);
   }
 
-  const prospect = db.prepare("SELECT * FROM prospects WHERE id = ?").get(listing.prospectId) as Record<string, unknown> | undefined;
+  const prospect = db.prepare("SELECT * FROM prospects WHERE id = ?").get(listing.prospectId) as ProspectRecord | undefined;
   if (!prospect) {
     throw new Error(`Prospect not found for listing: ${listingId}`);
   }
 
   const rawListing: RawListingData = {
-    asin: listing.asin as string,
-    title: (listing.title as string) || "",
-    bullets: safeJsonParse(listing.bullets as string, []),
-    description: (listing.description as string) || "",
-    brand: (listing.brand as string) || "",
-    category: (listing.category as string) || "",
-    subcategory: (listing.category as string) || "",
-    images: safeJsonParse(listing.images as string, []),
-    price: (listing.price as number) || 0,
-    rating: (listing.rating as number) || 0,
-    reviewCount: (listing.reviewCount as number) || 0,
-    attributes: safeJsonParse(listing.rawScrapeData as string, {}),
+    asin: listing.asin,
+    title: listing.title || "",
+    bullets: safeJsonParse(listing.bullets, []),
+    description: listing.description || "",
+    brand: listing.brand || "",
+    category: listing.category || "",
+    subcategory: listing.category || "",
+    images: safeJsonParse(listing.images, []),
+    price: listing.price || 0,
+    rating: listing.rating || 0,
+    reviewCount: listing.reviewCount || 0,
+    attributes: safeJsonParse(listing.rawScrapeData, {}),
   };
 
-  const state = await orchestrator.runPipeline(listing.asin as string, (listing.marketplace as string) || "US", {
+  const state = await orchestrator.runPipeline(listing.asin, listing.marketplace || "US", {
     listingData: rawListing,
   });
 
@@ -61,8 +63,8 @@ async function runAnalysis(listingId: number) {
   const opportunities = gaps.filter((g) => g.gap >= 0.3).map((g) => g.dimension);
 
   // Build prospect name
-  const firstName = (prospect.firstName as string) || "";
-  const lastName = (prospect.lastName as string) || "";
+  const firstName = prospect.firstName || "";
+  const lastName = prospect.lastName || "";
   const prospectName = [firstName, lastName].filter(Boolean).join(" ") || "there";
 
   // Generate ALL stage copy
@@ -144,78 +146,71 @@ async function runAnalysis(listingId: number) {
   return { analysis: analysisRow, listing, prospect };
 }
 
-export const analysisRouter = {
-  run: {
-    type: "mutation" as const,
-    input: z.object({ listingId: z.number().int() }),
-    resolve: async ({ input }: { input: { listingId: number } }) => {
+export const analysisRouter = router({
+  run: publicProcedure
+    .input(z.object({ listingId: z.number().int() }))
+    .mutation(async ({ input }) => {
       return runAnalysis(input.listingId);
-    },
-  },
+    }),
 
-  runByProspect: {
-    type: "mutation" as const,
-    input: z.object({ prospectId: z.number().int() }),
-    resolve: async ({ input }: { input: { prospectId: number } }) => {
+  runByProspect: publicProcedure
+    .input(z.object({ prospectId: z.number().int() }))
+    .mutation(async ({ input }) => {
       const listing = db
         .prepare("SELECT * FROM listings WHERE prospectId = ? ORDER BY createdAt DESC LIMIT 1")
-        .get(input.prospectId) as Record<string, unknown> | undefined;
+        .get(input.prospectId) as ListingRecord | undefined;
       if (!listing) {
         throw new Error(`No listing found for prospect: ${input.prospectId}`);
       }
-      return runAnalysis(listing.id as number);
-    },
-  },
+      return runAnalysis(listing.id);
+    }),
 
-  getByProspect: {
-    type: "query" as const,
-    input: z.object({ prospectId: z.number().int() }),
-    resolve: ({ input }: { input: { prospectId: number } }) => {
+  getByProspect: publicProcedure
+    .input(z.object({ prospectId: z.number().int() }))
+    .query(({ input }) => {
       const listing = db
         .prepare("SELECT * FROM listings WHERE prospectId = ? ORDER BY createdAt DESC LIMIT 1")
-        .get(input.prospectId);
+        .get(input.prospectId) as ListingRecord | undefined;
       const analysis = listing
         ? db
             .prepare("SELECT * FROM listing_analyses WHERE prospectId = ? ORDER BY createdAt DESC LIMIT 1")
             .get(input.prospectId)
         : null;
       return { analysis: analysis || null, listing: listing || null };
-    },
-  },
+    }),
 
-  regenerateCopy: {
-    type: "mutation" as const,
-    input: z.object({ analysisId: z.number().int() }),
-    resolve: async ({ input }: { input: { analysisId: number } }) => {
+  regenerateCopy: publicProcedure
+    .input(z.object({ analysisId: z.number().int() }))
+    .mutation(async ({ input }) => {
       const analysisRow = db.prepare("SELECT * FROM listing_analyses WHERE id = ?").get(input.analysisId) as Record<string, unknown> | undefined;
       if (!analysisRow) {
         throw new Error(`Analysis not found: ${input.analysisId}`);
       }
 
-      const listing = db.prepare("SELECT * FROM listings WHERE id = ?").get(analysisRow.listingId) as Record<string, unknown> | undefined;
+      const listing = db.prepare("SELECT * FROM listings WHERE id = ?").get(analysisRow.listingId) as ListingRecord | undefined;
       if (!listing) {
         throw new Error(`Listing not found for analysis: ${input.analysisId}`);
       }
 
-      const prospect = db.prepare("SELECT * FROM prospects WHERE id = ?").get(analysisRow.prospectId) as Record<string, unknown> | undefined;
+      const prospect = db.prepare("SELECT * FROM prospects WHERE id = ?").get(analysisRow.prospectId) as ProspectRecord | undefined;
 
       const rawListing: RawListingData = {
-        asin: listing.asin as string,
-        title: (listing.title as string) || "",
-        bullets: safeJsonParse(listing.bullets as string, []),
-        description: (listing.description as string) || "",
-        brand: (listing.brand as string) || "",
-        category: (listing.category as string) || "",
-        subcategory: (listing.category as string) || "",
-        images: safeJsonParse(listing.images as string, []),
-        price: (listing.price as number) || 0,
-        rating: (listing.rating as number) || 0,
-        reviewCount: (listing.reviewCount as number) || 0,
-        attributes: safeJsonParse(listing.rawScrapeData as string, {}),
+        asin: listing.asin,
+        title: listing.title || "",
+        bullets: safeJsonParse(listing.bullets, []),
+        description: listing.description || "",
+        brand: listing.brand || "",
+        category: listing.category || "",
+        subcategory: listing.category || "",
+        images: safeJsonParse(listing.images, []),
+        price: listing.price || 0,
+        rating: listing.rating || 0,
+        reviewCount: listing.reviewCount || 0,
+        attributes: safeJsonParse(listing.rawScrapeData, {}),
       };
 
-      const firstName = (prospect?.firstName as string) || "";
-      const lastName = (prospect?.lastName as string) || "";
+      const firstName = prospect?.firstName || "";
+      const lastName = prospect?.lastName || "";
       const prospectName = [firstName, lastName].filter(Boolean).join(" ") || "there";
 
       const gaps = safeJsonParse<SemanticGap[]>(analysisRow.gaps as string, []);
@@ -266,6 +261,6 @@ export const analysisRouter = {
       );
 
       return db.prepare("SELECT * FROM listing_analyses WHERE id = ?").get(input.analysisId);
-    },
-  },
-};
+    }),
+});
+

@@ -1,11 +1,42 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { serveStatic } from "hono/serve-static";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { appRouter } from "./router.js";
 import "./db/schema.js";
+import fs from "fs";
+import path from "path";
 
 export const app = new Hono();
+
+// A simple serveStatic replacement using Node fs for portable and error-free execution
+function serveStatic(options: { root?: string; path?: string }) {
+  return async (c: any, next: () => Promise<void>) => {
+    let filePath = options.path;
+    if (!filePath && options.root) {
+      const urlPath = c.req.path;
+      filePath = path.join(options.root, urlPath);
+    }
+    
+    if (filePath && fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+      const content = fs.readFileSync(filePath);
+      const ext = path.extname(filePath).toLowerCase();
+      const mimeTypes: Record<string, string> = {
+        ".html": "text/html",
+        ".css": "text/css",
+        ".js": "application/javascript",
+        ".json": "application/json",
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".gif": "image/gif",
+        ".svg": "image/svg+xml",
+        ".ico": "image/x-icon",
+      };
+      c.header("Content-Type", mimeTypes[ext] || "application/octet-stream");
+      return c.body(content);
+    }
+    await next();
+  };
+}
 
 // CORS
 app.use("*", cors({ origin: "*" }));
@@ -47,7 +78,7 @@ const httpServer = createServer(async (req, res) => {
     headers: new Headers(
       Object.entries(req.headers).map(([k, v]) => [k, Array.isArray(v) ? v.join(", ") : v || ""])
     ),
-    body: req.method !== "GET" && req.method !== "HEAD" ? await getBody(req) : undefined,
+    body: (req.method !== "GET" && req.method !== "HEAD" ? await getBody(req) : undefined) as any,
   });
 
   const response = await app.fetch(request);

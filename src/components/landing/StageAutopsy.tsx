@@ -107,12 +107,17 @@ export default function StageAutopsy({
   const coreX = 250;
   const coreY = 180;
   const radius = 130;
-  const surroundingNodes = cosmoGraphData.nodes.filter(n => n.group !== 'core');
+  const safeNodes = cosmoGraphData?.nodes ?? [];
+  const safeEdges = cosmoGraphData?.edges ?? [];
+  const coreNode = safeNodes.find(n => n.group === 'core');
+  const surroundingNodes = safeNodes.filter(n => n.group !== 'core');
 
   const nodesWithPositions = [
-    { ...cosmoGraphData.nodes.find(n => n.group === 'core')!, x: coreX, y: coreY },
+    ...(coreNode ? [{ ...coreNode, x: coreX, y: coreY }] : []),
     ...surroundingNodes.map((node, index) => {
-      const angle = (index * 2 * Math.PI) / surroundingNodes.length;
+      const angle = surroundingNodes.length > 0
+        ? (index * 2 * Math.PI) / surroundingNodes.length
+        : 0;
       return {
         ...node,
         x: Math.round(coreX + radius * Math.cos(angle)),
@@ -238,7 +243,7 @@ export default function StageAutopsy({
                   </div>
                 </div>
                 <div className="border border-brand-dark bg-white p-3 text-xs font-mono leading-relaxed">
-                  💡 **Result**: Rufus fails to recommend your product for **{cosmoGraphData.nodes.filter(n => n.group === 'gap').map(n => n.label).join(', ')}** because there are no semantic links connecting them in your listing copy.
+                  💡 **Result**: Rufus fails to recommend your product for **{safeNodes.filter(n => n.group === 'gap').map(n => n.label).join(', ')}** because there are no semantic links connecting them in your listing copy.
                 </div>
               </div>
 
@@ -246,7 +251,7 @@ export default function StageAutopsy({
               <div className="w-full md:w-1/2 flex justify-center bg-white border-[3px] border-brand-dark p-4 shadow-brutal-sm relative overflow-hidden">
                 <svg viewBox="0 0 500 360" className="w-full max-w-[420px] h-auto select-none">
                   {/* Drawing Edges */}
-                  {cosmoGraphData.edges.map((edge, i) => {
+                  {safeEdges.map((edge, i) => {
                     const fromNode = nodesWithPositions.find(n => n.id === edge.from);
                     const toNode = nodesWithPositions.find(n => n.id === edge.to);
                     if (!fromNode || !toNode) return null;
@@ -270,7 +275,7 @@ export default function StageAutopsy({
                     const isCore = node.group === 'core';
                     const isGap = node.group === 'gap';
 
-                    let nodeBg = 'bg-brand-blue';
+                    let nodeBg: string;
                     if (isCore) nodeBg = 'fill-brand-blue';
                     else if (isGap) nodeBg = 'fill-brutal-red animate-pulse';
                     else nodeBg = 'fill-green-500';

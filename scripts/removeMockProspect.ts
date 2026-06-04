@@ -1,4 +1,4 @@
-import { db } from "../api/db/client.ts";
+import { db } from "../api/db/client.js";
 
 async function run() {
   console.log("🧹 Removing mock-prospect data from database...");

@@ -40,7 +40,7 @@ export async function getRunStatus(runId: string): Promise<"RUNNING" | "SUCCEEDE
     return "SUCCEEDED";
   }
 
-  const response = await fetch(`${BASE_URL}/acts/runs/${runId}`, {
+  const response = await fetch(`${BASE_URL}/actor-runs/${runId}`, {
     headers: { Authorization: `Bearer ${APIFY_API_TOKEN}` },
   });
 

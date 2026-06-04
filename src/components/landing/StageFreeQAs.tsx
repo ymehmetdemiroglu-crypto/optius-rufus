@@ -5,14 +5,16 @@ import type { FreeQAItem } from '../../types/prospect';
 interface StageFreeQAsProps {
   freeQAs: FreeQAItem[];
   visible: boolean;
+  onCopyQA?: (text: string) => void;
 }
 
-export default function StageFreeQAs({ freeQAs, visible }: StageFreeQAsProps) {
+export default function StageFreeQAs({ freeQAs, visible, onCopyQA }: StageFreeQAsProps) {
   const [copiedIndex, setCopiedIndex] = useState<{ [key: string]: boolean }>({});
 
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text).then(() => {
       setCopiedIndex((prev) => ({ ...prev, [key]: true }));
+      onCopyQA?.(text);
       setTimeout(() => {
         setCopiedIndex((prev) => ({ ...prev, [key]: false }));
       }, 2000);

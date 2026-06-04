@@ -4,6 +4,7 @@ import { trpc } from '../providers/trpc';
 import { mapBackendToProspectData } from '../lib/prospectMapper';
 import type { ProspectData } from '../types/prospect';
 import { MOCK_PROSPECT_DATA } from '../lib/mockProspectData';
+import { useActivityTracker } from '../hooks/useActivityTracker';
 
 import ProgressBar from '../components/landing/ProgressBar';
 import StageHero from '../components/landing/StageHero';
@@ -47,12 +48,27 @@ export default function ProspectLanding() {
 
   const isMock = slug === 'mock-prospect';
 
-  const { data, isLoading } = trpc.prospects?.getBySlug?.useQuery(
+  const { data, isLoading } = trpc.prospects.getBySlug.useQuery(
     { slug: slug || '' },
     { enabled: !!slug && !isMock }
   );
 
-  const incrementViews = trpc.prospects?.incrementViews?.useMutation();
+  const incrementViews = trpc.prospects.incrementViews.useMutation();
+
+  const prospectId = isMock ? 5 : (data?.prospect?.id as number ?? 0);
+  const tracker = useActivityTracker(prospectId);
+
+  const handleScanComplete = useCallback(() => {
+    setScanComplete(true);
+  }, []);
+
+  const handleCopyQA = useCallback((text: string) => {
+    tracker.trackEvent('copy_qa', { text: text.slice(0, 100) }, 10);
+  }, [tracker]);
+
+  const handleDownloadPPC = useCallback(() => {
+    tracker.trackEvent('download_ppc', {}, 15);
+  }, [tracker]);
 
   useEffect(() => {
     if (slug && !isMock && incrementViews && !hasIncremented.current) {
@@ -61,9 +77,13 @@ export default function ProspectLanding() {
     }
   }, [slug, incrementViews, isMock]);
 
-  // Track scroll position to determine current stage
   useEffect(() => {
     if (!scanComplete) return;
+
+    const stageNames = [
+      'hero', 'autopsy', 'bleed', 'simulator', 'transform',
+      'free-qas', 'ppc-planner', 'bundling', 'roadmap', 'proof', 'book',
+    ];
 
     const stageIds = [
       'stage-hero',
@@ -85,7 +105,10 @@ export default function ProspectLanding() {
       for (let i = stageIds.length - 1; i >= 0; i--) {
         const el = document.getElementById(stageIds[i]);
         if (el && el.offsetTop <= scrollY) {
-          setCurrentStage(i);
+          if (i !== currentStage) {
+            setCurrentStage(i);
+            tracker.trackScrollStage(i, stageNames[i]);
+          }
           break;
         }
       }
@@ -95,11 +118,7 @@ export default function ProspectLanding() {
     handleScroll();
 
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [scanComplete]);
-
-  const handleScanComplete = useCallback(() => {
-    setScanComplete(true);
-  }, []);
+  }, [scanComplete, currentStage, tracker]);
 
   const scrollToBooking = () => {
     const el = document.getElementById('stage-book');
@@ -156,6 +175,7 @@ export default function ProspectLanding() {
   const estimatedTraffic = Math.max(2000, (prospect.listing.reviewCount || 100) * 20);
   const conversionGap = Math.max(1.5, (100 - prospect.scores.overallScore) / 15);
 
+
   return (
     <div className="min-h-screen bg-brand-dark text-brand-dark selection:bg-brand-gold selection:text-brand-dark">
       {/* Progress Bar */}
@@ -190,6 +210,7 @@ export default function ProspectLanding() {
 
           {/* Stage 3: Bleed Calculator */}
           <StageBleedCalculator
+            key={`bleed-${prospect.id}`}
             headline={stageCopy.bleedHeadline}
             body={stageCopy.bleedBody}
             defaultPrice={prospect.listing.price}
@@ -219,12 +240,14 @@ export default function ProspectLanding() {
           <StageFreeQAs
             freeQAs={stageCopy.freeQAs}
             visible={currentStage >= 5}
+            onCopyQA={handleCopyQA}
           />
 
           {/* Stage 7: Conversational PPC Planner */}
           <StagePPCPlanner
             ppcKeywords={stageCopy.ppcKeywords}
             visible={currentStage >= 6}
+            onDownloadPPC={handleDownloadPPC}
           />
 
           {/* Stage 8: COSMO Bundling Blueprint */}
@@ -251,6 +274,7 @@ export default function ProspectLanding() {
 
           {/* Stage 11: Book Call */}
           <StageBookCall
+            key={`book-${prospect.id}`}
             headline={stageCopy.ctaHeadline}
             guarantee={stageCopy.ctaGuarantee}
             prospectId={prospect.id}

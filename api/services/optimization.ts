@@ -9,46 +9,49 @@ export async function generateOptimizedContent(
 ): Promise<OptimizedContent> {
   await delay(400 + Math.random() * 400);
 
-  const topGaps = gaps.slice(0, 3).map((g) => g.dimension.replace("_", " "));
+  const topGaps = gaps.slice(0, 3).map((g) => g.dimension.replace(/_/g, " "));
+  const brand = listing.brand || "Premium Brand";
+  const category = listing.category || "Health Product";
+  const existingTitle = listing.title || `${brand} ${category}`;
 
-  const title = `${listing.brand} Magnesium Glycinate 400mg — ${topGaps.join(", ")} | 180 Capsules, Third-Party Tested`;
+  const title = `${brand} ${category} — ${topGaps.join(", ")} | ${existingTitle.split("|")[0]?.trim() || "Premium Quality"}, Third-Party Tested`;
 
   const bullets = [
-    `Clinically Studied Absorption: Our magnesium glycinate delivers 400mg elemental magnesium with superior bioavailability — gentle on your stomach and free from laxative effects.`,
-    `Supports ${topGaps[0] || "Restful Sleep"}: Formulated to help you relax, fall asleep faster, and wake up feeling refreshed and energized every morning.`,
-    `${topGaps[1] || "Muscle Recovery"} for Active Lifestyles: Perfect for athletes and fitness enthusiasts looking to reduce soreness and prevent post-workout cramps.`,
-    `Third-Party Tested & Certified: Manufactured in a GMP-certified, NSF-registered facility. Every batch is independently verified for purity and potency.`,
-    `180-Capsule 3-Month Supply: Exceptional value with 400mg per serving. Non-GMO, vegan-friendly, and free from artificial colors, fillers, and allergens.`,
+    `Clinically Studied Formulation: Our ${category.toLowerCase()} delivers superior bioavailability — gentle on your system and optimized for maximum absorption.`,
+    `Supports ${topGaps[0] || "Core Benefits"}: Specifically formulated to address your primary needs. Backed by research and trusted by thousands of satisfied customers.`,
+    `${topGaps[1] || "Advanced Quality"} for Every Lifestyle: Perfect for health-conscious consumers looking for reliable, effective ${category.toLowerCase()} solutions.`,
+    `Third-Party Tested & Certified: Manufactured in a GMP-certified facility. Every batch is independently verified for purity, potency, and safety.`,
+    `Exceptional Value: Premium quality at $${listing.price || "competitive pricing"}. Non-GMO, clean-label, and free from artificial colors, fillers, and common allergens.`,
   ];
 
   const qas = [
     {
-      question: "What form of magnesium is this?",
-      optimizedAnswer: "This is Magnesium Glycinate (bisglycinate), a chelated form bound to the amino acid glycine. It offers superior absorption compared to oxide or citrate and is gentle on digestion.",
+      question: `What makes this ${category.toLowerCase()} different from competitors?`,
+      optimizedAnswer: `Our ${brand} ${category.toLowerCase()} uses a premium formulation optimized for ${topGaps[0] || "maximum effectiveness"}. Unlike generic alternatives, every batch is third-party tested for purity and potency in a GMP-certified facility.`,
       category: "product_info",
       priority: "high" as const,
     },
     {
-      question: "Will this cause diarrhea?",
-      optimizedAnswer: "No. Magnesium glycinate is the gentlest form and does not cause diarrhea at recommended doses. Unlike oxide or citrate, it bypasses the osmotic effect in the intestines.",
+      question: `Is this ${category.toLowerCase()} safe to use daily?`,
+      optimizedAnswer: `Yes. Our ${category.toLowerCase()} is formulated for daily use with clean, tested ingredients. It is gentle on your system and free from common allergens. Always consult your healthcare provider if you have specific medical conditions.`,
       category: "safety",
       priority: "critical" as const,
     },
     {
-      question: "Is this safe for vegetarians?",
-      optimizedAnswer: "Yes, our magnesium glycinate is 100% vegan and vegetarian-friendly. The capsules are made from plant-based cellulose with no gelatin or animal-derived ingredients.",
+      question: `Is this suitable for vegans and people with dietary restrictions?`,
+      optimizedAnswer: `Yes, our ${brand} ${category.toLowerCase()} is designed to be inclusive. It is free from common allergens and artificial additives. Check the full ingredient list on the label for specific dietary compatibility.`,
       category: "safety",
       priority: "high" as const,
     },
     {
-      question: "How long until I feel results?",
-      optimizedAnswer: "Most users notice improved sleep quality within 3-7 days. Muscle recovery benefits typically appear after 2-3 weeks of consistent daily use at the recommended 400mg dose.",
+      question: "How long until I see results?",
+      optimizedAnswer: `Most customers report noticeable benefits within 1-2 weeks of consistent daily use. Individual results may vary based on lifestyle and usage consistency.`,
       category: "usage",
       priority: "medium" as const,
     },
     {
-      question: "Can I take this with other supplements?",
-      optimizedAnswer: "Yes, magnesium glycinate pairs well with Vitamin D, Zinc, and B-Complex. We recommend spacing calcium supplements 2 hours apart as they compete for absorption.",
+      question: `Can I combine this with other ${category.toLowerCase()} products?`,
+      optimizedAnswer: `Yes, our ${category.toLowerCase()} is designed to complement a balanced routine. For best results, follow the recommended dosage and consult your healthcare provider if combining with other supplements.`,
       category: "usage",
       priority: "medium" as const,
     },

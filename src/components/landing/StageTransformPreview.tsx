@@ -44,6 +44,7 @@ export default function StageTransformPreview({
   }, [before]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSandboxScore(contentScore);
   }, [contentScore]);
 

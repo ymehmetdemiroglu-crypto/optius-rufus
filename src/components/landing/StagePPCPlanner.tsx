@@ -5,31 +5,43 @@ import type { PPCKeywordItem } from '../../types/prospect';
 interface StagePPCPlannerProps {
   ppcKeywords: PPCKeywordItem[];
   visible: boolean;
+  onDownloadPPC?: () => void;
 }
 
-export default function StagePPCPlanner({ ppcKeywords, visible }: StagePPCPlannerProps) {
+export default function StagePPCPlanner({ ppcKeywords, visible, onDownloadPPC }: StagePPCPlannerProps) {
   const [downloaded, setDownloaded] = useState(false);
 
   const downloadCSV = () => {
     const headers = ['Intent Category', 'Conversational Keyword', 'Difficulty', 'Monthly Search Volume', 'Est. CPC Bid ($)'];
+    const escapeCSV = (val: string | number) => {
+      const str = String(val);
+      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
     const rows = ppcKeywords.map(k => [
-      k.intent,
-      `"${k.keyword}"`,
-      k.difficulty,
-      k.searchVolume,
-      k.bidEstimate.toFixed(2)
+      escapeCSV(k.intent),
+      escapeCSV(k.keyword),
+      escapeCSV(k.difficulty),
+      escapeCSV(k.searchVolume),
+      escapeCSV(k.bidEstimate.toFixed(2)),
     ]);
-    
-    const csvContent = "data:text/csv;charset=utf-8," 
-      + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
-    
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "rufus_conversational_ppc_plan.csv");
+
+    const csvString = [headers.map(escapeCSV).join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'rufus_conversational_ppc_plan.csv';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    onDownloadPPC?.();
 
     setDownloaded(true);
     setTimeout(() => setDownloaded(false), 3000);

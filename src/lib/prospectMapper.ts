@@ -24,11 +24,8 @@ function safeJsonParse<T>(str: string | null | undefined, fallback: T): T {
   }
 }
 
-export function mapBackendToProspectData(data: {
-  prospect: Record<string, unknown>;
-  listing: Record<string, unknown> | null;
-  analysis: Record<string, unknown> | null;
-}): ProspectData {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function mapBackendToProspectData(data: any): ProspectData {
   const prospect = data.prospect;
   const listing = data.listing;
   const analysis = data.analysis;

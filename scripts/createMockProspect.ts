@@ -1,7 +1,7 @@
-import "../api/db/schema.ts";
-import { db } from "../api/db/client.ts";
-import { generateAllStageCopy } from "../api/services/copywriter.ts";
-import type { RawListingData } from "../api/agents/types.ts";
+import "../api/db/schema.js";
+import { db } from "../api/db/client.js";
+import { generateAllStageCopy } from "../api/services/copywriter.js";
+import type { RawListingData } from "../api/agents/types.js";
 
 async function run() {
   console.log("🧹 Cleaning up old mock-prospect data if it exists...");
@@ -81,18 +81,24 @@ async function run() {
   const semanticGaps = [
     {
       dimension: "safety_information",
+      currentScore: 0.28,
+      targetScore: 0.90,
       gap: 0.62,
       priority: "critical" as const,
       recommendation: "Lacks explicit statements on daily dosage limits and safety warning callouts."
     },
     {
       dimension: "usage_instructions",
+      currentScore: 0.35,
+      targetScore: 0.90,
       gap: 0.55,
       priority: "high" as const,
       recommendation: "Fails to detail optimal consumption timing and routine integration."
     },
     {
       dimension: "ingredient_purity",
+      currentScore: 0.42,
+      targetScore: 0.90,
       gap: 0.48,
       priority: "high" as const,
       recommendation: "Sourcing details and organic certifications are buried and hard for Rufus to parse."

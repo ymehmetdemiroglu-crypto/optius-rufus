@@ -1,13 +1,14 @@
 import { z } from "zod";
 import { db } from "../db/client.js";
+import type { ProspectRecord } from "../db/client.js";
 import { createContact, enrollInSequence, getSequences } from "../services/apollo.js";
+import { router, publicProcedure } from "../trpc.js";
 
-export const apolloRouter = {
-  createContact: {
-    type: "mutation" as const,
-    input: z.object({ prospectId: z.number().int() }),
-    resolve: async ({ input }: { input: { prospectId: number } }) => {
-      const prospect = db.prepare("SELECT * FROM prospects WHERE id = ?").get(input.prospectId);
+export const apolloRouter = router({
+  createContact: publicProcedure
+    .input(z.object({ prospectId: z.number().int() }))
+    .mutation(async ({ input }) => {
+      const prospect = db.prepare("SELECT * FROM prospects WHERE id = ?").get(input.prospectId) as ProspectRecord | undefined;
       if (!prospect) {
         throw new Error(`Prospect not found: ${input.prospectId}`);
       }
@@ -22,19 +23,19 @@ export const apolloRouter = {
       db.prepare("UPDATE prospects SET apolloContactId = ?, status = 'emailed' WHERE id = ?").run(contact.id, input.prospectId);
       return {
         contactId: contact.id,
-        prospect: db.prepare("SELECT * FROM prospects WHERE id = ?").get(input.prospectId),
+        prospect: db.prepare("SELECT * FROM prospects WHERE id = ?").get(input.prospectId) as ProspectRecord | undefined,
       };
-    },
-  },
-
-  enrollSequence: {
-    type: "mutation" as const,
-    input: z.object({
-      prospectId: z.number().int(),
-      sequenceId: z.string(),
     }),
-    resolve: async ({ input }: { input: { prospectId: number; sequenceId: string } }) => {
-      const prospect = db.prepare("SELECT * FROM prospects WHERE id = ?").get(input.prospectId);
+
+  enrollSequence: publicProcedure
+    .input(
+      z.object({
+        prospectId: z.number().int(),
+        sequenceId: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const prospect = db.prepare("SELECT * FROM prospects WHERE id = ?").get(input.prospectId) as ProspectRecord | undefined;
       if (!prospect) {
         throw new Error(`Prospect not found: ${input.prospectId}`);
       }
@@ -47,16 +48,14 @@ export const apolloRouter = {
 
       return {
         enrollmentId: enrollment.id,
-        prospect: db.prepare("SELECT * FROM prospects WHERE id = ?").get(input.prospectId),
+        prospect: db.prepare("SELECT * FROM prospects WHERE id = ?").get(input.prospectId) as ProspectRecord | undefined,
       };
-    },
-  },
+    }),
 
-  getSequences: {
-    type: "query" as const,
-    input: z.object({}),
-    resolve: async () => {
+  getSequences: publicProcedure
+    .input(z.object({}))
+    .query(async () => {
       return getSequences();
-    },
-  },
-};
+    }),
+});
+
