@@ -11,6 +11,7 @@ interface ProspectDetails {
 export async function triggerWebhook(
   prospect: ProspectDetails,
   eventType: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   eventData: any = {},
   interestScore: number = 0
 ) {
@@ -33,7 +34,6 @@ export async function triggerWebhook(
   const COLOR_BLUE = 3899990;    // #3b82f6
   const COLOR_YELLOW = 15381256;  // #eab308
   const COLOR_GREEN = 2278750;    // #22c55e
-  const COLOR_RED = 15673644;     // #ef4444
 
   let embedColor = COLOR_BLUE;
   if (eventType === "click_booking") embedColor = COLOR_GREEN;
@@ -56,6 +56,7 @@ export async function triggerWebhook(
   }
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let payload: any = {};
 
     // 2. Format for Discord Webhook

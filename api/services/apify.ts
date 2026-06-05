@@ -1,4 +1,4 @@
-const APIFY_API_TOKEN = process.env.APIFY_API_TOKEN;
+const APIFY_API_TOKEN = process.env.APIFY_API_TOKEN || process.env.APIFY_TOKEN;
 const BASE_URL = "https://api.apify.com/v2";
 
 export async function triggerScrape(
@@ -55,6 +55,7 @@ export async function getRunStatus(runId: string): Promise<"RUNNING" | "SUCCEEDE
   return "FAILED";
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getDatasetItems(datasetId: string): Promise<any[]> {
   if (!APIFY_API_TOKEN || datasetId.startsWith("mock-")) {
     return [

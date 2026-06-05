@@ -36,7 +36,6 @@ export default function StageBookCall({
   prospectId,
   prospectName,
   prospectEmail,
-  visible,
 }: StageBookCallProps) {
   const [form, setForm] = useState<BookingFormData>({
     name: prospectName || '',

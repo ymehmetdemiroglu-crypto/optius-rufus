@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Hono, type Context } from "hono";
 import { cors } from "hono/cors";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { appRouter } from "./router.js";
@@ -10,7 +10,7 @@ export const app = new Hono();
 
 // A simple serveStatic replacement using Node fs for portable and error-free execution
 function serveStatic(options: { root?: string; path?: string }) {
-  return async (c: any, next: () => Promise<void>) => {
+  return async (c: Context, next: () => Promise<void>) => {
     let filePath = options.path;
     if (!filePath && options.root) {
       const urlPath = c.req.path;
@@ -66,7 +66,6 @@ const port = parseInt(process.env.PORT || "3000", 10);
 console.log(`🚀 Optimus Rufus server running on http://localhost:${port}`);
 
 // Bun/Deno/Node compatibility
-const server = { port, fetch: app.fetch };
 
 // Node native fetch server
 import { createServer } from "http";
@@ -78,6 +77,7 @@ const httpServer = createServer(async (req, res) => {
     headers: new Headers(
       Object.entries(req.headers).map(([k, v]) => [k, Array.isArray(v) ? v.join(", ") : v || ""])
     ),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     body: (req.method !== "GET" && req.method !== "HEAD" ? await getBody(req) : undefined) as any,
   });
 

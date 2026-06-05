@@ -1,6 +1,7 @@
 import type { RawListingData } from "../agents/types.js";
 
 export async function fetchListingFromAmazon(asin: string, marketplace = "US"): Promise<RawListingData> {
+  console.log(`[SP-API] Fetching mock listing for ASIN: ${asin} in marketplace: ${marketplace}`);
   return {
     asin,
     title: `Mock SP-API Product: ${asin}`,

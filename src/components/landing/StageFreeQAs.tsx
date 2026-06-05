@@ -8,7 +8,7 @@ interface StageFreeQAsProps {
   onCopyQA?: (text: string) => void;
 }
 
-export default function StageFreeQAs({ freeQAs, visible, onCopyQA }: StageFreeQAsProps) {
+export default function StageFreeQAs({ freeQAs, onCopyQA }: StageFreeQAsProps) {
   const [copiedIndex, setCopiedIndex] = useState<{ [key: string]: boolean }>({});
 
   const handleCopy = (text: string, key: string) => {

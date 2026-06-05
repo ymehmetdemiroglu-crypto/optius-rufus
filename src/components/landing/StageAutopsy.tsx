@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AlertCircle, CheckCircle2, Info, Network, MessageSquare, BarChart3 } from 'lucide-react';
+import { Network, MessageSquare, BarChart3 } from 'lucide-react';
 import type { ProspectScoreBreakdown, CosmoNodeData, ReviewSentimentProfile } from '../../types/prospect';
 
 interface StageAutopsyProps {
@@ -99,7 +99,10 @@ export default function StageAutopsy({
 
   useEffect(() => {
     if (visible && !hasAnimated) {
-      setHasAnimated(true);
+      const timer = setTimeout(() => {
+        setHasAnimated(true);
+      }, 50);
+      return () => clearTimeout(timer);
     }
   }, [visible, hasAnimated]);
 

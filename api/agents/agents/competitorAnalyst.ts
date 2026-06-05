@@ -1,5 +1,5 @@
 import { fetchCompetitors } from "../../services/competitor.js";
-import type { Agent, AgentRole, CompetitorBenchmark, RawListingData } from "../types.js";
+import type { Agent, AgentRole, CompetitorBenchmark } from "../types.js";
 
 export class CompetitorAnalystAgent implements Agent {
   role: AgentRole = "competitor_analyst";

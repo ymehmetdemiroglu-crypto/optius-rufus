@@ -28,7 +28,6 @@ export default function StageTransformPreview({
   headline,
   before,
   after,
-  visible,
   contentScore,
 }: StageTransformPreviewProps) {
   const [showAfter, setShowAfter] = useState(false);
@@ -39,13 +38,18 @@ export default function StageTransformPreview({
 
   useEffect(() => {
     if (before[1]?.content) {
-      setSandboxInput(before[1].content);
+      const timer = setTimeout(() => {
+        setSandboxInput(before[1].content);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [before]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSandboxScore(contentScore);
+    const timer = setTimeout(() => {
+      setSandboxScore(contentScore);
+    }, 0);
+    return () => clearTimeout(timer);
   }, [contentScore]);
 
   const handleTest = () => {

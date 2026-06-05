@@ -22,6 +22,11 @@ export default function StageBleedCalculator({
   const [aov, setAov] = useState(defaultPrice || 30);
   const [gap, setGap] = useState(conversionGap || 3.2);
   const [displayLoss, setDisplayLoss] = useState(0);
+  const displayLossRef = useRef(displayLoss);
+
+  useEffect(() => {
+    displayLossRef.current = displayLoss;
+  }, [displayLoss]);
 
   const monthlyLoss = Math.round(traffic * (gap / 100) * aov);
   const annualLoss = monthlyLoss * 12;
@@ -31,7 +36,7 @@ export default function StageBleedCalculator({
     if (!visible) return;
     const duration = 1000;
     const start = performance.now();
-    const startVal = displayLoss;
+    const startVal = displayLossRef.current;
     const diff = monthlyLoss - startVal;
 
     function step(now: number) {

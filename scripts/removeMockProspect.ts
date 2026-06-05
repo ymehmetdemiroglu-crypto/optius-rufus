@@ -8,11 +8,15 @@ async function run() {
   if (prospect) {
     const analysesDel = db.prepare("DELETE FROM listing_analyses WHERE prospectId = ?").run(prospect.id);
     const listingsDel = db.prepare("DELETE FROM listings WHERE prospectId = ?").run(prospect.id);
+    const bookingsDel = db.prepare("DELETE FROM bookings WHERE prospectId = ?").run(prospect.id);
+    const activitiesDel = db.prepare("DELETE FROM prospect_activities WHERE prospectId = ?").run(prospect.id);
     const prospectDel = db.prepare("DELETE FROM prospects WHERE id = ?").run(prospect.id);
     
     console.log(`✨ Successfully removed:`);
     console.log(`   - ${analysesDel.changes} listing analysis records`);
     console.log(`   - ${listingsDel.changes} listing records`);
+    console.log(`   - ${bookingsDel.changes} booking records`);
+    console.log(`   - ${activitiesDel.changes} activity records`);
     console.log(`   - ${prospectDel.changes} prospect records`);
   } else {
     console.log("ℹ️ No 'mock-prospect' records found in the database.");

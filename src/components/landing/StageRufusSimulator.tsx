@@ -15,7 +15,7 @@ function TypewriterText({ text, speed = 25, onComplete }: { text: string; speed?
 
   useEffect(() => {
     indexRef.current = 0;
-    setDisplayed('');
+    const t0 = setTimeout(() => setDisplayed(''), 0);
 
     const interval = setInterval(() => {
       indexRef.current++;
@@ -26,7 +26,10 @@ function TypewriterText({ text, speed = 25, onComplete }: { text: string; speed?
       }
     }, speed);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(t0);
+      clearInterval(interval);
+    };
   }, [text, speed, onComplete]);
 
   return (
@@ -46,7 +49,7 @@ export default function StageRufusSimulator({ intro, scenarios, visible, competi
 
   useEffect(() => {
     if (!visible) return;
-    setPhase('question');
+    const t0 = setTimeout(() => setPhase('question'), 0);
 
     // Auto-progress through phases
     const t1 = setTimeout(() => setPhase('typing'), 1500);
@@ -54,6 +57,7 @@ export default function StageRufusSimulator({ intro, scenarios, visible, competi
     const t3 = setTimeout(() => setPhase('fail'), 4500);
 
     return () => {
+      clearTimeout(t0);
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);

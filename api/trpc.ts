@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { initTRPC } from "@trpc/server";
 import { z } from "zod";
 

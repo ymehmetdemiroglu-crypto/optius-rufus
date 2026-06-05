@@ -199,7 +199,7 @@ COPY --from=builder /app/package.json ./package.json
 
 EXPOSE 3000
 
-CMD ["node", "api/boot.js"]
+CMD ["node", "dist/api/boot.js"]
 ```
 
 ---

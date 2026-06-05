@@ -7,7 +7,6 @@ import type {
   CleanedText,
   CompetitorBenchmark,
   OptimizedContent,
-  OptimizationReport,
   PipelineState,
   RawListingData,
   ReviewResult,
@@ -85,7 +84,7 @@ export class OptimizationOrchestrator extends EventEmitter {
         const role = STAGES[i];
         state.currentStage = i;
 
-        const task = await this.createTask(state, role, i);
+        const task = await this.createTask(state, role);
         state.tasks.push(task);
 
         this.emit("stage:start", { stage: i, role, name: STAGE_NAMES[role] });
@@ -222,8 +221,7 @@ export class OptimizationOrchestrator extends EventEmitter {
 
   private async createTask(
     state: PipelineState,
-    role: AgentRole,
-    _stageIndex: number
+    role: AgentRole
   ): Promise<AgentTask> {
     return {
       id: `${state.asin}-${role}-${Date.now()}`,

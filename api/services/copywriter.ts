@@ -1,4 +1,6 @@
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini";
 
 import type { RawListingData, SemanticGap } from "../agents/types.js";
 
@@ -58,7 +60,7 @@ export async function generateAllStageCopy(
 ): Promise<StageCopy> {
   const fallback = buildFallbackCopy(analysis, listing, prospectName);
 
-  if (!OPENAI_API_KEY) {
+  if (!OPENAI_API_KEY && !OPENROUTER_API_KEY) {
     return fallback;
   }
 
@@ -117,14 +119,27 @@ CRITICAL RULES:
 Return ONLY a valid JSON object.`;
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const url = OPENROUTER_API_KEY
+      ? "https://openrouter.ai/api/v1/chat/completions"
+      : "https://api.openai.com/v1/chat/completions";
+    const apiKey = OPENROUTER_API_KEY || OPENAI_API_KEY;
+    const model = OPENROUTER_API_KEY ? OPENROUTER_MODEL : "gpt-4o-mini";
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    };
+
+    if (OPENROUTER_API_KEY) {
+      headers["HTTP-Referer"] = "https://github.com/ymehmetdemiroglu-crypto/optius-rufus";
+      headers["X-Title"] = "Optimus Rufus";
+    }
+
+    const response = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
+      headers,
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model,
         messages: [
           {
             role: "system",
@@ -140,7 +155,7 @@ Return ONLY a valid JSON object.`;
     });
 
     if (!response.ok) {
-      console.error(`OpenAI error: ${response.status}`);
+      console.error(`LLM API error: ${response.status} ${await response.text()}`);
       return fallback;
     }
 
@@ -194,7 +209,6 @@ function buildFallbackCopy(
   const brand = listing.brand || "your brand";
   const category = listing.category || "your category";
   const rufus = analysis.rufusScore || 42;
-  const cosmo = analysis.cosmoScore || 38;
   const topGapNames = (analysis.semanticGaps || [])
     .slice(0, 3)
     .map((g) => g.dimension.replace(/_/g, " "))

@@ -13,7 +13,6 @@ interface StageHeroProps {
 
 export default function StageHero({
   listing,
-  prospectName,
   headline,
   subheadline,
   onScanComplete,

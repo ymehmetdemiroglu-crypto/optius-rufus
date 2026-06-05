@@ -38,8 +38,10 @@ export default function StageScanAnimation({ asin, brand, onComplete }: StageSca
       timeoutRef.current.push(t);
     });
 
+    const currentTimeouts = timeoutRef.current;
+
     return () => {
-      timeoutRef.current.forEach(clearTimeout);
+      currentTimeouts.forEach(clearTimeout);
     };
   }, [onComplete]);
 

@@ -11,14 +11,16 @@ async function run() {
   if (oldProspect) {
     db.prepare("DELETE FROM listing_analyses WHERE prospectId = ?").run(oldProspect.id);
     db.prepare("DELETE FROM listings WHERE prospectId = ?").run(oldProspect.id);
+    db.prepare("DELETE FROM bookings WHERE prospectId = ?").run(oldProspect.id);
+    db.prepare("DELETE FROM prospect_activities WHERE prospectId = ?").run(oldProspect.id);
     db.prepare("DELETE FROM prospects WHERE id = ?").run(oldProspect.id);
     console.log("✨ Cleaned up old mock-prospect records.");
   }
 
   console.log("🌱 Inserting fresh mock prospect...");
   const prospectResult = db.prepare(`
-    INSERT INTO prospects (slug, email, firstName, lastName, company, status, landingPageViews, createdAt)
-    VALUES (?, ?, ?, ?, ?, 'analyzed', 0, datetime('now'))
+    INSERT INTO prospects (id, slug, email, firstName, lastName, company, status, landingPageViews, createdAt)
+    VALUES (5, ?, ?, ?, ?, ?, 'analyzed', 0, datetime('now'))
   `).run(
     "mock-prospect",
     "founder@acmegreens.com",

@@ -1,5 +1,4 @@
 import type {
-  AgentRole,
   AgentTask,
   AnalysisResult,
   CleanedText,
