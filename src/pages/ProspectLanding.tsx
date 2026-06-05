@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { trpc } from '../providers/trpc';
 import { mapBackendToProspectData } from '../lib/prospectMapper';
 import type { ProspectData } from '../types/prospect';
@@ -42,7 +42,10 @@ function SkeletonLoader() {
 
 export default function ProspectLanding() {
   const { slug } = useParams<{ slug: string }>();
-  const [scanComplete, setScanComplete] = useState(false);
+  const [searchParams] = useSearchParams();
+  const isPrint = searchParams.get('print') === 'true';
+
+  const [scanComplete, setScanComplete] = useState(isPrint);
   const [currentStage, setCurrentStage] = useState(0);
   const hasIncremented = useRef(false);
 
@@ -52,6 +55,8 @@ export default function ProspectLanding() {
     { slug: slug || '' },
     { enabled: !!slug && !isMock }
   );
+
+  const { data: brandData } = trpc.branding.getSettings.useQuery();
 
   const incrementViews = trpc.prospects.incrementViews.useMutation();
 
@@ -178,125 +183,198 @@ export default function ProspectLanding() {
 
   return (
     <div className="min-h-screen bg-brand-dark text-brand-dark selection:bg-brand-gold selection:text-brand-dark">
+      {/* Dynamic Brand Settings CSS injection */}
+      {brandData && (
+        <style dangerouslySetInnerHTML={{ __html: `
+          :root {
+            --brand-gold: ${brandData.primaryColor} !important;
+          }
+          .bg-brand-gold, .progress-segment.active, .gauge-bar-fill.score-warning {
+            background-color: ${brandData.primaryColor} !important;
+          }
+          .text-brand-gold, .price-token {
+            color: ${brandData.primaryColor} !important;
+          }
+          .border-brand-gold {
+            border-color: ${brandData.primaryColor} !important;
+          }
+          ${brandData.logoBase64 ? `
+            .agency-logo-placeholder {
+              background-image: url(${brandData.logoBase64}) !important;
+              background-size: contain;
+              background-repeat: no-repeat;
+            }
+          ` : ""}
+          @media print {
+            body {
+              background-color: #f5f0e8 !important;
+              color: #1a1a1a !important;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            .no-print {
+              display: none !important;
+            }
+            #stage-hero, #stage-autopsy, #stage-bleed, #stage-simulator, #stage-transform, #stage-free-qas, #stage-ppc-planner, #stage-bundling, #stage-roadmap, #stage-proof {
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
+              margin-bottom: 2rem !important;
+              page-break-after: auto !important;
+            }
+          }
+        `}} />
+      )}
+
       {/* Progress Bar */}
-      <ProgressBar
-        currentStage={currentStage}
-        totalStages={TOTAL_STAGES}
-        visible={scanComplete}
-      />
+      {!isPrint && (
+        <ProgressBar
+          currentStage={currentStage}
+          totalStages={TOTAL_STAGES}
+          visible={scanComplete}
+        />
+      )}
 
       {/* Stage 1: Hero + Scan */}
-      <StageHero
-        listing={prospect.listing}
-        prospectName={prospect.name}
-        headline={stageCopy.heroHeadline}
-        subheadline={stageCopy.heroSubheadline}
-        onScanComplete={handleScanComplete}
-      />
+      <div id="stage-hero">
+        <StageHero
+          listing={prospect.listing}
+          prospectName={prospect.name}
+          headline={stageCopy.heroHeadline}
+          subheadline={stageCopy.heroSubheadline}
+          onScanComplete={handleScanComplete}
+        />
+      </div>
 
       {/* Remaining stages only visible after scan */}
       {scanComplete && (
         <>
           {/* Stage 2: Autopsy Report */}
-          <StageAutopsy
-            scores={prospect.scores}
-            headline={stageCopy.autopsyHeadline}
-            body={stageCopy.autopsyBody}
-            category={prospect.listing.category}
-            visible={scanComplete}
-            cosmoGraphData={stageCopy.cosmoGraphData}
-            reviewSentiment={stageCopy.reviewSentiment}
-          />
+          <div id="stage-autopsy">
+            <StageAutopsy
+              scores={prospect.scores}
+              headline={stageCopy.autopsyHeadline}
+              body={stageCopy.autopsyBody}
+              category={prospect.listing.category}
+              visible={scanComplete}
+              cosmoGraphData={stageCopy.cosmoGraphData}
+              reviewSentiment={stageCopy.reviewSentiment}
+            />
+          </div>
 
           {/* Stage 3: Bleed Calculator */}
-          <StageBleedCalculator
-            key={`bleed-${prospect.id}`}
-            headline={stageCopy.bleedHeadline}
-            body={stageCopy.bleedBody}
-            defaultPrice={prospect.listing.price}
-            defaultTraffic={estimatedTraffic}
-            conversionGap={conversionGap}
-            visible={currentStage >= 2}
-          />
+          <div id="stage-bleed">
+            <StageBleedCalculator
+              key={`bleed-${prospect.id}`}
+              headline={stageCopy.bleedHeadline}
+              body={stageCopy.bleedBody}
+              defaultPrice={prospect.listing.price}
+              defaultTraffic={estimatedTraffic}
+              conversionGap={conversionGap}
+              visible={isPrint || currentStage >= 2}
+            />
+          </div>
 
           {/* Stage 4: Rufus Simulator */}
-          <StageRufusSimulator
-            intro={stageCopy.simulatorIntro}
-            scenarios={stageCopy.simulatorScenarios}
-            visible={currentStage >= 3}
-            competitorAudit={stageCopy.competitorAudit}
-          />
+          <div id="stage-simulator">
+            <StageRufusSimulator
+              intro={stageCopy.simulatorIntro}
+              scenarios={stageCopy.simulatorScenarios}
+              visible={isPrint || currentStage >= 3}
+              competitorAudit={stageCopy.competitorAudit}
+            />
+          </div>
 
           {/* Stage 5: Transformation Preview */}
-          <StageTransformPreview
-            headline={stageCopy.transformHeadline}
-            before={stageCopy.transformBefore}
-            after={stageCopy.transformAfter}
-            contentScore={prospect.scores.contentScore}
-            visible={currentStage >= 4}
-          />
+          <div id="stage-transform">
+            <StageTransformPreview
+              headline={stageCopy.transformHeadline}
+              before={stageCopy.transformBefore}
+              after={stageCopy.transformAfter}
+              contentScore={prospect.scores.contentScore}
+              visible={isPrint || currentStage >= 4}
+            />
+          </div>
 
           {/* Stage 6: Free QAs */}
-          <StageFreeQAs
-            freeQAs={stageCopy.freeQAs}
-            visible={currentStage >= 5}
-            onCopyQA={handleCopyQA}
-          />
+          <div id="stage-free-qas">
+            <StageFreeQAs
+              freeQAs={stageCopy.freeQAs}
+              visible={isPrint || currentStage >= 5}
+              onCopyQA={handleCopyQA}
+            />
+          </div>
 
           {/* Stage 7: Conversational PPC Planner */}
-          <StagePPCPlanner
-            ppcKeywords={stageCopy.ppcKeywords}
-            visible={currentStage >= 6}
-            onDownloadPPC={handleDownloadPPC}
-          />
+          <div id="stage-ppc-planner">
+            <StagePPCPlanner
+              ppcKeywords={stageCopy.ppcKeywords}
+              visible={isPrint || currentStage >= 6}
+              onDownloadPPC={handleDownloadPPC}
+            />
+          </div>
 
           {/* Stage 8: COSMO Bundling Blueprint */}
-          <StageBundlingBlueprint
-            cosmoBundling={stageCopy.cosmoBundling}
-            visible={currentStage >= 7}
-          />
+          <div id="stage-bundling">
+            <StageBundlingBlueprint
+              cosmoBundling={stageCopy.cosmoBundling}
+              visible={isPrint || currentStage >= 7}
+            />
+          </div>
 
           {/* Stage 9: Roadmap */}
-          <StageRoadmap
-            headline={stageCopy.roadmapHeadline}
-            body={stageCopy.roadmapBody}
-            prospectName={prospect.name}
-            visible={currentStage >= 8}
-          />
+          <div id="stage-roadmap">
+            <StageRoadmap
+              headline={stageCopy.roadmapHeadline}
+              body={stageCopy.roadmapBody}
+              prospectName={prospect.name}
+              visible={isPrint || currentStage >= 8}
+            />
+          </div>
 
           {/* Stage 10: Social Proof */}
-          <StageProofWall
-            headline={stageCopy.socialProofHeadline}
-            urgencyCTA={stageCopy.urgencyCTA}
-            onOpenBooking={scrollToBooking}
-            visible={currentStage >= 9}
-          />
+          <div id="stage-proof">
+            <StageProofWall
+              headline={stageCopy.socialProofHeadline}
+              urgencyCTA={stageCopy.urgencyCTA}
+              onOpenBooking={scrollToBooking}
+              visible={isPrint || currentStage >= 9}
+            />
+          </div>
 
           {/* Stage 11: Book Call */}
-          <StageBookCall
-            key={`book-${prospect.id}`}
-            headline={stageCopy.ctaHeadline}
-            guarantee={stageCopy.ctaGuarantee}
-            prospectId={prospect.id}
-            prospectName={prospect.name}
-            prospectEmail={prospect.email || ''}
-            visible={currentStage >= 10}
-          />
+          {!isPrint && (
+            <StageBookCall
+              key={`book-${prospect.id}`}
+              headline={stageCopy.ctaHeadline}
+              guarantee={stageCopy.ctaGuarantee}
+              prospectId={prospect.id}
+              prospectName={prospect.name}
+              prospectEmail={prospect.email || ''}
+              visible={currentStage >= 10}
+            />
+          )}
 
           {/* Floating CTA (mobile) */}
-          <FloatingCTA
-            visible={currentStage >= 1 && currentStage < 10}
-            onClick={scrollToBooking}
-          />
+          {!isPrint && (
+            <FloatingCTA
+              visible={currentStage >= 1 && currentStage < 10}
+              onClick={scrollToBooking}
+            />
+          )}
+          
+          {/* Signal selector for Puppeteer rendering completion */}
+          <div className="report-ready" style={{ display: 'none' }} />
         </>
       )}
 
       {/* Footer */}
-      <footer className="bg-brand-dark border-t-[3px] border-white/10 py-8 px-6 text-center">
-        <p className="font-mono text-xs text-white/30 uppercase tracking-widest">
-          OPTIMUS RUFUS — AI-NATIVE AMAZON LISTING OPTIMIZATION
-        </p>
-      </footer>
+      {!isPrint && (
+        <footer className="bg-brand-dark border-t-[3px] border-white/10 py-8 px-6 text-center">
+          <p className="font-mono text-xs text-white/30 uppercase tracking-widest">
+            OPTIMUS RUFUS — AI-NATIVE AMAZON LISTING OPTIMIZATION
+          </p>
+        </footer>
+      )}
     </div>
   );
 }

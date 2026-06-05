@@ -31,6 +31,7 @@ export function initSchema() {
       rating REAL,
       reviewCount INTEGER,
       images TEXT,
+      aPlusText TEXT,
       rawScrapeData TEXT,
       scrapedAt DATETIME,
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -126,7 +127,53 @@ export function initSchema() {
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (prospectId) REFERENCES prospects(id)
     );
+
+    CREATE TABLE IF NOT EXISTS brand_settings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      companyName TEXT,
+      logoUrl TEXT,
+      logoBase64 TEXT,
+      primaryColor TEXT DEFAULT '#b8860b',
+      website TEXT,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS rufus_queries (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      prospectId INTEGER NOT NULL,
+      queryText TEXT NOT NULL,
+      category TEXT NOT NULL,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (prospectId) REFERENCES prospects(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS rufus_query_runs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      queryId INTEGER NOT NULL,
+      asinRankings TEXT NOT NULL,
+      sovPercent REAL NOT NULL,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (queryId) REFERENCES rufus_queries(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS catalog_links (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      prospectId INTEGER NOT NULL,
+      sourceAsin TEXT NOT NULL,
+      targetAsin TEXT NOT NULL,
+      relationshipType TEXT NOT NULL,
+      strengthScore REAL DEFAULT 0.50,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (prospectId) REFERENCES prospects(id) ON DELETE CASCADE
+    );
   `);
+
+  // Migration: add aPlusText to listings table if not exists
+  try {
+    db.exec(`ALTER TABLE listings ADD COLUMN aPlusText TEXT`);
+  } catch {
+    // Column already exists — skip silently
+  }
 
   // Migration: add new columns to existing listing_analyses tables
   const newColumns = [

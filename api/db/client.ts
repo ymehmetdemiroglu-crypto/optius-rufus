@@ -71,6 +71,7 @@ export interface ListingRecord {
   rating?: number;
   reviewCount?: number;
   images?: string; // JSON string representation of string[]
+  aPlusText?: string;
   rawScrapeData?: string; // JSON string representation of record
   scrapedAt?: string;
   createdAt: string;
@@ -86,6 +87,42 @@ export interface BookingRecord {
   notes?: string;
   scheduledDate?: string;
   status: string;
+  createdAt: string;
+}
+
+export interface BrandSettingsRecord {
+  id: number;
+  companyName?: string;
+  logoUrl?: string;
+  logoBase64?: string;
+  primaryColor?: string;
+  website?: string;
+  createdAt: string;
+}
+
+export interface RufusQueryRecord {
+  id: number;
+  prospectId: number;
+  queryText: string;
+  category: string;
+  createdAt: string;
+}
+
+export interface RufusQueryRunRecord {
+  id: number;
+  queryId: number;
+  asinRankings: string; // JSON representation of ranking objects
+  sovPercent: number;
+  createdAt: string;
+}
+
+export interface CatalogLinkRecord {
+  id: number;
+  prospectId: number;
+  sourceAsin: string;
+  targetAsin: string;
+  relationshipType: string;
+  strengthScore: number;
   createdAt: string;
 }
 

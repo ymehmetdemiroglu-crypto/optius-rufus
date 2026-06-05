@@ -1,11 +1,8 @@
 import { z } from "zod";
 import { db } from "../db/client.js";
 import type { ListingRecord } from "../db/client.js";
-import { triggerScrape, getRunStatus, getDatasetItems } from "../services/apify.js";
+import { scrapeAmazonListing } from "../services/scraper.js";
 import { router, publicProcedure } from "../trpc.js";
-
-// In-memory store for Apify runs
-const runStore = new Map<string, { prospectId: number; datasetId: string }>();
 
 export const scraperRouter = router({
   trigger: publicProcedure
@@ -17,42 +14,22 @@ export const scraperRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const { runId, datasetId } = await triggerScrape(input.asin, input.marketplace);
-      runStore.set(runId, { prospectId: input.prospectId, datasetId });
-      return { runId };
-    }),
-
-  poll: publicProcedure
-    .input(z.object({ runId: z.string() }))
-    .mutation(async ({ input }) => {
-      const runInfo = runStore.get(input.runId);
-      if (!runInfo) {
-        throw new Error(`Run not found: ${input.runId}`);
-      }
-
-      const status = await getRunStatus(input.runId);
-
-      if (status === "SUCCEEDED") {
-        const items = await getDatasetItems(runInfo.datasetId);
-        const item = items[0];
-
-        if (!item) {
-          throw new Error("No items found in dataset");
-        }
-
-        const bullets = Array.isArray(item.bullets) ? JSON.stringify(item.bullets) : item.bullets || "[]";
-        const images = Array.isArray(item.images) ? JSON.stringify(item.images) : item.images || "[]";
+      try {
+        const item = await scrapeAmazonListing(input.asin, input.marketplace);
+        
+        const bullets = Array.isArray(item.bullets) ? JSON.stringify(item.bullets) : "[]";
+        const images = Array.isArray(item.images) ? JSON.stringify(item.images) : "[]";
 
         const result = db
           .prepare(
-            `INSERT INTO listings (prospectId, asin, marketplace, url, title, bullets, description, brand, category, price, rating, reviewCount, images, rawScrapeData, scrapedAt, createdAt)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
+            `INSERT INTO listings (prospectId, asin, marketplace, url, title, bullets, description, brand, category, price, rating, reviewCount, images, aPlusText, rawScrapeData, scrapedAt, createdAt)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
           )
           .run(
-            runInfo.prospectId,
-            input.runId.startsWith("mock-") ? item.asin || "B0TEST1234" : item.asin,
-            item.marketplace || "US",
-            item.url || `https://www.amazon.com/dp/${item.asin}`,
+            input.prospectId,
+            item.asin,
+            input.marketplace,
+            `https://www.amazon.com/dp/${item.asin}`,
             item.title || "",
             bullets,
             item.description || "",
@@ -62,17 +39,26 @@ export const scraperRouter = router({
             item.rating || 0,
             item.reviewCount || 0,
             images,
-            JSON.stringify(item)
+            item.aPlusText || "",
+            item.rawScrapeData || "{}"
           );
 
         const listing = db.prepare("SELECT * FROM listings WHERE id = ?").get(result.lastInsertRowid) as ListingRecord | undefined;
+        db.prepare("UPDATE prospects SET status = 'scraped' WHERE id = ?").run(input.prospectId);
 
-        db.prepare("UPDATE prospects SET status = 'scraped' WHERE id = ?").run(runInfo.prospectId);
-
-        return { status, listing };
+        return { status: "SUCCEEDED", listing };
+      } catch (err: any) {
+        console.error("❌ [ScraperRouter] Trigger failed:", err);
+        throw new Error(`Scraping failed: ${err.message}`);
       }
+    }),
 
-      return { status, listing: null };
+  poll: publicProcedure
+    .input(z.object({ runId: z.string() }))
+    .mutation(async ({ input }) => {
+      // Kept for backward compatibility with existing frontend expectations
+      // Since trigger now runs synchronously, poll can immediately return SUCCEEDED if listing exists
+      return { status: "SUCCEEDED", listing: null };
     }),
 
   ingestDirect: publicProcedure
@@ -86,28 +72,29 @@ export const scraperRouter = router({
     )
     .mutation(({ input }) => {
       const item = input.data;
-      const bullets = Array.isArray(item.bullets) ? JSON.stringify(item.bullets) : item.bullets || "[]";
-      const images = Array.isArray(item.images) ? JSON.stringify(item.images) : item.images || "[]";
+      const bullets = Array.isArray(item.bullets) ? JSON.stringify(item.bullets) : "[]";
+      const images = Array.isArray(item.images) ? JSON.stringify(item.images) : "[]";
 
       const result = db
         .prepare(
-          `INSERT INTO listings (prospectId, asin, marketplace, url, title, bullets, description, brand, category, price, rating, reviewCount, images, rawScrapeData, scrapedAt, createdAt)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
+          `INSERT INTO listings (prospectId, asin, marketplace, url, title, bullets, description, brand, category, price, rating, reviewCount, images, aPlusText, rawScrapeData, scrapedAt, createdAt)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
         )
         .run(
           input.prospectId,
           input.asin,
           input.marketplace,
           item.url || `https://www.amazon.com/dp/${input.asin}`,
-          item.title || "",
+          (item.title as string) || "",
           bullets,
-          item.description || "",
-          item.brand || "",
-          item.category || "",
-          item.price || 0,
-          item.rating || 0,
-          item.reviewCount || 0,
+          (item.description as string) || "",
+          (item.brand as string) || "",
+          (item.category as string) || "",
+          (item.price as number) || 0,
+          (item.rating as number) || 0,
+          (item.reviewCount as number) || 0,
           images,
+          (item.aPlusText as string) || "",
           JSON.stringify(item)
         );
 
@@ -117,4 +104,3 @@ export const scraperRouter = router({
       return listing;
     }),
 });
-

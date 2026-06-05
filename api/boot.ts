@@ -6,6 +6,8 @@ import "./db/schema.js";
 import fs from "fs";
 import path from "path";
 
+import { generatePdf } from "./services/pdf.js";
+
 export const app = new Hono();
 
 // A simple serveStatic replacement using Node fs for portable and error-free execution
@@ -43,6 +45,20 @@ app.use("*", cors({ origin: "*" }));
 
 // Health check
 app.get("/health", (c) => c.json({ status: "ok", version: process.env.APP_VERSION || "1.0.0" }));
+
+// PDF Download route
+app.get("/api/pdf/:slug", async (c) => {
+  const slug = c.req.param("slug");
+  try {
+    const pdfBuffer = await generatePdf(slug);
+    c.header("Content-Type", "application/pdf");
+    c.header("Content-Disposition", `attachment; filename="optimus-rufus-audit-${slug}.pdf"`);
+    return c.body(pdfBuffer);
+  } catch (err: any) {
+    console.error("❌ [Hono] PDF download route failed:", err);
+    return c.text(`Failed to generate PDF: ${err.message}`, 500);
+  }
+});
 
 // tRPC API endpoint
 app.use("/api/trpc/*", async (c) => {

@@ -412,43 +412,117 @@ payment.webhook
 
 ---
 
-## 9. SP-API Router (`spapi.`)
+## 9. Branding Router (`branding.`)
 
-### 9.1 Connect Amazon Account
+### 9.1 Get Settings
 ```typescript
-spapi.getAuthUrl
-```
-**Type:** Query  
-**Input:** `{ marketplace: string }`  
-**Output:** `{ url: string }` — Amazon OAuth URL  
-
-### 9.2 Handle Amazon Callback
-```typescript
-spapi.handleCallback
-```
-**Type:** Query  
-**Input:** `{ code: string, state: string, selling_partner_id: string }`  
-**Output:** `{ success: boolean, account: AmazonAccount }`  
-
-### 9.3 Get Connected Accounts
-```typescript
-spapi.getAccounts
+branding.getSettings
 ```
 **Type:** Query  
 **Input:** None  
-**Output:** `AmazonAccount[]`  
-
-### 9.4 Disconnect Account
+**Output:**
 ```typescript
-spapi.disconnect
+{
+  companyName: string;
+  logoUrl: string;
+  logoBase64: string;
+  primaryColor: string;
+  website: string;
+}
+```
+
+### 9.2 Update Settings
+```typescript
+branding.updateSettings
 ```
 **Type:** Mutation  
-**Input:** `{ accountId: number }`  
-**Output:** `{ success: boolean }`  
+**Input:**
+```typescript
+z.object({
+  companyName: z.string().optional(),
+  logoUrl: z.string().optional(),
+  logoBase64: z.string().optional(),
+  primaryColor: z.string().optional(),
+  website: z.string().optional(),
+})
+```
+**Output:** `{ success: boolean }`
 
 ---
 
-## 10. Error Handling
+## 10. Rufus Tracker Router (`rufusTracker.`)
+
+### 10.1 Run SOV Simulation
+```typescript
+rufusTracker.runSOVSimulation
+```
+**Type:** Mutation  
+**Input:**
+```typescript
+z.object({
+  prospectId: z.number().int(),
+  category: z.string().optional(),
+})
+```
+**Output:**
+```typescript
+{
+  success: boolean;
+  sovPercent: number;
+  questions: {
+    queryText: string;
+    rankings: {
+      asin: string;
+      rank: number;
+      recommended: boolean;
+      reason: string;
+    }[];
+  }[];
+}
+```
+
+### 10.2 Get SOV History
+```typescript
+rufusTracker.getSOVHistory
+```
+**Type:** Query  
+**Input:** `{ prospectId: number }`  
+**Output:**
+```typescript
+{
+  history: SOVRun[];
+  timeline: { date: string, sovPercent: number }[];
+  currentSOV: number;
+}
+```
+
+---
+
+## 11. Catalog Graph Router (`catalogGraph.`)
+
+### 11.1 Get Graph
+```typescript
+catalogGraph.getGraph
+```
+**Type:** Query  
+**Input:** `{ prospectId: number }`  
+**Output:**
+```typescript
+{
+  links: {
+    id: number;
+    prospectId: number;
+    sourceAsin: string;
+    targetAsin: string;
+    relationshipType: "substitute" | "complementary" | "co_occurrence";
+    strengthScore: number;
+  }[];
+}
+```
+
+---
+
+## 12. Error Handling
 
 ### 10.1 Standard Error Format
 
