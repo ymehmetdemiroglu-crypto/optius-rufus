@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { db } from "../db/client.js";
-import type { ProspectRecord, ListingRecord } from "../db/client.js";
+import type { ProspectRecord, ListingRecord, ListingAnalysisRecord } from "../db/client.js";
 import { triggerWebhook } from "../services/webhook.js";
 import { router, publicProcedure } from "../trpc.js";
 
@@ -54,9 +54,9 @@ export const prospectsRouter = router({
         .prepare("SELECT * FROM listings WHERE prospectId = ? ORDER BY createdAt DESC LIMIT 1")
         .get(prospect.id) as ListingRecord | undefined;
       const analysis = listing
-        ? db
+        ? (db
             .prepare("SELECT * FROM listing_analyses WHERE listingId = ? ORDER BY createdAt DESC LIMIT 1")
-            .get(listing.id)
+            .get(listing.id) as ListingAnalysisRecord | undefined)
         : null;
 
       return { prospect, listing: listing || null, analysis: analysis || null };
@@ -108,9 +108,9 @@ export const prospectsRouter = router({
         .prepare("SELECT * FROM listings WHERE prospectId = ? ORDER BY createdAt DESC LIMIT 1")
         .get(prospect.id) as ListingRecord | undefined;
       const analysis = listing
-        ? db
+        ? (db
             .prepare("SELECT * FROM listing_analyses WHERE listingId = ? ORDER BY createdAt DESC LIMIT 1")
-            .get(listing.id)
+            .get(listing.id) as ListingAnalysisRecord | undefined)
         : null;
       const bookings = db.prepare("SELECT * FROM bookings WHERE prospectId = ? ORDER BY createdAt DESC").all(prospect.id);
 

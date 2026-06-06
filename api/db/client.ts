@@ -88,6 +88,63 @@ export interface ListingRecord {
   createdAt: string;
 }
 
+export interface ListingAnalysisRecord {
+  id: number;
+  listingId: number;
+  prospectId: number;
+  overallScore: number;
+  rufusScore: number;
+  cosmoScore: number;
+  semanticScore: number;
+  contentScore: number;
+  visualScore: number;
+  gaps: string;
+  topIssues: string;
+  strengths: string;
+  opportunities: string;
+  aiAnalysisRaw: string;
+
+  copyPersonalizedHook?: string;
+  copyProblemNarrative?: string;
+  copySolutionPitch?: string;
+  copyUrgencyCTA?: string;
+
+  copyHeroHeadline?: string;
+  copyHeroSubheadline?: string;
+
+  copyAutopsyHeadline?: string;
+  copyAutopsyBody?: string;
+
+  copyBleedHeadline?: string;
+  copyBleedBody?: string;
+
+  copySimulatorIntro?: string;
+  copySimulatorScenarios?: string;
+
+  copyTransformHeadline?: string;
+  copyTransformBefore?: string;
+  copyTransformAfter?: string;
+
+  copyRoadmapHeadline?: string;
+  copyRoadmapBody?: string;
+
+  copySocialProofHeadline?: string;
+
+  copyCtaHeadline?: string;
+  copyCtaGuarantee?: string;
+
+  copyFreeQAs?: string;
+  copyReviewSentiment?: string;
+  copyCompetitorAudit?: string;
+  copyPpcKeywords?: string;
+  copyCosmoBundling?: string;
+  copyCosmoGraphData?: string;
+
+  packageType?: string;
+  pricePoint?: number;
+  createdAt: string;
+}
+
 export interface BookingRecord {
   id: number;
   prospectId: number;

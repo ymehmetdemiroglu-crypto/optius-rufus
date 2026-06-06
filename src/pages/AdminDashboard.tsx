@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "../providers/trpc";
 import { usePipeline } from "../hooks/usePipeline";
 import { 
@@ -905,7 +905,7 @@ function COSMOCanvas({ links, targetAsin }: { links: any[]; targetAsin: string }
             </div>
           </div>
         );
-      })
+      })}
     </div>
   );
 }
