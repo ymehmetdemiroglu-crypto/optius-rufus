@@ -40,7 +40,7 @@ export async function generatePdf(slug: string): Promise<Buffer> {
     
     // Log console messages and errors from the browser
     page.on("console", (msg) => console.log(`[Browser Console] ${msg.text()}`));
-    page.on("pageerror", (err) => console.error(`[Browser Error] ${err.message}`));
+    page.on("pageerror", (err) => console.error(`[Browser Error] ${(err as any).message || err}`));
     
     // Set viewport size for high resolution printing
     await page.setViewport({
@@ -56,7 +56,7 @@ export async function generatePdf(slug: string): Promise<Buffer> {
         await page.goto(url, { waitUntil: "load", timeout: 15000 });
         break;
       } catch (err: any) {
-        if (err.message.includes("ERR_NETWORK_CHANGED") && retries > 1) {
+        if ((err as any).message?.includes("ERR_NETWORK_CHANGED") && retries > 1) {
           console.warn(`[PDFService] Encountered ERR_NETWORK_CHANGED. Retrying navigation... (${retries - 1} retries left)`);
           retries--;
           await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -89,7 +89,7 @@ export async function generatePdf(slug: string): Promise<Buffer> {
     });
 
     console.log(`✅ [PDFService] PDF generated successfully for slug: ${slug} (${pdfBuffer.length} bytes)`);
-    return pdfBuffer;
+    return Buffer.from(pdfBuffer);
   } finally {
     await browser.close();
   }

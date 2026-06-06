@@ -53,7 +53,7 @@ app.get("/api/pdf/:slug", async (c) => {
     const pdfBuffer = await generatePdf(slug);
     c.header("Content-Type", "application/pdf");
     c.header("Content-Disposition", `attachment; filename="optimus-rufus-audit-${slug}.pdf"`);
-    return c.body(pdfBuffer);
+    return c.body(pdfBuffer as any);
   } catch (err: any) {
     console.error("❌ [Hono] PDF download route failed:", err);
     return c.text(`Failed to generate PDF: ${err.message}`, 500);
@@ -91,7 +91,7 @@ const httpServer = createServer(async (req, res) => {
   const request = new Request(url, {
     method: req.method,
     headers: new Headers(
-      Object.entries(req.headers).map(([k, v]) => [k, Array.isArray(v) ? v.join(", ") : v || ""])
+      Object.entries(req.headers).map(([k, v]) => [k, Array.isArray(v) ? v.join(", ") : v || ""]) as any
     ),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     body: (req.method !== "GET" && req.method !== "HEAD" ? await getBody(req) : undefined) as any,
