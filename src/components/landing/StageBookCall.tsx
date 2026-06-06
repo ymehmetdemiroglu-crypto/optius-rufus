@@ -10,6 +10,8 @@ interface StageBookCallProps {
   prospectName: string;
   prospectEmail: string;
   visible: boolean;
+  packageType?: string;
+  pricePoint?: number;
 }
 
 const revenueOptions = [
@@ -36,7 +38,11 @@ export default function StageBookCall({
   prospectId,
   prospectName,
   prospectEmail,
+  packageType = 'package_2',
+  pricePoint = 1500,
+  visible,
 }: StageBookCallProps) {
+  if (!visible) return null;
   const [form, setForm] = useState<BookingFormData>({
     name: prospectName || '',
     email: prospectEmail || '',
@@ -45,6 +51,31 @@ export default function StageBookCall({
     notes: '',
   });
   const [submitted, setSubmitted] = useState(false);
+
+  // Resolve dynamic package pricing and guarantees
+  let displayHeadline = headline;
+  let displayGuarantee = guarantee;
+
+  // If using default / fallback copywriting, customize based on selected package
+  if (
+    !headline ||
+    headline.startsWith("Book Your Free") ||
+    headline.includes("Listing Audit")
+  ) {
+    if (packageType === 'package_1') {
+      displayHeadline = `Book Your Rufus Conquest & SOV Consultation, ${prospectName}`;
+      displayGuarantee = `If we can't find at least 3 high-intent search queries where your competitors are stealing your sales, the consultation call is 100% free. No credit card required.`;
+    } else if (packageType === 'package_2') {
+      displayHeadline = `Secure Your Full-Funnel Listing & A+ Overhaul, ${prospectName}`;
+      displayGuarantee = `We will rewrite your Core Listing, A+ modules, and Storefront SEO. If this doesn't pass our 7-agent AI audit with a score above 85, we'll rewrite it until it does.`;
+    } else if (packageType === 'package_3') {
+      displayHeadline = `Secure Your PPC & AEO Intent Alignment Setup, ${prospectName}`;
+      displayGuarantee = `Get your COSMO-optimized listing and semantic PPC keyword map. If we don't lower your ACOS by at least 15% in the first 30 days, we'll work with you for free until we do.`;
+    } else if (packageType === 'package_4') {
+      displayHeadline = `Claim Your COSMO Catalog & Bundling Blueprint, ${prospectName}`;
+      displayGuarantee = `We'll build your catalog relationship map and virtual bundles. If we don't find at least 2 highly profitable product bundles to link, you pay nothing.`;
+    }
+  }
 
   const bookMutation = trpc.booking?.create?.useMutation({
     onSuccess: () => setSubmitted(true),
@@ -107,9 +138,16 @@ export default function StageBookCall({
                 FINAL STEP
               </p>
               <h2 className="display-heading text-3xl md:text-5xl text-brand-dark">
-                {headline}
+                {displayHeadline}
               </h2>
-              <p className="font-mono text-xs uppercase tracking-widest text-brand-dark/50">
+              {/* Package Badge */}
+              <div className="inline-block bg-brand-dark text-brand-gold font-mono text-xs uppercase px-3 py-1.5 border-[2px] border-brand-dark font-black tracking-wider">
+                {packageType === 'package_1' && `Package 1: Rufus SOV & Conquesting — $${pricePoint.toLocaleString()}`}
+                {packageType === 'package_2' && `Package 2: Full-Funnel Listing Optimization — $${pricePoint.toLocaleString()}`}
+                {packageType === 'package_3' && `Package 3: AEO & PPC Intent Alignment — $${pricePoint.toLocaleString()}`}
+                {packageType === 'package_4' && `Package 4: COSMO Bundling & Catalog — $${pricePoint.toLocaleString()}`}
+              </div>
+              <p className="font-mono text-xs uppercase tracking-widest text-brand-dark/50 pt-2">
                 Next available slot: {getTomorrowDate()} • 10:00 AM ET
               </p>
             </div>
@@ -219,7 +257,7 @@ export default function StageBookCall({
                   Our Guarantee
                 </h4>
                 <p className="text-sm font-bold text-brand-dark/90 leading-relaxed">
-                  {guarantee}
+                  {displayGuarantee}
                 </p>
               </div>
             </div>

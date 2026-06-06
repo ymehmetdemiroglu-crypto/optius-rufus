@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { trpc } from "../providers/trpc";
+import { usePipeline } from "../hooks/usePipeline";
 import { 
   Search, Sliders, Palette, Download, FolderOpen, Cpu, 
   Layers, AlertTriangle, CheckCircle, RefreshCw, Upload, ExternalLink 
@@ -26,14 +27,14 @@ export default function AdminDashboard() {
   const [logoBase64, setLogoBase64] = useState("");
 
   // Populate branding fields when loaded
-  useState(() => {
+  useEffect(() => {
     if (brandData) {
       setCompanyName(brandData.companyName);
       setWebsite(brandData.website || "");
       setPrimaryColor(brandData.primaryColor);
       setLogoBase64(brandData.logoBase64 || "");
     }
-  });
+  }, [brandData]);
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -503,8 +504,8 @@ function ProspectDetailPanel({ prospectId }: { prospectId: number }) {
     }
 
     // Trigger standard browser CSV download
-    const csvContent = "data:text/csv;charset=utf-8," + csvRows.join("\n");
-    const encodedUri = encodeURI(csvContent);
+    const csvContent = csvRows.join("\n");
+    const encodedUri = "data:text/csv;charset=utf-8," + encodeURIComponent(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", `amazon_ads_bulksheet_${asin}.csv`);
@@ -547,7 +548,14 @@ function ProspectDetailPanel({ prospectId }: { prospectId: number }) {
           <div className="border-[2px] border-brand-dark bg-brand-bg p-4 flex gap-4 items-center">
             {listing.images && (
               <img 
-                src={JSON.parse(listing.images)[0]} 
+                src={(() => {
+                  try {
+                    const parsed = JSON.parse(listing.images);
+                    return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : "https://placehold.co/100x100/png";
+                  } catch {
+                    return "https://placehold.co/100x100/png";
+                  }
+                })()}
                 alt="Product Preview" 
                 className="h-16 w-16 object-contain border border-brand-dark bg-white p-1"
                 onError={(e) => {
@@ -566,6 +574,8 @@ function ProspectDetailPanel({ prospectId }: { prospectId: number }) {
             </div>
           </div>
         )}
+
+        <PipelineStatusPanel prospectId={prospect.id} />
 
         <div className="flex flex-wrap gap-4 pt-2 border-t-[2px] border-brand-dark/10">
           <a 
@@ -709,6 +719,125 @@ function ProspectDetailPanel({ prospectId }: { prospectId: number }) {
 }
 
 /* =========================================================================
+   PIPELINE STATUS PANEL
+   ========================================================================= */
+function PipelineStatusPanel({ prospectId }: { prospectId: number }) {
+  const { job, isLoading, isConnected, error, handleRetry } = usePipeline({ prospectId, enableSse: false });
+
+  if (isLoading && !job) {
+    return (
+      <div className="border-[2px] border-dashed border-brand-dark/20 p-4 bg-brand-bg/20">
+        <p className="font-mono text-[10px] text-gray-400 uppercase">Loading pipeline status...</p>
+      </div>
+    );
+  }
+
+  if (!job) {
+    return (
+      <div className="border-[2px] border-dashed border-brand-dark/20 p-4 bg-brand-bg/20">
+        <p className="font-mono text-[10px] text-gray-400 uppercase">No pipeline jobs found for this prospect.</p>
+      </div>
+    );
+  }
+
+  const stageNames = ["fetch", "preprocess", "embedding", "semantic", "optimize", "competitor"];
+  const stageLabels: Record<string, string> = {
+    fetch: "Data Fetch",
+    preprocess: "Preprocess",
+    embedding: "Embedding",
+    semantic: "Semantic Analysis",
+    optimize: "Content Optimization",
+    competitor: "Competitor Analysis",
+  };
+
+  return (
+    <div className="border-[2px] border-brand-dark bg-white p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <h4 className="font-mono text-[10px] uppercase font-bold text-gray-500 flex items-center gap-2">
+          <Cpu size={12} /> Pipeline Job #{job.id}
+        </h4>
+        <div className="flex items-center gap-2">
+          <span className={`font-mono text-[9px] px-2 py-0.5 uppercase font-bold ${
+            job.status === "completed" ? "bg-green-100 text-green-700" :
+            job.status === "failed" ? "bg-red-100 text-red-700" :
+            job.status === "running" ? "bg-blue-100 text-blue-700" :
+            "bg-yellow-100 text-yellow-700"
+          }`}>
+            {job.status}
+          </span>
+          {isConnected && (
+            <span className="font-mono text-[9px] text-green-600 uppercase">● Live</span>
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-1">
+        {stageNames.map((stage, idx) => {
+          const stageState = job.stages[stage];
+          const isCompleted = stageState?.status === "completed";
+          const isFailed = stageState?.status === "failed";
+          const isRunning = stageState?.status === "running";
+
+          return (
+            <div key={stage} className="flex items-center gap-1 flex-1">
+              <div
+                className={`h-2 flex-1 rounded-none ${
+                  isCompleted ? "bg-green-500" :
+                  isFailed ? "bg-red-500" :
+                  isRunning ? "bg-blue-500 animate-pulse" :
+                  "bg-gray-200"
+                }`}
+                title={stageLabels[stage]}
+              />
+              {idx < stageNames.length - 1 && (
+                <div className="w-1 h-[2px] bg-brand-dark/20" />
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="grid grid-cols-3 gap-2">
+        {stageNames.map((stage) => {
+          const stageState = job.stages[stage];
+          if (!stageState || stageState.status === "pending") return null;
+          return (
+            <div key={stage} className="flex items-center justify-between border border-brand-dark/10 p-1.5">
+              <span className="font-mono text-[9px] uppercase text-gray-600">{stageLabels[stage]}</span>
+              {stageState.status === "completed" ? (
+                <CheckCircle size={10} className="text-green-600" />
+              ) : stageState.status === "failed" ? (
+                <button
+                  onClick={() => handleRetry(stage)}
+                  className="flex items-center gap-1 text-[9px] font-mono text-red-600 hover:underline"
+                >
+                  <RefreshCw size={8} /> Retry
+                </button>
+              ) : (
+                <RefreshCw size={10} className="text-blue-600 animate-spin" />
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {error && (
+        <div className="flex items-center gap-2 text-red-600 font-mono text-[10px] bg-red-50 border border-red-200 p-2">
+          <AlertTriangle size={12} />
+          {error}
+        </div>
+      )}
+
+      {job.tokenUsage > 0 && (
+        <p className="font-mono text-[9px] text-gray-400 text-right">
+          Token usage: {job.tokenUsage}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/* =========================================================================
    COSMO CANVAS COMPONENT
    ========================================================================= */
 function COSMOCanvas({ links, targetAsin }: { links: any[]; targetAsin: string }) {
@@ -721,12 +850,14 @@ function COSMOCanvas({ links, targetAsin }: { links: any[]; targetAsin: string }
       </div>
 
       {/* Competitor Nodes (Orbiting) */}
-      {links.map((link: any, index: number) => {
+      {links.map((link: { id: number; relationshipType: string; strengthScore: number; targetAsin: string }, index: number) => {
         // Calculate orbit positions (distributed evenly around center)
         const angle = (index * (2 * Math.PI)) / links.length;
         const radius = 100; // Orbit distance in pixels
         const x = Math.cos(angle) * radius;
         const y = Math.sin(angle) * radius;
+        const lineLength = Math.sqrt(x * x + y * y);
+        const lineAngle = (Math.atan2(y, x) * 180) / Math.PI;
 
         // Color based on relationship type
         const nodeColor = 
@@ -735,40 +866,37 @@ function COSMOCanvas({ links, targetAsin }: { links: any[]; targetAsin: string }
 
         return (
           <div key={link.id}>
-            {/* SVG Connecting Link Line */}
-            <svg 
-              className="absolute inset-0 h-full w-full pointer-events-none z-10"
-              style={{ overflow: 'visible' }}
+            {/* Connecting Link Line (using rotated div instead of SVG calc) */}
+            <div
+              className="absolute top-1/2 left-1/2 pointer-events-none z-10 origin-left"
+              style={{
+                width: `${lineLength}px`,
+                height: `${Math.max(1, Math.round(link.strengthScore * 4))}px`,
+                backgroundColor: nodeColor,
+                opacity: 0.6,
+                transform: `rotate(${lineAngle}deg)`,
+                borderStyle: link.relationshipType === "complementary" ? "dashed" : "solid",
+                borderWidth: 0,
+              }}
+            />
+            {/* Strength Score Indicator */}
+            <div
+              className="absolute pointer-events-none z-10 font-mono text-[8px] text-white"
+              style={{
+                left: `calc(50% + ${x / 2}px)`,
+                top: `calc(50% + ${y / 2}px)`,
+                transform: "translate(-50%, -50%)",
+              }}
             >
-              <line 
-                x1="50%" 
-                y1="50%" 
-                x2={`calc(50% + ${x}px)`} 
-                y2={`calc(50% + ${y}px)`} 
-                stroke={nodeColor}
-                strokeWidth={Math.max(1, Math.round(link.strengthScore * 4))}
-                strokeDasharray={link.relationshipType === "complementary" ? "4 4" : "0"}
-                opacity={0.6}
-              />
-              {/* Strength Score Indicator */}
-              <text
-                x={`calc(50% + ${x / 2}px)`}
-                y={`calc(50% + ${y / 2}px)`}
-                fill="#ffffff"
-                fontSize="8px"
-                fontFamily="monospace"
-                textAnchor="middle"
-                dy="-4"
-              >
-                {link.strengthScore}
-              </text>
-            </svg>
+              {link.strengthScore}
+            </div>
 
             {/* Orbit Node */}
             <div 
               className="absolute h-12 w-12 border-[2px] border-white rounded-full flex flex-col items-center justify-center text-center shadow-md z-20"
               style={{
-                transform: `translate(${x}px, ${y}px)`,
+                left: `calc(50% + ${x}px - 24px)`,
+                top: `calc(50% + ${y}px - 24px)`,
                 backgroundColor: nodeColor,
               }}
             >
@@ -777,7 +905,7 @@ function COSMOCanvas({ links, targetAsin }: { links: any[]; targetAsin: string }
             </div>
           </div>
         );
-      })}
+      })
     </div>
   );
 }

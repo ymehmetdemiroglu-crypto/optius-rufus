@@ -31,7 +31,8 @@ const testimonials = [
   },
 ];
 
-export default function StageProofWall({ headline, urgencyCTA, onOpenBooking }: StageProofWallProps) {
+export default function StageProofWall({ headline, urgencyCTA, onOpenBooking, visible }: StageProofWallProps) {
+  if (!visible) return null;
   return (
     <section
       id="stage-proof"

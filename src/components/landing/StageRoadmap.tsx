@@ -31,7 +31,8 @@ const steps = [
   },
 ];
 
-export default function StageRoadmap({ headline, body }: StageRoadmapProps) {
+export default function StageRoadmap({ headline, body, prospectName, visible }: StageRoadmapProps) {
+  if (!visible) return null;
   return (
     <section
       id="stage-roadmap"

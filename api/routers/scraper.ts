@@ -20,31 +20,35 @@ export const scraperRouter = router({
         const bullets = Array.isArray(item.bullets) ? JSON.stringify(item.bullets) : "[]";
         const images = Array.isArray(item.images) ? JSON.stringify(item.images) : "[]";
 
-        const result = db
-          .prepare(
-            `INSERT INTO listings (prospectId, asin, marketplace, url, title, bullets, description, brand, category, price, rating, reviewCount, images, aPlusText, rawScrapeData, scrapedAt, createdAt)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
-          )
-          .run(
-            input.prospectId,
-            item.asin,
-            input.marketplace,
-            `https://www.amazon.com/dp/${item.asin}`,
-            item.title || "",
-            bullets,
-            item.description || "",
-            item.brand || "",
-            item.category || "",
-            item.price || 0,
-            item.rating || 0,
-            item.reviewCount || 0,
-            images,
-            item.aPlusText || "",
-            item.rawScrapeData || "{}"
-          );
+        const result = db.transaction(() => {
+          const insertResult = db
+            .prepare(
+              `INSERT INTO listings (prospectId, asin, marketplace, url, title, bullets, description, brand, category, price, rating, reviewCount, images, aPlusText, rawScrapeData, scrapedAt, createdAt)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
+            )
+            .run(
+              input.prospectId,
+              item.asin,
+              input.marketplace,
+              `https://www.amazon.com/dp/${item.asin}`,
+              item.title || "",
+              bullets,
+              item.description || "",
+              item.brand || "",
+              item.category || "",
+              item.price || 0,
+              item.rating || 0,
+              item.reviewCount || 0,
+              images,
+              item.aPlusText || "",
+              item.rawScrapeData || "{}"
+            );
+
+          db.prepare("UPDATE prospects SET status = 'scraped' WHERE id = ?").run(input.prospectId);
+          return insertResult;
+        })();
 
         const listing = db.prepare("SELECT * FROM listings WHERE id = ?").get(result.lastInsertRowid) as ListingRecord | undefined;
-        db.prepare("UPDATE prospects SET status = 'scraped' WHERE id = ?").run(input.prospectId);
 
         return { status: "SUCCEEDED", listing };
       } catch (err: any) {

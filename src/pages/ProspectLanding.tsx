@@ -22,6 +22,49 @@ import FloatingCTA from '../components/landing/FloatingCTA';
 
 const TOTAL_STAGES = 11;
 
+function isValidCssColor(color: string): boolean {
+  // Strict validation: only hex colors (#rgb or #rrggbb) or known safe keywords
+  const safeKeywords = ['transparent', 'inherit', 'initial', 'unset'];
+  if (safeKeywords.includes(color.toLowerCase())) return true;
+  return /^#([0-9A-Fa-f]{3}){1,2}$/.test(color);
+}
+
+function isValidDataUrl(url: string): boolean {
+  return /^data:image\/(png|jpeg|jpg|gif|svg\+xml|webp);base64,/.test(url);
+}
+
+function BrandStyleInjector({ brandData }: { brandData: { primaryColor?: string; logoBase64?: string } }) {
+  const safeColor = brandData.primaryColor && isValidCssColor(brandData.primaryColor)
+    ? brandData.primaryColor
+    : "#b8860b";
+  const safeLogo = brandData.logoBase64 && isValidDataUrl(brandData.logoBase64)
+    ? brandData.logoBase64
+    : null;
+
+  const css = `
+    :root { --brand-gold: ${safeColor} !important; }
+    .bg-brand-gold, .progress-segment.active, .gauge-bar-fill.score-warning {
+      background-color: ${safeColor} !important;
+    }
+    .text-brand-gold, .price-token { color: ${safeColor} !important; }
+    .border-brand-gold { border-color: ${safeColor} !important; }
+    ${safeLogo ? `.agency-logo-placeholder {
+      background-image: url(${safeLogo}) !important;
+      background-size: contain; background-repeat: no-repeat;
+    }` : ""}
+    @media print {
+      body { background-color: #f5f0e8 !important; color: #1a1a1a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .no-print { display: none !important; }
+      #stage-hero, #stage-autopsy, #stage-bleed, #stage-simulator, #stage-transform, #stage-free-qas, #stage-ppc-planner, #stage-bundling, #stage-roadmap, #stage-proof {
+        page-break-inside: avoid !important; break-inside: avoid !important;
+        margin-bottom: 2rem !important; page-break-after: auto !important;
+      }
+    }
+  `;
+
+  return <style dangerouslySetInnerHTML={{ __html: css }} />;
+}
+
 function SkeletonLoader() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-20 bg-brand-dark select-none font-sans text-white">
@@ -62,18 +105,22 @@ export default function ProspectLanding() {
 
   const prospectId = isMock ? 5 : (data?.prospect?.id as number ?? 0);
   const tracker = useActivityTracker(prospectId);
+  const trackerRef = useRef(tracker);
+  useEffect(() => {
+    trackerRef.current = tracker;
+  }, [tracker]);
 
   const handleScanComplete = useCallback(() => {
     setScanComplete(true);
   }, []);
 
   const handleCopyQA = useCallback((text: string) => {
-    tracker.trackEvent('copy_qa', { text: text.slice(0, 100) }, 10);
-  }, [tracker]);
+    trackerRef.current.trackEvent('copy_qa', { text: text.slice(0, 100) }, 10);
+  }, []);
 
   const handleDownloadPPC = useCallback(() => {
-    tracker.trackEvent('download_ppc', {}, 15);
-  }, [tracker]);
+    trackerRef.current.trackEvent('download_ppc', {}, 15);
+  }, []);
 
   useEffect(() => {
     if (slug && !isMock && incrementViews && !hasIncremented.current) {
@@ -112,7 +159,7 @@ export default function ProspectLanding() {
         if (el && el.offsetTop <= scrollY) {
           if (i !== currentStage) {
             setCurrentStage(i);
-            tracker.trackScrollStage(i, stageNames[i]);
+            trackerRef.current.trackScrollStage(i, stageNames[i]);
           }
           break;
         }
@@ -123,7 +170,7 @@ export default function ProspectLanding() {
     handleScroll();
 
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [scanComplete, currentStage, tracker]);
+  }, [scanComplete, currentStage]);
 
   const scrollToBooking = () => {
     const el = document.getElementById('stage-book');
@@ -185,44 +232,7 @@ export default function ProspectLanding() {
     <div className="min-h-screen bg-brand-dark text-brand-dark selection:bg-brand-gold selection:text-brand-dark">
       {/* Dynamic Brand Settings CSS injection */}
       {brandData && (
-        <style dangerouslySetInnerHTML={{ __html: `
-          :root {
-            --brand-gold: ${brandData.primaryColor} !important;
-          }
-          .bg-brand-gold, .progress-segment.active, .gauge-bar-fill.score-warning {
-            background-color: ${brandData.primaryColor} !important;
-          }
-          .text-brand-gold, .price-token {
-            color: ${brandData.primaryColor} !important;
-          }
-          .border-brand-gold {
-            border-color: ${brandData.primaryColor} !important;
-          }
-          ${brandData.logoBase64 ? `
-            .agency-logo-placeholder {
-              background-image: url(${brandData.logoBase64}) !important;
-              background-size: contain;
-              background-repeat: no-repeat;
-            }
-          ` : ""}
-          @media print {
-            body {
-              background-color: #f5f0e8 !important;
-              color: #1a1a1a !important;
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-            }
-            .no-print {
-              display: none !important;
-            }
-            #stage-hero, #stage-autopsy, #stage-bleed, #stage-simulator, #stage-transform, #stage-free-qas, #stage-ppc-planner, #stage-bundling, #stage-roadmap, #stage-proof {
-              page-break-inside: avoid !important;
-              break-inside: avoid !important;
-              margin-bottom: 2rem !important;
-              page-break-after: auto !important;
-            }
-          }
-        `}} />
+        <BrandStyleInjector brandData={brandData} />
       )}
 
       {/* Progress Bar */}
@@ -258,6 +268,7 @@ export default function ProspectLanding() {
               visible={scanComplete}
               cosmoGraphData={stageCopy.cosmoGraphData}
               reviewSentiment={stageCopy.reviewSentiment}
+              isPrint={isPrint}
             />
           </div>
 
@@ -350,6 +361,8 @@ export default function ProspectLanding() {
               prospectId={prospect.id}
               prospectName={prospect.name}
               prospectEmail={prospect.email || ''}
+              packageType={prospect.packageType}
+              pricePoint={prospect.pricePoint}
               visible={currentStage >= 10}
             />
           )}

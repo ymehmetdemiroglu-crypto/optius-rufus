@@ -25,11 +25,6 @@ export async function generatePdf(slug: string): Promise<Buffer> {
   // Configure executable path for Puppeteer
   if (process.env.PUPPETEER_EXECUTABLE_PATH) {
     launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
-  } else if (process.platform === "win32") {
-    const defaultWinPath = "C:\\Users\\hp\\.cache\\puppeteer\\chrome-headless-shell\\win64-148.0.7778.97\\chrome-headless-shell-win64\\chrome-headless-shell.exe";
-    if (fs.existsSync(defaultWinPath)) {
-      launchOptions.executablePath = defaultWinPath;
-    }
   }
 
   const browser = await puppeteer.launch(launchOptions);

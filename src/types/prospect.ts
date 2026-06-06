@@ -151,6 +151,8 @@ export interface ProspectData {
   stageCopy: StageCopyData;
   status: 'new' | 'scraped' | 'analyzed' | 'emailed' | 'visited' | 'booked';
   views: number;
+  packageType?: string;
+  pricePoint?: number;
   createdAt: string;
 }
 

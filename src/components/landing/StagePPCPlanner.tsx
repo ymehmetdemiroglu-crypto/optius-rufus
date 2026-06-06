@@ -8,7 +8,8 @@ interface StagePPCPlannerProps {
   onDownloadPPC?: () => void;
 }
 
-export default function StagePPCPlanner({ ppcKeywords, onDownloadPPC }: StagePPCPlannerProps) {
+export default function StagePPCPlanner({ ppcKeywords, onDownloadPPC, visible }: StagePPCPlannerProps) {
+  if (!visible) return null;
   const [downloaded, setDownloaded] = useState(false);
 
   const downloadCSV = () => {

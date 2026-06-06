@@ -38,16 +38,20 @@ export default function StageBleedCalculator({
     const start = performance.now();
     const startVal = displayLossRef.current;
     const diff = monthlyLoss - startVal;
+    let rafId: number;
 
     function step(now: number) {
       const elapsed = now - start;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       setDisplayLoss(Math.round(startVal + diff * eased));
-      if (progress < 1) requestAnimationFrame(step);
+      if (progress < 1) {
+        rafId = requestAnimationFrame(step);
+      }
     }
 
-    requestAnimationFrame(step);
+    rafId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(rafId);
   }, [monthlyLoss, visible]);
 
   return (

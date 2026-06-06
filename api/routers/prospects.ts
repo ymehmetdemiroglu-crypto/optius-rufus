@@ -18,16 +18,26 @@ export const prospectsRouter = router({
         company: z.string().optional(),
         asin: z.string().optional(),
         marketplace: z.string().optional(),
+        packageType: z.string().optional(),
+        pricePoint: z.number().optional(),
       })
     )
     .mutation(async ({ input }) => {
       const slug = generateSlug();
       const result = db
         .prepare(
-          `INSERT INTO prospects (slug, email, firstName, lastName, company, status, landingPageViews, createdAt)
-         VALUES (?, ?, ?, ?, ?, 'new', 0, datetime('now'))`
+          `INSERT INTO prospects (slug, email, firstName, lastName, company, status, landingPageViews, packageType, pricePoint, createdAt)
+         VALUES (?, ?, ?, ?, ?, 'new', 0, ?, ?, datetime('now'))`
         )
-        .run(slug, input.email, input.firstName || null, input.lastName || null, input.company || null);
+        .run(
+          slug,
+          input.email,
+          input.firstName || null,
+          input.lastName || null,
+          input.company || null,
+          input.packageType || 'package_2',
+          input.pricePoint ?? 1500
+        );
 
       return db.prepare("SELECT * FROM prospects WHERE id = ?").get(result.lastInsertRowid) as ProspectRecord | undefined;
     }),
@@ -154,15 +164,9 @@ export const prospectsRouter = router({
         if (prospect) {
           const name = [prospect.firstName, prospect.lastName].filter(Boolean).join(" ") || prospect.email || "Unknown Prospect";
           prospectInfo = { name, company: prospect.company, email: prospect.email };
-        } else if (input.prospectId === 5) {
-          // Hardcoded fallback details for mock presentation tracking
-          prospectInfo = { name: "Alex Hormozi", company: "Acme Greens", email: "founder@acmegreens.com" };
         }
       } catch (err) {
         console.error("⚠️ Failed to read prospect details for webhook, using fallback:", err);
-        if (input.prospectId === 5) {
-          prospectInfo = { name: "Alex Hormozi", company: "Acme Greens", email: "founder@acmegreens.com" };
-        }
       }
 
       // Trigger webhook notification

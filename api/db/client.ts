@@ -16,7 +16,15 @@ const isVercel = !!process.env.VERCEL;
  * On Vercel, the bundled DB file is inside the read-only deployment bundle.
  * We copy it to /tmp (the only writable directory in a serverless function)
  * so that mutation endpoints (bookings, views, activities) can write.
- * NOTE: /tmp is ephemeral — data does not persist across cold starts.
+ * 
+ * ⚠️ CRITICAL: /tmp is ephemeral — data does not persist across cold starts.
+ * All writes (prospects, bookings, activities, pipeline jobs) are LOST when
+ * the function instance recycles. For production persistence, migrate to:
+ *   - PostgreSQL (Neon, Supabase, Railway)
+ *   - MySQL (PlanetScale, RDS)
+ *   - Or use Vercel Postgres / Vercel Blob for specific data
+ * 
+ * This SQLite setup is suitable for demos and local development only.
  */
 let dbPath: string;
 
@@ -41,6 +49,7 @@ console.log(`🔌 Connecting to SQLite database at: ${dbPath}`);
 export const db: Database.Database = new Database(dbPath);
 
 db.pragma("journal_mode = WAL");
+db.pragma("foreign_keys = ON");
 
 export interface ProspectRecord {
   id: number;
@@ -53,6 +62,8 @@ export interface ProspectRecord {
   apolloSequenceId?: string;
   status: string;
   landingPageViews: number;
+  packageType?: string;
+  pricePoint?: number;
   createdAt: string;
 }
 
@@ -124,5 +135,93 @@ export interface CatalogLinkRecord {
   relationshipType: string;
   strengthScore: number;
   createdAt: string;
+}
+
+export interface PipelineJobRecord {
+  id: number;
+  prospectId: number;
+  listingId?: number;
+  packageType?: string;
+  status: string;
+  currentStage?: string;
+  stagesJSON?: string;
+  tokenUsage: number;
+  errorLog?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PipelineJobStageRecord {
+  id: number;
+  jobId: number;
+  stageName: string;
+  status: string;
+  outputJSON?: string;
+  errorMessage?: string;
+  startedAt?: string;
+  completedAt?: string;
+  createdAt: string;
+}
+
+export interface UsageEventRecord {
+  id: number;
+  prospectId: number;
+  jobId?: number;
+  service: string;
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  costCents: number;
+  createdAt: string;
+}
+
+export interface JobQueueRecord {
+  id: number;
+  queue: string;
+  name: string;
+  dataJSON: string;
+  optsJSON?: string;
+  progress: number;
+  delay: number;
+  timestamp: number;
+  attempts: number;
+  maxAttempts: number;
+  processedOn?: number;
+  finishedOn?: number;
+  returnValueJSON?: string;
+  failedReason?: string;
+  stacktraceJSON?: string;
+  status: string;
+  createdAt: string;
+}
+
+/**
+ * Execute a function within an explicit SQLite transaction.
+ * Automatically commits on success, rolls back on error.
+ */
+export function withTransaction<T>(fn: (db: Database.Database) => T): T {
+  db.prepare("BEGIN").run();
+  try {
+    const result = fn(db);
+    db.prepare("COMMIT").run();
+    return result;
+  } catch (err) {
+    db.prepare("ROLLBACK").run();
+    throw err;
+  }
+}
+
+export async function withTransactionAsync<T>(
+  fn: (db: Database.Database) => Promise<T>
+): Promise<T> {
+  db.prepare("BEGIN").run();
+  try {
+    const result = await fn(db);
+    db.prepare("COMMIT").run();
+    return result;
+  } catch (err) {
+    db.prepare("ROLLBACK").run();
+    throw err;
+  }
 }
 

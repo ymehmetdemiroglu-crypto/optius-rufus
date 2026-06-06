@@ -328,6 +328,8 @@ export function mapBackendToProspectData(data: any): ProspectData {
     stageCopy,
     status: (prospect.status as ProspectData['status']) || 'new',
     views: typeof prospect.landingPageViews === 'number' ? prospect.landingPageViews : 0,
+    packageType: (prospect.packageType as string) || 'package_2',
+    pricePoint: typeof prospect.pricePoint === 'number' ? prospect.pricePoint : 1500,
     createdAt: (prospect.createdAt as string) || '',
   };
 }

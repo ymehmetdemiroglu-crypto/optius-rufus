@@ -1,6 +1,8 @@
 import { db } from "./client.js";
+import { initMigrations } from "./migrations/runner.js";
 
 export function initSchema() {
+  // Base tables (idempotent CREATE TABLE IF NOT EXISTS)
   db.exec(`
     CREATE TABLE IF NOT EXISTS prospects (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -13,6 +15,8 @@ export function initSchema() {
       apolloSequenceId TEXT,
       status TEXT DEFAULT 'new',
       landingPageViews INTEGER DEFAULT 0,
+      packageType TEXT DEFAULT 'package_2',
+      pricePoint REAL DEFAULT 1500,
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -33,6 +37,7 @@ export function initSchema() {
       images TEXT,
       aPlusText TEXT,
       rawScrapeData TEXT,
+      embeddingVector TEXT,
       scrapedAt DATETIME,
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (prospectId) REFERENCES prospects(id)
@@ -54,51 +59,43 @@ export function initSchema() {
       opportunities TEXT,
       aiAnalysisRaw TEXT,
 
-      -- Legacy copy columns (kept for backward compat)
       copyPersonalizedHook TEXT,
       copyProblemNarrative TEXT,
       copySolutionPitch TEXT,
       copyUrgencyCTA TEXT,
 
-      -- Stage 1: Hero
       copyHeroHeadline TEXT,
       copyHeroSubheadline TEXT,
 
-      -- Stage 2: Autopsy Report
       copyAutopsyHeadline TEXT,
       copyAutopsyBody TEXT,
 
-      -- Stage 3: Bleed Calculator
       copyBleedHeadline TEXT,
       copyBleedBody TEXT,
 
-      -- Stage 4: Rufus Simulator
       copySimulatorIntro TEXT,
       copySimulatorScenarios TEXT,
 
-      -- Stage 5: Transformation Preview
       copyTransformHeadline TEXT,
       copyTransformBefore TEXT,
       copyTransformAfter TEXT,
 
-      -- Stage 6: Roadmap
       copyRoadmapHeadline TEXT,
       copyRoadmapBody TEXT,
 
-      -- Stage 7: Social Proof
       copySocialProofHeadline TEXT,
 
-      -- Stage 8: Book Call CTA
       copyCtaHeadline TEXT,
       copyCtaGuarantee TEXT,
 
-      -- Advanced Features
       copyFreeQAs TEXT,
       copyReviewSentiment TEXT,
       copyCompetitorAudit TEXT,
       copyPpcKeywords TEXT,
       copyCosmoBundling TEXT,
       copyCosmoGraphData TEXT,
+      packageType TEXT DEFAULT 'package_2',
+      pricePoint REAL DEFAULT 1500,
 
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (listingId) REFERENCES listings(id),
@@ -168,46 +165,8 @@ export function initSchema() {
     );
   `);
 
-  // Migration: add aPlusText to listings table if not exists
-  try {
-    db.exec(`ALTER TABLE listings ADD COLUMN aPlusText TEXT`);
-  } catch {
-    // Column already exists — skip silently
-  }
-
-  // Migration: add new columns to existing listing_analyses tables
-  const newColumns = [
-    "copyHeroHeadline TEXT",
-    "copyHeroSubheadline TEXT",
-    "copyAutopsyHeadline TEXT",
-    "copyAutopsyBody TEXT",
-    "copyBleedHeadline TEXT",
-    "copyBleedBody TEXT",
-    "copySimulatorIntro TEXT",
-    "copySimulatorScenarios TEXT",
-    "copyTransformHeadline TEXT",
-    "copyTransformBefore TEXT",
-    "copyTransformAfter TEXT",
-    "copyRoadmapHeadline TEXT",
-    "copyRoadmapBody TEXT",
-    "copySocialProofHeadline TEXT",
-    "copyCtaHeadline TEXT",
-    "copyCtaGuarantee TEXT",
-    "copyFreeQAs TEXT",
-    "copyReviewSentiment TEXT",
-    "copyCompetitorAudit TEXT",
-    "copyPpcKeywords TEXT",
-    "copyCosmoBundling TEXT",
-    "copyCosmoGraphData TEXT",
-  ];
-
-  for (const col of newColumns) {
-    try {
-      db.exec(`ALTER TABLE listing_analyses ADD COLUMN ${col}`);
-    } catch {
-      // Column already exists — skip silently
-    }
-  }
+  // Run numbered SQL migrations for additive schema changes (indexes, new tables)
+  initMigrations();
 }
 
 initSchema();

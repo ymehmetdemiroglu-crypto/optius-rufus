@@ -38,14 +38,16 @@ export async function scrapeAmazonListing(
     try {
       console.log(`[Scraper] Attempting Rainforest API scrape...`);
       const domain = DOMAIN_MAP[marketplace.toUpperCase()] || "amazon.com";
-      const url = `https://api.rainforestapi.com/request?api_key=${RAINFOREST_API_KEY}&type=product&asin=${asin}&amazon_domain=${domain}`;
-      
-      const response = await fetch(url);
+      const url = `https://api.rainforestapi.com/request?type=product&asin=${asin}&amazon_domain=${domain}`;
+
+      const response = await fetch(url, {
+        headers: { "Authorization": `Bearer ${RAINFOREST_API_KEY}` },
+      });
       if (response.ok) {
         const json = await response.json();
         if (json.request_info?.success && json.product) {
           const product = json.product;
-          
+
           // Helper to extract text from A+ content
           let aPlusText = "";
           if (product.a_plus_content?.text_content) {
@@ -73,7 +75,7 @@ export async function scrapeAmazonListing(
             price: product.price?.value || 0,
             rating: product.rating || 0,
             reviewCount: product.ratings_total || product.reviews_count || 0,
-            images: product.images?.map((img: any) => typeof img === "string" ? img : img.link) || [],
+            images: product.images?.map((img: { link?: string } | string) => typeof img === "string" ? img : img.link) || [],
             aPlusText: aPlusText,
             rawScrapeData: JSON.stringify(json),
           };
@@ -94,17 +96,28 @@ export async function scrapeAmazonListing(
     try {
       console.log(`[Scraper] Falling back to Apify scraper...`);
       const { runId, datasetId } = await triggerScrape(asin, marketplace);
-      
-      // Poll Apify run status
+
+      // Poll Apify run status with timeout and abort support
       let attempts = 0;
-      const maxAttempts = 15; // 15 * 3s = 45s max wait
+      const maxAttempts = 10; // 10 * 2s = 20s max wait
       let status = "RUNNING";
-      
-      while (status === "RUNNING" && attempts < maxAttempts) {
-        attempts++;
-        console.log(`[Scraper] Polling Apify run ${runId} (Attempt ${attempts}/${maxAttempts})...`);
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-        status = await getRunStatus(runId);
+      const abortController = new AbortController();
+      const timeoutId = setTimeout(() => abortController.abort(), 25000);
+
+      try {
+        while (status === "RUNNING" && attempts < maxAttempts && !abortController.signal.aborted) {
+          attempts++;
+          console.log(`[Scraper] Polling Apify run ${runId} (Attempt ${attempts}/${maxAttempts})...`);
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+          status = await getRunStatus(runId);
+        }
+      } finally {
+        clearTimeout(timeoutId);
+      }
+
+      if (abortController.signal.aborted) {
+        console.warn(`⚠️ [Scraper] Apify polling timed out after 25s`);
+        throw new Error("Apify scrape timed out");
       }
 
       if (status === "SUCCEEDED") {

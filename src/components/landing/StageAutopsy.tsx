@@ -10,6 +10,7 @@ interface StageAutopsyProps {
   visible: boolean;
   cosmoGraphData: CosmoNodeData;
   reviewSentiment: ReviewSentimentProfile[];
+  isPrint?: boolean;
 }
 
 interface AnimatedScoreProps {
@@ -18,6 +19,7 @@ interface AnimatedScoreProps {
   description: string;
   delay: number;
   animate: boolean;
+  isPrint?: boolean;
 }
 
 function getScoreLevel(score: number): 'critical' | 'warning' | 'good' {
@@ -34,11 +36,15 @@ function getScoreColor(level: 'critical' | 'warning' | 'good'): string {
   }
 }
 
-function AnimatedScore({ label, score, description, delay, animate }: AnimatedScoreProps) {
-  const [displayScore, setDisplayScore] = useState(0);
+function AnimatedScore({ label, score, description, delay, animate, isPrint }: AnimatedScoreProps) {
+  const [displayScore, setDisplayScore] = useState(isPrint ? score : 0);
   const level = getScoreLevel(score);
 
   useEffect(() => {
+    if (isPrint) {
+      setDisplayScore(score);
+      return;
+    }
     if (!animate) return;
 
     const timeout = setTimeout(() => {
@@ -57,7 +63,7 @@ function AnimatedScore({ label, score, description, delay, animate }: AnimatedSc
     }, delay);
 
     return () => clearTimeout(timeout);
-  }, [animate, score, delay]);
+  }, [animate, score, delay, isPrint]);
 
   return (
     <div className="brutalist-card brutalist-card-hover space-y-3 bg-white">
@@ -74,8 +80,9 @@ function AnimatedScore({ label, score, description, delay, animate }: AnimatedSc
         <div
           className={`gauge-bar-fill score-${level}`}
           style={{
-            width: animate ? `${score}%` : '0%',
-            transitionDelay: `${delay}ms`,
+            width: (isPrint || animate) ? `${score}%` : '0%',
+            transition: isPrint ? 'none' : undefined,
+            transitionDelay: isPrint ? undefined : `${delay}ms`,
           }}
         />
       </div>
@@ -92,19 +99,24 @@ export default function StageAutopsy({
   visible,
   cosmoGraphData,
   reviewSentiment,
+  isPrint,
 }: StageAutopsyProps) {
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(isPrint);
   const [activeTab, setActiveTab] = useState<'scores' | 'cosmo' | 'reviews'>('scores');
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    if (isPrint) {
+      setHasAnimated(true);
+      return;
+    }
     if (visible && !hasAnimated) {
       const timer = setTimeout(() => {
         setHasAnimated(true);
       }, 50);
       return () => clearTimeout(timer);
     }
-  }, [visible, hasAnimated]);
+  }, [visible, hasAnimated, isPrint]);
 
   // Node position mapping (radial layout around core)
   const coreX = 250;
@@ -199,6 +211,7 @@ export default function StageAutopsy({
                 description="How well Amazon's AI can answer buyer questions from your listing."
                 delay={200}
                 animate={hasAnimated}
+                isPrint={isPrint}
               />
               <AnimatedScore
                 label="COSMO Score"
@@ -206,6 +219,7 @@ export default function StageAutopsy({
                 description="How Amazon's knowledge graph connects your product to buyer intent."
                 delay={400}
                 animate={hasAnimated}
+                isPrint={isPrint}
               />
               <AnimatedScore
                 label="Semantic Density"
@@ -213,6 +227,7 @@ export default function StageAutopsy({
                 description="How complete your semantic coverage is across all buyer queries."
                 delay={600}
                 animate={hasAnimated}
+                isPrint={isPrint}
               />
               <AnimatedScore
                 label="Content Quality"
@@ -220,6 +235,7 @@ export default function StageAutopsy({
                 description="Conversion-readiness of your title, bullets, and description."
                 delay={800}
                 animate={hasAnimated}
+                isPrint={isPrint}
               />
             </div>
           )}

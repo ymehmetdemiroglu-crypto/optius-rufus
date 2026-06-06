@@ -6,7 +6,8 @@ interface StageBundlingBlueprintProps {
   visible: boolean;
 }
 
-export default function StageBundlingBlueprint({ cosmoBundling }: StageBundlingBlueprintProps) {
+export default function StageBundlingBlueprint({ cosmoBundling, visible }: StageBundlingBlueprintProps) {
+  if (!visible) return null;
   if (!cosmoBundling || cosmoBundling.length === 0) return null;
 
   return (
