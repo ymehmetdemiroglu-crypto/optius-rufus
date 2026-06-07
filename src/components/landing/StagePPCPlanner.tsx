@@ -9,7 +9,6 @@ interface StagePPCPlannerProps {
 }
 
 export default function StagePPCPlanner({ ppcKeywords, onDownloadPPC, visible }: StagePPCPlannerProps) {
-  if (!visible) return null;
   const [downloaded, setDownloaded] = useState(false);
 
   const downloadCSV = () => {
@@ -48,6 +47,7 @@ export default function StagePPCPlanner({ ppcKeywords, onDownloadPPC, visible }:
     setTimeout(() => setDownloaded(false), 3000);
   };
 
+  if (!visible) return null;
   if (!ppcKeywords || ppcKeywords.length === 0) return null;
 
   return (

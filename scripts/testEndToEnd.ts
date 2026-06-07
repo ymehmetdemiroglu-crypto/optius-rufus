@@ -145,6 +145,7 @@ async function run() {
     {
       rufusScore: analysisResult?.rufusScore ?? 0,
       cosmoScore: analysisResult?.cosmoScore ?? 0,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       semanticGaps: gaps as any,
     },
     rawListing,

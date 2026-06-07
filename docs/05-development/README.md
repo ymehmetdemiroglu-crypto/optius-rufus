@@ -14,7 +14,6 @@ This section contains everything developers need to build, integrate, and extend
 | [API Specification](./api-specification.md) | tRPC endpoints, request/response schemas, error codes |
 | [Database Schema](./database-schema.md) | ERD, table definitions, relationships, migrations |
 | [AI/ML Pipeline](./ai-ml-pipeline.md) | Embedding flow, gap analysis, scoring algorithms |
-| [SP-API Integration](./sp-api-integration.md) | Amazon OAuth, endpoints, rate limits, error handling |
 
 ---
 

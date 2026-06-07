@@ -18,7 +18,7 @@
 | XSS Attack | Medium | High | React escaping + CSP headers |
 | CSRF Attack | Low | Medium | SameSite cookies + CSRF tokens |
 | Token theft | Low | High | HTTP-only cookies + short expiry |
-| SP-API credential leak | Low | Critical | AES-256 encryption |
+| API credential leak | Low | Critical | AES-256 encryption |
 | Rate limit abuse | Medium | Medium | Rate limiting per IP/user |
 | Data breach | Low | Critical | Minimal PII, encrypted tokens |
 
@@ -42,11 +42,10 @@
     v
 [Services] -- Encrypted DB access, secure API calls
     |
-    +---> [MySQL] -- Encrypted at rest (optional)
+    +---> [PostgreSQL] -- Encrypted at rest (optional)
     +---> [Qdrant] -- Network isolated
     +---> [OpenAI API] -- API key auth
     +---> [Paddle] -- Webhook signature verification
-    +---> [Amazon SP-API] -- OAuth 2.0
 ```
 
 ---
@@ -202,10 +201,8 @@ listing.getById: authedProcedure
 
 | Data Type | Encryption Method | Key Management |
 |-----------|------------------|----------------|
-| SP-API refresh tokens | AES-256-GCM | Environment variable |
-| SP-API access tokens | Plaintext (in memory only) | N/A (not stored) |
-| User passwords | N/A (OAuth only) | N/A |
-| Database | Optional: MySQL TDE | AWS KMS / Hetzner |
+| API keys | AES-256-GCM | Environment variable |
+| Database | Optional: PostgreSQL TDE | AWS KMS / Hetzner |
 
 ### 4.2 Encryption Implementation
 
@@ -366,10 +363,6 @@ app.use("/trpc/payment.*", rateLimit({
   max: 10,
 }));
 
-app.use("/trpc/spapi.*", rateLimit({
-  windowMs: 60 * 1000,
-  max: 30,
-}));
 ```
 
 ### 7.2 Rate Limit Tiers

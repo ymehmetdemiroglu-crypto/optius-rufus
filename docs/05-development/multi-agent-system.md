@@ -34,7 +34,7 @@ User Input (ASIN + Marketplace)
 
 | Agent | Role | File | Responsibility |
 |-------|------|------|----------------|
-| **ListingFetcher** | `listing_fetcher` | `api/agents/agents/listingFetcher.ts` | Fetch raw listing from Amazon SP-API |
+| **ListingFetcher** | `listing_fetcher` | `api/agents/agents/listingFetcher.ts` | Fetch raw listing from Apify / Rainforest API |
 | **Preprocessor** | `preprocessor` | `api/agents/agents/preprocessor.ts` | Clean text, remove HTML, normalize |
 | **EmbeddingGenerator** | `embedding_generator` | `api/agents/agents/embeddingGenerator.ts` | Generate 1536-dim vector via OpenAI |
 | **SemanticAnalyzer** | `semantic_analyzer` | `api/agents/agents/semanticAnalyzer.ts` | Compute gaps and Rufus/COSMO scores |
@@ -177,11 +177,11 @@ The agents import from `api/services/`. Currently these are stubs that simulate 
 
 | Service | File | Real Implementation |
 |---------|------|---------------------|
-| SP-API | `api/services/spapi.ts` | Amazon Selling Partner API calls |
+| Scraper | `api/services/scraper.ts` | Apify / Rainforest API calls |
 | Embedding | `api/services/embedding.ts` | OpenAI text-embedding-3-small |
 | Analysis | `api/services/analysis.ts` | Cosine similarity + gap scoring |
 | Optimization | `api/services/optimization.ts` | GPT-4 content generation |
-| Competitor | `api/services/competitor.ts` | SP-API search + comparison |
+| Competitor | `api/services/competitor.ts` | Apify / Rainforest API search + comparison |
 
 ---
 
@@ -211,7 +211,7 @@ If a critical stage fails after all retries:
 | Total pipeline latency | 3-5 seconds (stubbed) |
 | Per-analysis cost | ~$0.0002 (OpenAI embedding) |
 | Max concurrent pipelines | 10 (configurable) |
-| SP-API rate limit | 1 req / 2s (enforced by fetch agent) |
+| Scraper API rate limit | 1 req / 2s (enforced by fetch agent) |
 
 ---
 

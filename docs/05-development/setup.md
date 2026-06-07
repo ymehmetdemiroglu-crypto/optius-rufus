@@ -61,7 +61,7 @@ bash /app/.agents/skills/backend-building/scripts/init.sh "Amazon Listing Optimi
 
 This adds:
 - Hono + tRPC 11 backend
-- Drizzle ORM + MySQL connection
+- Drizzle ORM + PostgreSQL connection
 - Kimi OAuth 2.0 authentication
 - Database schema folder
 - TRPCProvider auto-wired
@@ -96,7 +96,7 @@ cp .env.example .env
 
 ```env
 # Database
-DATABASE_URL=mysql://root:password@localhost:3306/amazon_optimizer
+DATABASE_URL=postgres://postgres:password@localhost:5432/amazon_optimizer
 
 # Vector Database
 QDRANT_URL=http://localhost:6333
@@ -108,11 +108,6 @@ OPENAI_API_KEY=sk-your-openai-api-key
 PADDLE_API_KEY=your-paddle-api-key
 PADDLE_WEBHOOK_SECRET=your-paddle-webhook-secret
 PADDLE_ENVIRONMENT=sandbox  # Change to 'production' for live
-
-# Amazon SP-API
-AMAZON_CLIENT_ID=your-amazon-client-id
-AMAZON_CLIENT_SECRET=your-amazon-client-secret
-AMAZON_APP_ID=amzn1.sp.solution.xxx
 
 # JWT
 JWT_SECRET=your-super-secret-jwt-key-min-32-chars
@@ -148,13 +143,7 @@ APP_VERSION=1.0.0
 2. Sign up → Developer Tools → Authentication
 3. Copy API key and webhook secret
 
-**Amazon SP-API:**
-1. Go to [developer.amazonservices.com](https://developer.amazonservices.com)
-2. Register as developer
-3. Create app → Get client ID and secret
-4. Note: Full approval takes 2-4 weeks; use sandbox for development
-
-### 3.4 Sentry Setup
+### 3.3 Sentry Setup
 
 **Create Sentry Project:**
 1. Go to [sentry.io](https://sentry.io) and sign up / log in
@@ -175,11 +164,11 @@ APP_VERSION=1.0.0
 
 ## 4. Database Setup
 
-### 4.1 Start MySQL and Qdrant (Docker)
+### 4.1 Start PostgreSQL and Qdrant (Docker)
 
 ```bash
 # From project root
-docker-compose up -d mysql qdrant
+docker-compose up -d postgres qdrant
 
 # Verify services are running
 docker-compose ps
@@ -204,11 +193,11 @@ This populates the `intent_vectors` table with pre-computed embeddings for healt
 ### 4.4 Verify Database
 
 ```bash
-# Connect to MySQL
-docker exec -it amazon-optimizer-mysql mysql -u root -p
+# Connect to PostgreSQL
+docker exec -it amazon-optimizer-postgres psql -U postgres -d amazon_optimizer
 
 # List tables
-SHOW TABLES;
+\dt
 
 # Check users table
 SELECT * FROM users;
@@ -283,7 +272,7 @@ const stats = trpc.analytics.getStats.useQuery({ period: '30d' });
 
 ```typescript
 // 1. Define schema in db/schema.ts
-export const analytics = mysqlTable("analytics", {
+export const analytics = pgTable("analytics", {
   id: serial("id").primaryKey(),
   userId: bigint("user_id", { mode: "number", unsigned: true })
     .references(() => users.id),
@@ -355,10 +344,10 @@ lsof -ti:3000 | xargs kill -9
 
 **Issue:** `Database connection refused`
 ```bash
-# Check MySQL container
+# Check PostgreSQL container
 docker-compose ps
 # If not running:
-docker-compose up -d mysql
+docker-compose up -d postgres
 ```
 
 **Issue:** `Type errors after adding router`
@@ -374,11 +363,6 @@ npm run check
 # Verify APP_ID in .env
 ```
 
-**Issue:** `SP-API rate limited`
-```bash
-# Normal in development — implement retry logic
-# Use mock SP-API service for testing
-```
 
 ### 8.2 Reset Development Environment
 
@@ -449,7 +433,7 @@ main          → Production-ready code
 
 ```
 feat: add competitor analysis feature
-fix: resolve SP-API token refresh issue
+fix: resolve scraper API token refresh issue
 docs: update API documentation
 refactor: optimize embedding pipeline
 test: add unit tests for analysis service

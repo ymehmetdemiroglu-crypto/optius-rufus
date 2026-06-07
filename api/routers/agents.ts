@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { db } from "../db/client.js";
 import { router, publicProcedure } from "../trpc.js";
 import { pipelineEngine } from "../pipeline/engine.js";
 import { queueWorker } from "../pipeline/worker.js";
 import { logger } from "../infra/logger.js";
+import * as pipelineRepo from "../db/repositories/pipelineRepository.js";
 
 // On Vercel, process jobs immediately after enqueueing since there's no background worker
 const isVercel = !!process.env.VERCEL;
@@ -49,8 +49,8 @@ export const agentsRouter = router({
 
   getStatus: publicProcedure
     .input(z.object({ jobId: z.number().int().positive() }))
-    .query(({ input }) => {
-      const job = pipelineEngine.getJob(input.jobId);
+    .query(async ({ input }) => {
+      const job = await pipelineEngine.getJob(input.jobId);
       if (!job) {
         throw new Error(`Job not found: ${input.jobId}`);
       }
@@ -82,12 +82,10 @@ export const agentsRouter = router({
 
   getLatestJob: publicProcedure
     .input(z.object({ prospectId: z.number().int().positive() }))
-    .query(({ input }) => {
-      const row = db.prepare(
-        `SELECT id FROM pipeline_jobs WHERE prospectId = ? ORDER BY createdAt DESC LIMIT 1`
-      ).get(input.prospectId) as { id: number } | undefined;
+    .query(async ({ input }) => {
+      const row = await pipelineRepo.getLatestJobForProspect(input.prospectId);
       if (!row) return null;
-      return pipelineEngine.getJob(row.id);
+      return await pipelineEngine.getJob(row.id);
     }),
 });
 

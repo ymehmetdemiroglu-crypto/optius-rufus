@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { db } from "../db/client.js";
-import type { ProspectRecord } from "../db/client.js";
+import type { ProspectRecord } from "../db/types.js";
 import { createContact, enrollInSequence, getSequences } from "../services/apollo.js";
 import { router, publicProcedure } from "../trpc.js";
 

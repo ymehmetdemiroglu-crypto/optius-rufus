@@ -55,7 +55,7 @@ Amazon seller'lar, özellikle health/supplements ve beauty kategorisinde, aşağ
 | 6 | **Q&A Optimization** | Rufus için optimize edilmiş Q&A önerileri | P1 |
 | 7 | **Competitor Benchmark** | Rakip listing'leri ile karşılaştırma | P1 |
 | 8 | **A+ Content Suggestions** | A+ Content modülü önerileri | P2 |
-| 9 | **Amazon SP-API Integration** | Listing'leri doğrudan Amazon'dan çekme | P0 |
+| 9 | **Apify / Rainforest API** | Listing verilerini scraping ile çekme | P0 |
 | 10 | **Free ASIN Analyzer (Lead Magnet)** | Ücretsiz sınırlı analiz aracı | P1 |
 
 ### 3.2 Kullanıcı Hikayeleri (User Stories)
@@ -84,20 +84,11 @@ Amazon seller'lar, özellikle health/supplements ve beauty kategorisinde, aşağ
 | FR-004 | Kullanıcı profili yönetimi | İsim, avatar, şirket bilgisi | P1 |
 | FR-005 | Abonelik planı yönetimi | Upgrade/downgrade/cancel | P0 |
 
-### 4.2 Amazon Hesap Entegrasyonu
+### 4.2 Listing Analizi
 
 | ID | Gereksinim | Detay | Öncelik |
 |----|-----------|-------|---------|
-| FR-006 | Amazon SP-API OAuth bağlantısı | Seller Central üzerinden yetkilendirme | P0 |
-| FR-007 | Çoklu marketplace desteği | US, UK, DE, FR, IT, ES, CA | P1 |
-| FR-008 | Token yenileme | Otomatik access token refresh | P0 |
-| FR-009 | Çoklu seller hesabı | Bir kullanıcı birden fazla seller hesabı bağlayabilmeli | P2 |
-
-### 4.3 Listing Analizi
-
-| ID | Gereksinim | Detay | Öncelik |
-|----|-----------|-------|---------|
-| FR-010 | ASIN ile listing çekme | SP-API catalogItems + listingsItems | P0 |
+| FR-010 | ASIN ile listing çekme | Apify / Rainforest API scraping | P0 |
 | FR-011 | Rufus Compatibility Score | 0-100 skorlama algoritması | P0 |
 | FR-012 | Semantic Gap Analysis | 24 boyutta gap hesaplama | P0 |
 | FR-013 | Optimized title önerisi | AI-generated başlık önerisi | P0 |
@@ -137,7 +128,6 @@ Amazon seller'lar, özellikle health/supplements ve beauty kategorisinde, aşağ
 | ID | Gereksinim | Detay |
 |----|-----------|-------|
 | NFR-006 | HTTPS zorunlu | Let's Encrypt SSL |
-| NFR-007 | SP-API token şifreleme | AES-256 veritabanında |
 | NFR-008 | JWT token yönetimi | 24 saat expiration, secure httpOnly cookie |
 | NFR-009 | Rate limiting | 100 req/ip/dakika |
 | NFR-010 | Input validation | Zod ile tüm tRPC input'ları |
@@ -162,8 +152,8 @@ Amazon seller'lar, özellikle health/supplements ve beauty kategorisinde, aşağ
 | **Frontend** | React 19 + TypeScript + Vite | Modern, hızlı, type-safe |
 | **Styling** | Tailwind CSS + shadcn/ui | Hızlı geliştirme, 40+ hazır bileşen |
 | **Backend** | Hono + tRPC 11 | Hafif, type-safe API |
-| **ORM** | Drizzle ORM | Type-safe SQL, MySQL uyumlu |
-| **Database** | MySQL 8.0 | Güvenilir, VPS'te çalışır |
+| **ORM** | Drizzle ORM | Type-safe SQL, PostgreSQL uyumlu |
+| **Database** | PostgreSQL 16 | Güvenilir, VPS'te çalışır |
 | **Vector DB** | Qdrant (self-hosted) | $0 maliyet, iyi performans |
 | **AI/ML** | OpenAI text-embedding-3-small | $0.02/1M token, en iyi kalite |
 | **Auth** | Kimi OAuth 2.0 | Hazır entegrasyon |
@@ -193,11 +183,11 @@ Amazon seller'lar, özellikle health/supplements ve beauty kategorisinde, aşağ
 
 | Risk | Olasılık | Etki | Azaltma |
 |------|---------|------|---------|
-| Amazon SP-API değişiklikleri | Orta | Yüksek | API wrapper abstraction layer |
+| Scraping API değişiklikleri | Orta | Yüksek | Abstraction layer + fallback |
 | OpenAI API fiyat artışı | Düşük | Orta | Self-host embedding planı |
 | Rakip çoğalması (Helium 10 vb.) | Yüksek | Orta | AI-native farklılaştırma |
-| Amazon listing güncelleme yetkisi | Orta | Yüksek | Read-only başlangıç, write sonrası |
-| SP-API rate limit aşımı | Orta | Orta | Queue + retry mekanizması |
+| Scraping rate limit | Orta | Yüksek | Proxy rotation + cache |
+| API rate limit aşımı | Orta | Orta | Queue + retry mekanizması |
 | Veri gizliliği endişeleri | Düşük | Yüksek | Açık gizlilik politikası, GDPR uyumlu |
 
 ---
@@ -206,7 +196,7 @@ Amazon seller'lar, özellikle health/supplements ve beauty kategorisinde, aşağ
 
 ### Phase 1: MVP (Ay 1-2)
 - Kullanıcı kayıt/giriş (Kimi OAuth)
-- Amazon SP-API OAuth entegrasyonu
+- Apify / Rainforest API entegrasyonu
 - ASIN Analyzer temel sürümü
 - Rufus Compatibility Score
 - Semantic Gap Analysis (12 boyut)

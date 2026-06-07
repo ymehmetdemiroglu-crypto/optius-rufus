@@ -2,6 +2,7 @@ import { Hono, type Context } from "hono";
 import { cors } from "hono/cors";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { appRouter } from "./router.js";
+import { createContext } from "./trpc.js";
 import "./db/schema.js";
 import fs from "fs";
 import path from "path";
@@ -79,10 +80,11 @@ app.get("/api/pdf/:slug", async (c) => {
     const pdfBuffer = await generatePdf(slug);
     c.header("Content-Type", "application/pdf");
     c.header("Content-Disposition", `attachment; filename="optimus-rufus-audit-${slug}.pdf"`);
-    return c.body(pdfBuffer as any);
-  } catch (err: any) {
+    return c.body(new Uint8Array(pdfBuffer));
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
     console.error("❌ [Hono] PDF download route failed:", err);
-    return c.text(`Failed to generate PDF: ${err.message}`, 500);
+    return c.text(`Failed to generate PDF: ${message}`, 500);
   }
 });
 
@@ -92,7 +94,7 @@ app.use("/api/trpc/*", async (c) => {
     endpoint: "/api/trpc",
     req: c.req.raw,
     router: appRouter,
-    createContext: () => ({}),
+    createContext,
   });
   return response;
 });
@@ -117,10 +119,9 @@ const httpServer = createServer(async (req, res) => {
   const request = new Request(url, {
     method: req.method,
     headers: new Headers(
-      Object.entries(req.headers).map(([k, v]) => [k, Array.isArray(v) ? v.join(", ") : v || ""]) as any
+      Object.entries(req.headers).map(([k, v]) => [k, Array.isArray(v) ? v.join(", ") : String(v || "")]) as HeadersInit
     ),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    body: (req.method !== "GET" && req.method !== "HEAD" ? await getBody(req) : undefined) as any,
+    body: (req.method !== "GET" && req.method !== "HEAD" ? await getBody(req) : undefined) as BodyInit | undefined,
   });
 
   const response = await app.fetch(request);

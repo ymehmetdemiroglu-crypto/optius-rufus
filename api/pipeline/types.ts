@@ -1,11 +1,3 @@
-import type {
-  RawListingData,
-  CleanedText,
-  AnalysisResult,
-  OptimizedContent,
-  CompetitorBenchmark,
-} from "../agents/types.js";
-
 export type StageName =
   | "fetch"
   | "preprocess"
@@ -13,6 +5,66 @@ export type StageName =
   | "semantic"
   | "optimize"
   | "competitor";
+
+export interface RawListingData {
+  asin: string;
+  title: string;
+  bullets: string[];
+  description: string;
+  brand: string;
+  category: string;
+  subcategory: string;
+  images: string[];
+  price: number;
+  rating: number;
+  reviewCount: number;
+  attributes: Record<string, unknown>;
+}
+
+export interface CleanedText {
+  text: string;
+  source: RawListingData;
+}
+
+export interface SemanticGap {
+  dimension: string;
+  currentScore: number;
+  targetScore: number;
+  gap: number;
+  priority: "critical" | "high" | "medium" | "low";
+  recommendation: string;
+}
+
+export interface AnalysisResult {
+  rufusScore: number;
+  cosmoScore: number;
+  semanticGaps: SemanticGap[];
+}
+
+export interface QAPair {
+  question: string;
+  optimizedAnswer: string;
+  category: string;
+  priority: "critical" | "high" | "medium" | "low";
+}
+
+export interface OptimizedContent {
+  title: string;
+  bullets: string[];
+  description: string | null;
+  qas: QAPair[];
+}
+
+export interface CompetitorBenchmark {
+  asin: string;
+  title: string;
+  brand: string;
+  price: number;
+  rating: number;
+  reviewCount: number;
+  score: number;
+  embeddingSimilarity: number;
+}
 
 export interface StageDefinition {
   name: StageName;
@@ -65,12 +117,3 @@ export interface StageExecutor {
   dependencies: StageName[];
   execute(ctx: StageContext): Promise<StageOutput[keyof StageOutput]>;
 }
-
-export const STAGE_ORDER: StageDefinition[] = [
-  { name: "fetch", dependencies: [] },
-  { name: "preprocess", dependencies: ["fetch"] },
-  { name: "embedding", dependencies: ["preprocess"] },
-  { name: "semantic", dependencies: ["embedding"] },
-  { name: "optimize", dependencies: ["semantic"] },
-  { name: "competitor", dependencies: ["fetch"] }, // Can run parallel to preprocess→optimize
-];

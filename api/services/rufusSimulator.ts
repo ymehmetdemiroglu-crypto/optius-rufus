@@ -166,7 +166,15 @@ Return ONLY a valid JSON object matching this schema:
 
 function generateFallbackSOV(
   title: string,
-  competitors: any[],
+  competitors: Array<{
+    asin: string;
+    title: string;
+    brand: string;
+    price: number;
+    rating: number;
+    reviewCount: number;
+    score: number;
+  }>,
   category: string
 ): RufusSOVResult {
   const queryTemplates = [

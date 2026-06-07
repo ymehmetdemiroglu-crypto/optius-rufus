@@ -92,7 +92,7 @@ apt install fail2ban -y
 │   └── .env
 ├── docker/
 │   ├── docker-compose.yml
-│   └── mysql-init/
+│   └── postgres-init/
 ├── nginx/
 │   └── amazon-optimizer.conf
 ├── scripts/
@@ -120,7 +120,7 @@ services:
     env_file:
       - ../app/.env
     depends_on:
-      - mysql
+      - postgres
       - qdrant
     networks:
       - app-network
@@ -131,26 +131,21 @@ services:
       retries: 3
       start_period: 40s
 
-  mysql:
-    image: mysql:8.0
-    container_name: amazon-optimizer-mysql
+  postgres:
+    image: postgres:16
+    container_name: amazon-optimizer-postgres
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: amazon_optimizer
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: amazon_optimizer
+      POSTGRES_USER: ${POSTGRES_USER}
     volumes:
-      - mysql_data:/var/lib/mysql
-      - ./mysql-init:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
     ports:
-      - "127.0.0.1:3306:3306"
+      - "127.0.0.1:5432:5432"
     networks:
       - app-network
-    command: >
-      --character-set-server=utf8mb4
-      --collation-server=utf8mb4_unicode_ci
-      --default-authentication-plugin=mysql_native_password
 
   qdrant:
     image: qdrant/qdrant:latest
@@ -164,7 +159,7 @@ services:
       - app-network
 
 volumes:
-  mysql_data:
+  postgres_data:
   qdrant_data:
 
 networks:
@@ -395,7 +390,7 @@ DB_NAME="amazon_optimizer"
 RETENTION_DAYS=30
 
 # Create backup
-mysqldump -u root -p$MYSQL_ROOT_PASSWORD $DB_NAME \
+pg_dump -U $POSTGRES_USER -d $DB_NAME \
     | gzip > $BACKUP_DIR/db_$DATE.sql.gz
 
 # Upload to S3 (optional)
@@ -679,15 +674,15 @@ If native builds fail, omit profiling by removing `nodeProfilingIntegration` and
 ```bash
 # Monthly backup test
 # 1. Create test environment
-docker run -d --name mysql-test -e MYSQL_ROOT_PASSWORD=test mysql:8.0
+docker run -d --name postgres-test -e POSTGRES_PASSWORD=test postgres:16
 
 # 2. Restore latest backup
 gunzip < /opt/amazon-optimizer/backups/db_$(ls -t backups/ | head -1) \
-    | docker exec -i mysql-test mysql -u root -ptest amazon_optimizer
+    | docker exec -i postgres-test psql -U postgres -d amazon_optimizer
 
 # 3. Verify data integrity
-docker exec mysql-test mysql -u root -ptest -e "SELECT COUNT(*) FROM users;"
+docker exec postgres-test psql -U postgres -d amazon_optimizer -c "SELECT COUNT(*) FROM users;"
 
 # 4. Cleanup
-docker stop mysql-test && docker rm mysql-test
+docker stop postgres-test && docker rm postgres-test
 ```

@@ -5,10 +5,10 @@ async function verify() {
   const url = "http://localhost:5173/p/nutrawell-b07t7h5c5r";
   console.log("🌐 Navigating to: " + url);
 
-  const launchOptions: any = {
+  const launchOptions = {
     headless: true,
     args: ["--no-sandbox"]
-  };
+  } as any; // eslint-disable-line @typescript-eslint/no-explicit-any -- Puppeteer launch options helper
 
   if (process.env.PUPPETEER_EXECUTABLE_PATH) {
     launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;

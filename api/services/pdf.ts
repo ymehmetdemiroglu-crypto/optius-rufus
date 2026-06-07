@@ -1,5 +1,4 @@
 import puppeteer from "puppeteer";
-import fs from "fs";
 
 /**
  * Renders the prospect landing page inside headless Chromium and exports a print-optimized PDF.
@@ -13,7 +12,7 @@ export async function generatePdf(slug: string): Promise<Buffer> {
   const url = `${appUrl}/p/${slug}?print=true`;
   console.log(`🖨️ [PDFService] Generating PDF for slug: ${slug} at URL: ${url}`);
 
-  const launchOptions: any = {
+  const launchOptions: Parameters<typeof puppeteer.launch>[0] = {
     headless: true,
     args: [
       "--no-sandbox",
@@ -29,13 +28,12 @@ export async function generatePdf(slug: string): Promise<Buffer> {
 
   const browser = await puppeteer.launch(launchOptions);
 
-
   try {
     const page = await browser.newPage();
     
     // Log console messages and errors from the browser
     page.on("console", (msg) => console.log(`[Browser Console] ${msg.text()}`));
-    page.on("pageerror", (err) => console.error(`[Browser Error] ${(err as any).message || err}`));
+    page.on("pageerror", (err) => console.error(`[Browser Error] ${(err as Error).message || String(err)}`));
     
     // Set viewport size for high resolution printing
     await page.setViewport({
@@ -50,8 +48,8 @@ export async function generatePdf(slug: string): Promise<Buffer> {
       try {
         await page.goto(url, { waitUntil: "load", timeout: 15000 });
         break;
-      } catch (err: any) {
-        if ((err as any).message?.includes("ERR_NETWORK_CHANGED") && retries > 1) {
+      } catch (err: unknown) {
+        if (err instanceof Error && err.message.includes("ERR_NETWORK_CHANGED") && retries > 1) {
           console.warn(`[PDFService] Encountered ERR_NETWORK_CHANGED. Retrying navigation... (${retries - 1} retries left)`);
           retries--;
           await new Promise((resolve) => setTimeout(resolve, 1000));

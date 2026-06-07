@@ -133,9 +133,9 @@ async function run() {
   const listingId = listingResult.lastInsertRowid;
 
   // 3. Conditional tool runs based on package type
-  let competitors: any[] = [];
-  let simulation: any = null;
-  let catalogLinks: any[] = [];
+  let competitors: any[] = []; // eslint-disable-line @typescript-eslint/no-explicit-any -- competitor array from fetchCompetitors
+  let simulation: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any -- raw simulation results
+  let catalogLinks: any[] = []; // eslint-disable-line @typescript-eslint/no-explicit-any -- catalog links array
 
   if (packageNum === 1 || packageNum === 4) {
     console.log("👥 Fetching category competitors...");
@@ -286,8 +286,9 @@ async function run() {
     const outputPath = path.resolve(__dirname, `../scratch/${slug}-audit.pdf`);
     fs.writeFileSync(outputPath, pdfBuffer);
     console.log(`✅ PDF written: ${outputPath}`);
-  } catch (pdfErr: any) {
-    console.warn(`\n⚠️ [PDF Error] Failed to generate PDF: ${pdfErr.message}`);
+  } catch (pdfErr) {
+    const error = pdfErr as any; // eslint-disable-line @typescript-eslint/no-explicit-any -- fallback error formatting
+    console.warn(`\n⚠️ [PDF Error] Failed to generate PDF: ${error.message}`);
     console.warn(`👉 To generate the PDF, please run "npm run dev" to launch the client on port 5173 first.`);
   }
 
@@ -298,17 +299,17 @@ async function run() {
 
 async function generatePackageCopy(
   packageNum: number,
-  listing: any,
+  listing: any, // eslint-disable-line @typescript-eslint/no-explicit-any -- listing is a dynamic scrape object
   name: string,
   brand: string,
   price: number
-): Promise<any> {
+): Promise<any> { // eslint-disable-line @typescript-eslint/no-explicit-any -- return shape is package-dependent copy structure
   const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY;
   const model = process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini";
 
   if (!apiKey) {
     console.warn("⚠️ API keys missing. Serving local fallback content.");
-    return getFallbackCopy(packageNum, listing, name, brand, price);
+    return getFallbackCopy(packageNum, listing, name, brand);
   }
 
   const prompt = `You are a world-class conversion copywriter specializing in direct response copy. 
@@ -350,7 +351,7 @@ Return a single JSON object containing:
 25. "strengths": Array of strings.
 26. "opportunities": Array of strings.
 
-${getPackageInstructions(packageNum, listing.category || "Health & Household")}
+${getPackageInstructions(packageNum)}
 
 Ensure every copy segment sounds like a direct pitch targeting that package. Avoid markdown formatting inside JSON.`;
 
@@ -391,11 +392,11 @@ Ensure every copy segment sounds like a direct pitch targeting that package. Avo
     return JSON.parse(data.choices[0].message.content);
   } catch (err) {
     console.error("⚠️ LLM copy generation failed, using fallback copy.", err);
-    return getFallbackCopy(packageNum, listing, name, brand, price);
+    return getFallbackCopy(packageNum, listing, name, brand);
   }
 }
 
-function getPackageInstructions(packageNum: number, category: string): string {
+function getPackageInstructions(packageNum: number): string {
   switch (packageNum) {
     case 1:
       return `For **Package 1 (SOV & Conquesting)**, please also include these keys:
@@ -423,7 +424,12 @@ function getPackageInstructions(packageNum: number, category: string): string {
   }
 }
 
-function getFallbackCopy(packageNum: number, listing: any, name: string, brand: string, price: number): any {
+function getFallbackCopy(
+  packageNum: number,
+  listing: any, // eslint-disable-line @typescript-eslint/no-explicit-any -- fallback copy requires listing
+  name: string,
+  brand: string
+): any { // eslint-disable-line @typescript-eslint/no-explicit-any -- fallback copy return matches main response
   const category = listing.category || "Health & Household";
   const bullets = listing.bullets || ["Premium Quality formulation"];
 

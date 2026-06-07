@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { db } from "../db/client.js";
 import { router, publicProcedure } from "../trpc.js";
+import * as brandRepo from "../db/repositories/brandRepository.js";
 
 export const brandingRouter = router({
   getSettings: publicProcedure.query(async () => {
     try {
-      const row = db.prepare("SELECT * FROM brand_settings ORDER BY id DESC LIMIT 1").get() as any;
+      const row = await brandRepo.getSettings();
       if (row) {
         return {
           companyName: row.companyName || "Optimus Rufus Agency",
@@ -39,34 +39,12 @@ export const brandingRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const existing = db.prepare("SELECT id FROM brand_settings LIMIT 1").get() as { id: number } | undefined;
-      
-      if (existing) {
-        db.prepare(
-          `UPDATE brand_settings 
-           SET companyName = ?, logoUrl = ?, logoBase64 = ?, primaryColor = ?, website = ?
-           WHERE id = ?`
-        ).run(
-          input.companyName ?? "Optimus Rufus Agency",
-          input.logoUrl ?? "",
-          input.logoBase64 ?? "",
-          input.primaryColor ?? "#b8860b",
-          input.website ?? "",
-          existing.id
-        );
-      } else {
-        db.prepare(
-          `INSERT INTO brand_settings (companyName, logoUrl, logoBase64, primaryColor, website)
-           VALUES (?, ?, ?, ?, ?)`
-        ).run(
-          input.companyName ?? "Optimus Rufus Agency",
-          input.logoUrl ?? "",
-          input.logoBase64 ?? "",
-          input.primaryColor ?? "#b8860b",
-          input.website ?? ""
-        );
+      try {
+        await brandRepo.upsertSettings(input);
+        return { success: true };
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        throw new Error(`Failed to update settings: ${message}`, { cause: err });
       }
-
-      return { success: true };
     }),
 });

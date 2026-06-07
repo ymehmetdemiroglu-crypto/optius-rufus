@@ -1,44 +1,38 @@
 import { z } from "zod";
-import { db } from "../db/client.js";
 import { router, publicProcedure } from "../trpc.js";
 import { buildCatalogGraph } from "../services/catalogGraph.js";
 import { generateEmbedding } from "../services/embedding.js";
 import { fetchCompetitors } from "../services/competitor.js";
+import * as catalogRepo from "../db/repositories/catalogRepository.js";
+import * as listingRepo from "../db/repositories/listingRepository.js";
 
 export const catalogGraphRouter = router({
   getGraph: publicProcedure
     .input(z.object({ prospectId: z.number().int() }))
     .query(async ({ input }) => {
-      // 1. Check if we already have links cached
-      const cached = db
-        .prepare("SELECT * FROM catalog_links WHERE prospectId = ?")
-        .all(input.prospectId) as any[];
-
-      if (cached && cached.length > 0) {
-        console.log(`[CatalogGraphRouter] Returning ${cached.length} cached catalog links`);
-        return { links: cached };
-      }
-
-      // 2. Otherwise, dynamically generate
-      const listing = db
-        .prepare("SELECT * FROM listings WHERE prospectId = ? ORDER BY id DESC LIMIT 1")
-        .get(input.prospectId) as any;
-
-      if (!listing) {
-        return { links: [] };
-      }
-
-      console.log(`[CatalogGraphRouter] No cached links found. Generating dynamically...`);
-
-      // Parse bullets safely
-      let bulletsList: string[] = [];
       try {
-        bulletsList = JSON.parse(listing.bullets || "[]");
-      } catch {
-        bulletsList = [];
-      }
+        // 1. Check if we already have links cached
+        const cached = await catalogRepo.getLinksByProspectId(input.prospectId);
 
-      try {
+        if (cached && cached.length > 0) {
+          console.log(`[CatalogGraphRouter] Returning ${cached.length} cached catalog links`);
+          return { links: cached };
+        }
+
+        // 2. Otherwise, dynamically generate
+        const listing = await listingRepo.getLatestByProspectId(input.prospectId);
+
+        if (!listing) {
+          return { links: [] };
+        }
+
+        console.log(`[CatalogGraphRouter] No cached links found. Generating dynamically...`);
+
+        // Parse bullets safely
+        const bulletsList: string[] = Array.isArray(listing.bullets)
+          ? (listing.bullets as string[])
+          : [];
+
         // Generate listing embedding if missing in row
         let embedding: number[] = [];
         if (listing.embeddingVector) {
@@ -53,10 +47,7 @@ export const catalogGraphRouter = router({
           const textToEmbed = `${listing.title || ""} ${bulletsList.join(" ")} ${listing.description || ""} ${listing.aPlusText || ""}`;
           embedding = await generateEmbedding(textToEmbed.slice(0, 3000));
           // Save embedding back to listing for caching
-          db.prepare("UPDATE listings SET embeddingVector = ? WHERE id = ?").run(
-            JSON.stringify(embedding),
-            listing.id
-          );
+          await listingRepo.updateEmbedding(listing.id, embedding);
         }
 
         // Fetch category competitors
@@ -73,24 +64,18 @@ export const catalogGraphRouter = router({
         // Compute similarity connections
         const generatedLinks = await buildCatalogGraph(listing.asin, embedding, linkInputs);
 
-        // Save generated links to SQLite
+        // Save generated links to Postgres
         for (const link of generatedLinks) {
-          db.prepare(
-            `INSERT INTO catalog_links (prospectId, sourceAsin, targetAsin, relationshipType, strengthScore, createdAt)
-             VALUES (?, ?, ?, ?, ?, datetime('now'))`
-          ).run(
-            input.prospectId,
-            link.sourceAsin,
-            link.targetAsin,
-            link.relationshipType,
-            link.strengthScore
-          );
+          await catalogRepo.createLink({
+            prospectId: input.prospectId,
+            sourceAsin: link.sourceAsin,
+            targetAsin: link.targetAsin,
+            relationshipType: link.relationshipType,
+            strengthScore: link.strengthScore,
+          });
         }
 
-        const freshLinks = db
-          .prepare("SELECT * FROM catalog_links WHERE prospectId = ?")
-          .all(input.prospectId) as any[];
-
+        const freshLinks = await catalogRepo.getLinksByProspectId(input.prospectId);
         return { links: freshLinks };
       } catch (err) {
         console.error("❌ [CatalogGraphRouter] Failed to build catalog graph dynamically:", err);

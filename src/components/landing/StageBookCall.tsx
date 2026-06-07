@@ -42,7 +42,6 @@ export default function StageBookCall({
   pricePoint = 1500,
   visible,
 }: StageBookCallProps) {
-  if (!visible) return null;
   const [form, setForm] = useState<BookingFormData>({
     name: prospectName || '',
     email: prospectEmail || '',
@@ -102,6 +101,8 @@ export default function StageBookCall({
 
   const inputClass =
     'w-full bg-white border-[3px] border-brand-dark px-4 py-3 text-base text-brand-dark placeholder-gray-400 outline-none focus:border-brand-blue transition-colors';
+
+  if (!visible) return null;
 
   return (
     <section

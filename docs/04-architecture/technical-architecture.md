@@ -38,7 +38,7 @@ Platform, **monolithic service-oriented architecture** ile tasarlanmıştır. MV
 | **Backend Framework** | Hono | 4.x | Lightweight web framework |
 | **API Protocol** | tRPC | 11.x | End-to-end typesafe APIs |
 | **ORM** | Drizzle ORM | 0.30+ | Type-safe SQL query builder |
-| **Database** | MySQL | 8.0 | Relational data storage |
+| **Database** | PostgreSQL | 16 | Relational data storage |
 | **Vector DB** | Qdrant | 1.x | Vector similarity search |
 | **Auth** | Kimi OAuth 2.0 | — | Authentication & authorization |
 | **Validation** | Zod | 3.23+ | Schema validation |
@@ -112,8 +112,7 @@ api/
 │   ├── competitor.ts
 │   ├── qa.ts
 │   ├── user.ts
-│   ├── payment.ts
-│   └── spapi.ts
+│   └── payment.ts
 └── queries/           # Database query functions
     └── connection.ts  # Drizzle DB connection
 ```
@@ -129,7 +128,6 @@ import { competitorRouter } from './routers/competitor';
 import { qaRouter } from './routers/qa';
 import { userRouter } from './routers/user';
 import { paymentRouter } from './routers/payment';
-import { spapiRouter } from './routers/spapi';
 
 export const appRouter = router({
   auth: authRouter,
@@ -139,7 +137,6 @@ export const appRouter = router({
   qa: qaRouter,
   user: userRouter,
   payment: paymentRouter,
-  spapi: spapiRouter,
 });
 
 export type AppRouter = typeof appRouter;
@@ -149,7 +146,7 @@ export type AppRouter = typeof appRouter;
 
 **Responsibilities:**
 - Business logic execution
-- External API communication (SP-API, OpenAI, Paddle)
+- External API communication (OpenAI, Paddle)
 - Data transformation
 - Caching strategies
 
@@ -158,7 +155,6 @@ export type AppRouter = typeof appRouter;
 | Service | File | Responsibilities |
 |---------|------|-----------------|
 | **Auth Service** | `api/services/auth.ts` | OAuth flow, JWT management, session validation |
-| **SP-API Service** | `api/services/spapi.ts` | Amazon SP-API calls, token refresh, error handling |
 | **Embedding Service** | `api/services/embedding.ts` | OpenAI API calls, vector storage/retrieval |
 | **Analysis Service** | `api/services/analysis.ts` | Semantic gap analysis, scoring algorithms |
 | **Optimization Service** | `api/services/optimization.ts` | Title/bullet/Q&A generation, report creation |
@@ -173,7 +169,7 @@ export type AppRouter = typeof appRouter;
 - Data integrity
 - Migration management
 
-**Database:** MySQL 8.0 via Drizzle ORM
+**Database:** PostgreSQL 16 via Drizzle ORM
 **Vector Database:** Qdrant (self-hosted Docker container)
 
 ---
@@ -189,10 +185,10 @@ User Input (ASIN + Marketplace)
 [Frontend] --tRPC--> [Backend API]
     |
     v
-[Auth Middleware] --valid token?--> [SP-API Service]
+[Auth Middleware] --valid token?--> [Scraper Service]
     |                                        |
     v                                        v
-[Rate Limit Check]              [SP-API: catalogItems]
+[Rate Limit Check]              [Apify / Rainforest API]
     |                                        |
     v                                        v
 [Listing Service] <-------------- [Raw Listing Data]
@@ -282,23 +278,7 @@ User selects plan
 
 ## 4. External Integrations
 
-### 4.1 Amazon Selling Partner API (SP-API)
-
-**Authentication:** OAuth 2.0 (Seller Central authorization)
-**Primary Endpoints:**
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `catalog/2022-04-01/items/{asin}` | GET | Product catalog data |
-| `listings/2021-08-01/items/{sellerId}/{sku}` | GET/PUT | Listing read/write |
-| `productPricing/competitiveSummary` | POST | Competitive pricing |
-| `reports/2021-06-30/reports` | POST/GET | Report generation |
-| `notifications/v1/subscriptions` | POST | Event notifications |
-
-**Rate Limits:** 1 request per 2 seconds (throttled)
-**Error Handling:** Exponential backoff retry
-
-### 4.2 OpenAI API
+### 4.1 OpenAI API
 
 **Endpoint:** `https://api.openai.com/v1/embeddings`
 **Model:** text-embedding-3-small
@@ -343,7 +323,6 @@ User selects plan
 
 ### 5.3 Data Protection
 
-- **SP-API tokens:** AES-256 encrypted in database
 - **HTTPS:** All traffic TLS 1.3
 - **CORS:** Whitelist-only
 - **Rate Limiting:** 100 req/ip/minute
@@ -375,7 +354,7 @@ User selects plan
 ### 6.3 Future Architecture (1000+ users)
 
 - **App Server:** Separate Hetzner instance (load balanced)
-- **Database:** Managed MySQL (Hetzner or AWS RDS)
+- **Database:** Managed PostgreSQL (Hetzner or AWS RDS)
 - **Vector DB:** Qdrant Cloud or Pinecone
 - **CDN:** CloudFront for static assets
 - **Queue:** Redis/RabbitMQ for async jobs
@@ -400,7 +379,7 @@ cp .env.example .env
 # Edit .env with your credentials
 
 # 4. Start database (Docker)
-docker-compose up -d mysql qdrant
+docker-compose up -d postgres qdrant
 
 # 5. Push database schema
 npm run db:push
@@ -413,13 +392,11 @@ npm run dev
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `DATABASE_URL` | Yes | MySQL connection string |
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
 | `QDRANT_URL` | Yes | Qdrant connection URL |
 | `OPENAI_API_KEY` | Yes | OpenAI API key |
 | `PADDLE_API_KEY` | Yes | Paddle API key |
 | `PADDLE_WEBHOOK_SECRET` | Yes | Paddle webhook secret |
-| `AMAZON_CLIENT_ID` | Yes | SP-API client ID |
-| `AMAZON_CLIENT_SECRET` | Yes | SP-API client secret |
 | `JWT_SECRET` | Yes | JWT signing secret |
 | `VITE_KIMI_AUTH_URL` | Yes | Kimi OAuth URL |
 | `VITE_APP_ID` | Yes | Kimi App ID |
@@ -500,7 +477,7 @@ npm run dev
     v
 [Node.js App] (PM2 managed)
     |
-    +---> [MySQL 8.0] (Docker)
+    +---> [PostgreSQL 16] (Docker)
     +---> [Qdrant] (Docker)
 ```
 
@@ -522,7 +499,7 @@ curl https://api.yourdomain.com/health
 
 ### 9.3 Backup Strategy
 
-- **Database:** Daily automated mysqldump (cron job)
+- **Database:** Daily automated pg_dump (cron job)
 - **Qdrant:** Weekly snapshot
 - **Backups stored:** S3-compatible object storage (Hetzner or AWS S3)
 - **Retention:** 30 days

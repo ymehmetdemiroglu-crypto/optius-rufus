@@ -1,8 +1,9 @@
 import { z } from "zod";
-import { db } from "../db/client.js";
 import { router, publicProcedure } from "../trpc.js";
 import { simulateRufusSOV } from "../services/rufusSimulator.js";
 import { fetchCompetitors } from "../services/competitor.js";
+import * as rufusRepo from "../db/repositories/rufusRepository.js";
+import * as listingRepo from "../db/repositories/listingRepository.js";
 
 export const rufusTrackerRouter = router({
   runSOVSimulation: publicProcedure
@@ -14,21 +15,16 @@ export const rufusTrackerRouter = router({
     )
     .mutation(async ({ input }) => {
       // 1. Fetch active listing
-      const listing = db
-        .prepare("SELECT * FROM listings WHERE prospectId = ? ORDER BY id DESC LIMIT 1")
-        .get(input.prospectId) as any;
+      const listing = await listingRepo.getLatestByProspectId(input.prospectId);
 
       if (!listing) {
         throw new Error(`No listing found for prospect ID: ${input.prospectId}`);
       }
 
-      // Parse bullets & images safely
-      let bulletsList: string[] = [];
-      try {
-        bulletsList = JSON.parse(listing.bullets || "[]");
-      } catch {
-        bulletsList = [];
-      }
+      // Parse bullets safely
+      const bulletsList: string[] = Array.isArray(listing.bullets)
+        ? (listing.bullets as string[])
+        : [];
 
       // 2. Fetch category competitors
       const competitors = await fetchCompetitors(listing.asin, input.category);
@@ -43,21 +39,19 @@ export const rufusTrackerRouter = router({
         competitors
       );
 
-      // 4. Save results to SQLite
+      // 4. Save results to Postgres
       for (const q of simulation.questions) {
-        const queryRes = db
-          .prepare(
-            `INSERT INTO rufus_queries (prospectId, queryText, category, createdAt)
-             VALUES (?, ?, ?, datetime('now'))`
-          )
-          .run(input.prospectId, q.queryText, input.category);
+        const queryRecord = await rufusRepo.createQuery({
+          prospectId: input.prospectId,
+          queryText: q.queryText,
+          category: input.category,
+        });
         
-        const queryId = queryRes.lastInsertRowid;
-
-        db.prepare(
-          `INSERT INTO rufus_query_runs (queryId, asinRankings, sovPercent, createdAt)
-           VALUES (?, ?, ?, datetime('now'))`
-        ).run(queryId, JSON.stringify(q.rankings), simulation.sovPercent);
+        await rufusRepo.createQueryRun({
+          queryId: queryRecord.id,
+          asinRankings: q.rankings,
+          sovPercent: simulation.sovPercent,
+        });
       }
 
       return {
@@ -71,27 +65,19 @@ export const rufusTrackerRouter = router({
     .input(z.object({ prospectId: z.number().int() }))
     .query(async ({ input }) => {
       try {
-        const rows = db
-          .prepare(
-            `SELECT rq.id, rq.queryText, rq.category, rq.createdAt, rqr.asinRankings, rqr.sovPercent
-             FROM rufus_queries rq
-             JOIN rufus_query_runs rqr ON rq.id = rqr.queryId
-             WHERE rq.prospectId = ?
-             ORDER BY rq.createdAt DESC`
-          )
-          .all(input.prospectId) as any[];
+        const rows = await rufusRepo.getSOVHistoryForProspect(input.prospectId);
 
         const formatted = rows.map((r) => ({
           queryId: r.id,
           queryText: r.queryText,
           category: r.category,
-          createdAt: r.createdAt,
+          createdAt: r.createdAt ? r.createdAt.toISOString() : new Date().toISOString(),
           sovPercent: r.sovPercent,
-          rankings: JSON.parse(r.asinRankings || "[]"),
+          rankings: Array.isArray(r.asinRankings) ? r.asinRankings : [],
         }));
 
         // Calculate average SOV if there are runs
-        const uniqueDates = [...new Set(formatted.map(r => r.createdAt.split(' ')[0]))];
+        const uniqueDates = [...new Set(formatted.map(r => r.createdAt.split('T')[0]))];
         const timeline = uniqueDates.map(date => {
           const runsOnDate = formatted.filter(r => r.createdAt.startsWith(date));
           const avgSov = runsOnDate.reduce((sum, r) => sum + r.sovPercent, 0) / runsOnDate.length;

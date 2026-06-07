@@ -255,6 +255,8 @@ export interface JobQueueRecord {
 /**
  * Execute a function within an explicit SQLite transaction.
  * Automatically commits on success, rolls back on error.
+ *
+ * @deprecated Use `withTransaction` from `./transaction.js` instead.
  */
 export function withTransaction<T>(fn: (db: Database.Database) => T): T {
   db.prepare("BEGIN").run();
@@ -268,6 +270,11 @@ export function withTransaction<T>(fn: (db: Database.Database) => T): T {
   }
 }
 
+/**
+ * Async variant of withTransaction.
+ *
+ * @deprecated Use `withTransactionAsync` from `./transaction.js` instead.
+ */
 export async function withTransactionAsync<T>(
   fn: (db: Database.Database) => Promise<T>
 ): Promise<T> {

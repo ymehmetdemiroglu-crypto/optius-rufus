@@ -41,11 +41,7 @@ function AnimatedScore({ label, score, description, delay, animate, isPrint }: A
   const level = getScoreLevel(score);
 
   useEffect(() => {
-    if (isPrint) {
-      setDisplayScore(score);
-      return;
-    }
-    if (!animate) return;
+    if (isPrint || !animate) return;
 
     const timeout = setTimeout(() => {
       const duration = 1200;
@@ -106,10 +102,7 @@ export default function StageAutopsy({
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    if (isPrint) {
-      setHasAnimated(true);
-      return;
-    }
+    if (isPrint) return;
     if (visible && !hasAnimated) {
       const timer = setTimeout(() => {
         setHasAnimated(true);

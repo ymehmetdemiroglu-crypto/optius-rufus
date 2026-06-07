@@ -22,7 +22,6 @@ appRouter
 ├── qa
 ├── user
 ├── payment
-└── spapi
 ```
 
 ---
@@ -117,7 +116,7 @@ z.object({
 - `403 FORBIDDEN` — Subscription limit reached
 - `404 NOT_FOUND` — ASIN not found on Amazon
 - `429 TOO_MANY_REQUESTS` — Rate limit exceeded
-- `502 BAD_GATEWAY` — SP-API error
+- `502 BAD_GATEWAY` — External API error
 
 ### 3.2 Get User's Listings
 ```typescript
@@ -317,15 +316,6 @@ qa.getForListing
 **Type:** Query  
 **Input:** `{ listingId: number }`  
 **Output:** `QaOptimization[]`  
-
-### 6.3 Publish Q&A to Amazon
-```typescript
-qa.publish
-```
-**Type:** Mutation  
-**Input:** `{ qaId: number }`  
-**Output:** `{ success: boolean, amazonResponse?: any }`  
-**Note:** Requires write permission on SP-API  
 
 ---
 
@@ -564,10 +554,9 @@ All errors return HTTP 200 with JSON-RPC error structure:
 
 | Code | Description |
 |------|-------------|
-| `SPAPI_INVALID_ASIN` | ASIN format invalid |
-| `SPAPI_NOT_FOUND` | Product not found on Amazon |
-| `SPAPI_RATE_LIMITED` | Amazon rate limit hit |
-| `SPAPI_AUTH_EXPIRED` | Amazon token expired |
+| `SCRAPER_INVALID_ASIN` | ASIN format invalid |
+| `SCRAPER_NOT_FOUND` | Product not found on Amazon |
+| `SCRAPER_RATE_LIMITED` | API rate limit hit |
 | `SUBSCRIPTION_LIMIT_REACHED` | Monthly analysis limit exceeded |
 | `OPENAI_ERROR` | OpenAI API error |
 | `PADDLE_WEBHOOK_INVALID` | Invalid webhook signature |

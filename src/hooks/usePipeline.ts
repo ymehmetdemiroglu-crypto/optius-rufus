@@ -57,7 +57,10 @@ export function usePipeline({ jobId, prospectId, pollingInterval = 3000, enableS
 
   useEffect(() => {
     if (statusQuery.data) {
-      setJob(statusQuery.data as PipelineJob);
+      const jobData = statusQuery.data as PipelineJob;
+      setTimeout(() => {
+        setJob(jobData);
+      }, 0);
     }
   }, [statusQuery.data]);
 
@@ -115,8 +118,7 @@ export function usePipeline({ jobId, prospectId, pollingInterval = 3000, enableS
       });
     });
 
-    es.addEventListener("pipeline:complete", (e) => {
-      const data = JSON.parse((e as MessageEvent).data);
+    es.addEventListener("pipeline:complete", () => {
       setJob((prev) => {
         if (!prev) return prev;
         return { ...prev, status: "completed", currentStage: undefined };
@@ -150,7 +152,7 @@ export function usePipeline({ jobId, prospectId, pollingInterval = 3000, enableS
   const handleRetry = useCallback(
     (stage: string) => {
       if (!resolvedJobId) return;
-      retryStage.mutate({ jobId: resolvedJobId, stage: stage as any });
+      retryStage.mutate({ jobId: resolvedJobId, stage: stage as any }); // eslint-disable-line @typescript-eslint/no-explicit-any -- cast stage string to stage enum type
     },
     [resolvedJobId, retryStage]
   );

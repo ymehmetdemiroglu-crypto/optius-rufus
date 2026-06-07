@@ -36,15 +36,15 @@ The AI/ML pipeline transforms raw Amazon listing data into actionable optimizati
 
 ---
 
-### Stage 2: Fetch (Amazon SP-API)
+### Stage 2: Fetch (Apify / Rainforest API)
 
 **Endpoints Called:**
 
 | Endpoint | Purpose | Response Fields |
 |----------|---------|----------------|
-| `GET /catalog/2022-04-01/items/{asin}` | Product catalog data | title, images, brand, category, features |
-| `GET /listings/2021-08-01/items/{sellerId}/{sku}` | Listing content | title, bullets, description, keywords |
-| `GET /productPricing/competitiveSummary` | Pricing data | buyBoxPrice, lowestPrices |
+| `GET /api/scrape` | Product catalog data | title, images, brand, category, features |
+| `GET /api/listing` | Listing content | title, bullets, description, keywords |
+| `GET /api/pricing` | Pricing data | buyBoxPrice, lowestPrices |
 
 **Raw Data Structure:**
 ```typescript
@@ -65,7 +65,7 @@ interface RawListingData {
 ```
 
 **Error Handling:**
-- SP-API timeout: 10s, retry 3x with exponential backoff
+- API timeout: 10s, retry 3x with exponential backoff
 - Rate limit: Queue with 2-second delay between requests
 - Invalid ASIN: Return 404 with suggestion
 
@@ -425,7 +425,7 @@ async function fetchCompetitors(
   count: number = 5
 ): Promise<Competitor[]> {
   // Search Amazon for similar products in same category
-  const searchResults = await spapi.searchItems({
+  const searchResults = await scraper.searchItems({
     keywords: extractKeywordsFromASIN(asin),
     category,
     pageSize: count * 2, // Fetch extra for filtering
@@ -438,7 +438,7 @@ async function fetchCompetitors(
   
   // Fetch detailed data for each competitor
   return Promise.all(competitors.map(async comp => {
-    const detail = await spapi.getCatalogItem(comp.asin);
+    const detail = await scraper.getCatalogItem(comp.asin);
     const embedding = await generateEmbedding(detail);
     
     return {
@@ -473,7 +473,7 @@ async function fetchCompetitors(
 
 | Cache Layer | Key | TTL | Purpose |
 |------------|-----|-----|---------|
-| SP-API Response | `spapi:{asin}:{marketplace}` | 1 hour | Avoid repeated Amazon calls |
+| Scraper Response | `scraper:{asin}:{marketplace}` | 1 hour | Avoid repeated Amazon calls |
 | Embedding | `emb:{asin}` | 24 hours | Embeddings don't change often |
 | Intent Vectors | `intent:{category}` | 7 days | Reference data is stable |
 | Analysis Report | `report:{listingId}:latest` | 1 hour | Recent reports |
@@ -508,7 +508,7 @@ async function analyzeAsync(listingId: number) {
 | OpenAI Embedding | $0.000016 | ~800 tokens @ $0.02/1M |
 | Qdrant Storage | $0 | Self-hosted |
 | Qdrant Query | $0 | Self-hosted |
-| SP-API Call | $0 | Free tier |
+| Scraper API Call | $0 | Apify / Rainforest |
 | **Total** | **~$0.0002** | Including overhead |
 
 ### 5.2 Monthly Cost Projections

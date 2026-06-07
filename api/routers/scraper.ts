@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { db } from "../db/client.js";
-import type { ListingRecord } from "../db/client.js";
 import { scrapeAmazonListing } from "../services/scraper.js";
+import * as listingService from "../services/domain/listingService.js";
+import * as prospectService from "../services/domain/prospectService.js";
 import { router, publicProcedure } from "../trpc.js";
 
 export const scraperRouter = router({
@@ -16,52 +16,47 @@ export const scraperRouter = router({
     .mutation(async ({ input }) => {
       try {
         const item = await scrapeAmazonListing(input.asin, input.marketplace);
-        
-        const bullets = Array.isArray(item.bullets) ? JSON.stringify(item.bullets) : "[]";
-        const images = Array.isArray(item.images) ? JSON.stringify(item.images) : "[]";
 
-        const result = db.transaction(() => {
-          const insertResult = db
-            .prepare(
-              `INSERT INTO listings (prospectId, asin, marketplace, url, title, bullets, description, brand, category, price, rating, reviewCount, images, aPlusText, rawScrapeData, scrapedAt, createdAt)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
-            )
-            .run(
-              input.prospectId,
-              item.asin,
-              input.marketplace,
-              `https://www.amazon.com/dp/${item.asin}`,
-              item.title || "",
-              bullets,
-              item.description || "",
-              item.brand || "",
-              item.category || "",
-              item.price || 0,
-              item.rating || 0,
-              item.reviewCount || 0,
-              images,
-              item.aPlusText || "",
-              item.rawScrapeData || "{}"
-            );
+        let rawScrapeData: Record<string, unknown> = {};
+        if (item.rawScrapeData) {
+          try {
+            rawScrapeData = JSON.parse(item.rawScrapeData);
+          } catch {
+            rawScrapeData = {};
+          }
+        }
 
-          db.prepare("UPDATE prospects SET status = 'scraped' WHERE id = ?").run(input.prospectId);
-          return insertResult;
-        })();
+        const listing = await listingService.createListing({
+          prospectId: input.prospectId,
+          asin: item.asin,
+          marketplace: input.marketplace,
+          url: `https://www.amazon.com/dp/${item.asin}`,
+          title: item.title,
+          bullets: item.bullets,
+          description: item.description,
+          brand: item.brand,
+          category: item.category,
+          price: item.price,
+          rating: item.rating,
+          reviewCount: item.reviewCount,
+          images: item.images,
+          aPlusText: item.aPlusText,
+          rawScrapeData,
+        });
 
-        const listing = db.prepare("SELECT * FROM listings WHERE id = ?").get(result.lastInsertRowid) as ListingRecord | undefined;
+        await prospectService.updateProspectStatus(input.prospectId, "scraped");
 
         return { status: "SUCCEEDED", listing };
-      } catch (err: any) {
-        console.error("❌ [ScraperRouter] Trigger failed:", err);
-        throw new Error(`Scraping failed: ${err.message}`);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error("[ScraperRouter] Trigger failed:", err);
+        throw new Error(`Scraping failed: ${message}`, { cause: err });
       }
     }),
 
   poll: publicProcedure
     .input(z.object({ runId: z.string() }))
-    .mutation(async ({ input }) => {
-      // Kept for backward compatibility with existing frontend expectations
-      // Since trigger now runs synchronously, poll can immediately return SUCCEEDED if listing exists
+    .mutation(async () => {
       return { status: "SUCCEEDED", listing: null };
     }),
 
@@ -74,36 +69,28 @@ export const scraperRouter = router({
         data: z.record(z.unknown()),
       })
     )
-    .mutation(({ input }) => {
+    .mutation(async ({ input }) => {
       const item = input.data;
-      const bullets = Array.isArray(item.bullets) ? JSON.stringify(item.bullets) : "[]";
-      const images = Array.isArray(item.images) ? JSON.stringify(item.images) : "[]";
 
-      const result = db
-        .prepare(
-          `INSERT INTO listings (prospectId, asin, marketplace, url, title, bullets, description, brand, category, price, rating, reviewCount, images, aPlusText, rawScrapeData, scrapedAt, createdAt)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
-        )
-        .run(
-          input.prospectId,
-          input.asin,
-          input.marketplace,
-          item.url || `https://www.amazon.com/dp/${input.asin}`,
-          (item.title as string) || "",
-          bullets,
-          (item.description as string) || "",
-          (item.brand as string) || "",
-          (item.category as string) || "",
-          (item.price as number) || 0,
-          (item.rating as number) || 0,
-          (item.reviewCount as number) || 0,
-          images,
-          (item.aPlusText as string) || "",
-          JSON.stringify(item)
-        );
+      const listing = await listingService.createListing({
+        prospectId: input.prospectId,
+        asin: input.asin,
+        marketplace: input.marketplace,
+        url: (item.url as string) || `https://www.amazon.com/dp/${input.asin}`,
+        title: (item.title as string) || "",
+        bullets: Array.isArray(item.bullets) ? item.bullets : [],
+        description: (item.description as string) || "",
+        brand: (item.brand as string) || "",
+        category: (item.category as string) || "",
+        price: (item.price as number) || 0,
+        rating: (item.rating as number) || 0,
+        reviewCount: (item.reviewCount as number) || 0,
+        images: Array.isArray(item.images) ? item.images : [],
+        aPlusText: (item.aPlusText as string) || "",
+        rawScrapeData: item,
+      });
 
-      const listing = db.prepare("SELECT * FROM listings WHERE id = ?").get(result.lastInsertRowid) as ListingRecord | undefined;
-      db.prepare("UPDATE prospects SET status = 'scraped' WHERE id = ?").run(input.prospectId);
+      await prospectService.updateProspectStatus(input.prospectId, "scraped");
 
       return listing;
     }),

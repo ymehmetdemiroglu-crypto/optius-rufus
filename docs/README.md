@@ -27,7 +27,7 @@ Amazon Listing Optimizer, health/supplements ve beauty kategorisinde Amazon'da s
 | **[02-research](./02-research/)** | AI Research | COSMO/Rufus deep-dive, methodology | Researchers, PMs |
 | **[03-business](./03-business/)** | Finance, Marketing, VPS | Business model, GTM, infra needs | Founder, Marketing |
 | **[04-architecture](./04-architecture/)** | System Design | Tech stack, data flow, scalability | Architects, Tech Lead |
-| **[05-development](./05-development/)** | API, DB, AI, SP-API, Setup | Implementation guides & reference | All Developers |
+| **[05-development](./05-development/)** | API, DB, AI, Setup | Implementation guides & reference | All Developers |
 | **[06-operations](./06-operations/)** | Security, Deployment, DevOps | Auth, infra, monitoring, CI/CD | DevOps, Developers |
 
 ---
@@ -39,7 +39,7 @@ Amazon Listing Optimizer, health/supplements ve beauty kategorisinde Amazon'da s
 ```
 Frontend:     React 19 + TypeScript + Vite + Tailwind CSS + shadcn/ui
 Backend:      Hono + tRPC 11 + Drizzle ORM + Zod
-Database:     MySQL 8.0 + Qdrant (Vector DB)
+Database:     PostgreSQL 16 + Qdrant (Vector DB)
 AI/ML:        OpenAI text-embedding-3-small (1536-dim)
 Auth:         Kimi OAuth 2.0 + JWT Sessions
 Payments:     Paddle (Subscriptions)
@@ -108,7 +108,6 @@ Monitoring:   Sentry + Grafana + Prometheus
 - [ ] Authentication (Kimi OAuth)
 
 ### Phase 2: Core Features (Weeks 3-5)
-- [ ] Amazon SP-API OAuth integration
 - [ ] ASIN fetch + listing display
 - [ ] OpenAI embedding integration
 - [ ] Semantic gap analysis algorithm
@@ -158,7 +157,6 @@ Monitoring:   Sentry + Grafana + Prometheus
 ## Support & Resources
 
 ### External Documentation
-- [Amazon SP-API Docs](https://developer-docs.amazon.com/sp-api/)
 - [OpenAI Embedding API](https://platform.openai.com/docs/guides/embeddings)
 - [Paddle Documentation](https://developer.paddle.com/)
 - [tRPC Documentation](https://trpc.io/docs)

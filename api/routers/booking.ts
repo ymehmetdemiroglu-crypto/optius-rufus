@@ -1,7 +1,6 @@
 import { z } from "zod";
-import { db } from "../db/client.js";
-import type { BookingRecord } from "../db/client.js";
 import { router, publicProcedure } from "../trpc.js";
+import * as bookingService from "../services/domain/bookingService.js";
 
 export const bookingRouter = router({
   create: publicProcedure
@@ -16,29 +15,13 @@ export const bookingRouter = router({
         scheduledDate: z.string().optional(),
       })
     )
-    .mutation(({ input }) => {
-      const result = db
-        .prepare(
-          `INSERT INTO bookings (prospectId, name, email, company, revenue, notes, scheduledDate, status, createdAt)
-         VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', datetime('now'))`
-        )
-        .run(
-          input.prospectId,
-          input.name,
-          input.email,
-          input.company || null,
-          input.revenue || null,
-          input.notes || null,
-          input.scheduledDate || null
-        );
-
-      return db.prepare("SELECT * FROM bookings WHERE id = ?").get(result.lastInsertRowid) as BookingRecord;
+    .mutation(async ({ input }) => {
+      return bookingService.createBooking(input);
     }),
 
   list: publicProcedure
     .input(z.object({}))
-    .query(() => {
-      return db.prepare("SELECT * FROM bookings ORDER BY createdAt DESC").all() as BookingRecord[];
+    .query(async () => {
+      return bookingService.listAllBookings();
     }),
 });
-

@@ -1,7 +1,6 @@
 import { pipelineQueue } from "../infra/queue.js";
 import { logger } from "../infra/logger.js";
 import { pipelineEngine } from "./engine.js";
-import type { Job } from "../infra/types.js";
 
 /**
  * QueueWorker polls the SQLite job queue and processes pipeline jobs.
