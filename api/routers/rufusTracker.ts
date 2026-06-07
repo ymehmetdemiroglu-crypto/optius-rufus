@@ -51,6 +51,9 @@ export const rufusTrackerRouter = router({
           queryId: queryRecord.id,
           asinRankings: q.rankings,
           sovPercent: simulation.sovPercent,
+          cosmoReadinessScore: simulation.cosmoReadinessScore,
+          qaCoverageRatio: simulation.qaCoverageRatio,
+          rufusAnsweredRate: simulation.rufusAnsweredRate,
         });
       }
 
@@ -58,6 +61,9 @@ export const rufusTrackerRouter = router({
         success: true,
         sovPercent: simulation.sovPercent,
         questions: simulation.questions,
+        cosmoReadinessScore: simulation.cosmoReadinessScore,
+        qaCoverageRatio: simulation.qaCoverageRatio,
+        rufusAnsweredRate: simulation.rufusAnsweredRate,
       };
     }),
 
@@ -74,6 +80,9 @@ export const rufusTrackerRouter = router({
           createdAt: r.createdAt ? r.createdAt.toISOString() : new Date().toISOString(),
           sovPercent: r.sovPercent,
           rankings: Array.isArray(r.asinRankings) ? r.asinRankings : [],
+          cosmoReadinessScore: r.cosmoReadinessScore ?? 0,
+          qaCoverageRatio: r.qaCoverageRatio ?? 0,
+          rufusAnsweredRate: r.rufusAnsweredRate ?? 0,
         }));
 
         // Calculate average SOV if there are runs
@@ -88,10 +97,13 @@ export const rufusTrackerRouter = router({
           history: formatted,
           timeline,
           currentSOV: formatted[0]?.sovPercent || 0,
+          currentCosmoReadiness: formatted[0]?.cosmoReadinessScore || 0,
+          currentQaCoverage: formatted[0]?.qaCoverageRatio || 0,
+          currentRufusAnsweredRate: formatted[0]?.rufusAnsweredRate || 0,
         };
       } catch (err) {
         console.error("Failed to query SOV history:", err);
-        return { history: [], timeline: [], currentSOV: 0 };
+        return { history: [], timeline: [], currentSOV: 0, currentCosmoReadiness: 0, currentQaCoverage: 0, currentRufusAnsweredRate: 0 };
       }
     }),
 });

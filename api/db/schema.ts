@@ -162,6 +162,9 @@ export const rufusQueryRuns = pgTable("rufus_query_runs", {
     .references(() => rufusQueries.id, { onDelete: "cascade" }),
   asinRankings: jsonb("asin_rankings").notNull(),
   sovPercent: real("sov_percent").notNull(),
+  cosmoReadinessScore: integer("cosmo_readiness_score"),
+  qaCoverageRatio: integer("qa_coverage_ratio"),
+  rufusAnsweredRate: integer("rufus_answered_rate"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 

@@ -4,189 +4,221 @@
 - cluster-only mode — file stats not available
 
 ## Summary
-- 594 nodes · 1074 edges · 55 communities (41 shown, 14 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 29 edges (avg confidence: 0.91)
+- 701 nodes · 1309 edges · 41 communities (35 shown, 6 thin omitted)
+- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f2c497e0`
+- Built from commit: `a3c102e0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- [[_COMMUNITY_Agent-based Data Fetching|Agent-based Data Fetching]]
-- [[_COMMUNITY_Database and API Setup|Database and API Setup]]
+- [[_COMMUNITY_AI Agents and Orchestration|AI Agents and Orchestration]]
+- [[_COMMUNITY_tRPC and Authentication|tRPC and Authentication]]
+- [[_COMMUNITY_AI Agent Evaluators|AI Agent Evaluators]]
 - [[_COMMUNITY_Logging and Event Bus|Logging and Event Bus]]
-- [[_COMMUNITY_Frontend Dependencies|Frontend Dependencies]]
-- [[_COMMUNITY_Scraper and Router Execution|Scraper and Router Execution]]
-- [[_COMMUNITY_HTTP Server Setup|HTTP Server Setup]]
-- [[_COMMUNITY_Prospect Data Simulation|Prospect Data Simulation]]
-- [[_COMMUNITY_Frontend TypeScript Config|Frontend TypeScript Config]]
-- [[_COMMUNITY_Backend TypeScript Config|Backend TypeScript Config]]
-- [[_COMMUNITY_System Architecture Overview|System Architecture Overview]]
-- [[_COMMUNITY_Node TypeScript Config|Node TypeScript Config]]
-- [[_COMMUNITY_Admin Dashboard & Pipeline|Admin Dashboard & Pipeline]]
-- [[_COMMUNITY_Pipeline Engine Core|Pipeline Engine Core]]
-- [[_COMMUNITY_Application Error Handling|Application Error Handling]]
-- [[_COMMUNITY_Landing Page Components|Landing Page Components]]
-- [[_COMMUNITY_Project Documentation|Project Documentation]]
-- [[_COMMUNITY_REPL and Logging|REPL and Logging]]
-- [[_COMMUNITY_Technical Architecture Guide|Technical Architecture Guide]]
-- [[_COMMUNITY_Caching Service|Caching Service]]
-- [[_COMMUNITY_System Integration Architecture|System Integration Architecture]]
-- [[_COMMUNITY_Autopsy Stage Scoring|Autopsy Stage Scoring]]
-- [[_COMMUNITY_Progress Bar Component|Progress Bar Component]]
-- [[_COMMUNITY_Hero Scan Animation|Hero Scan Animation]]
-- [[_COMMUNITY_tRPC Context|tRPC Context]]
-- [[_COMMUNITY_Matplotlib Library|Matplotlib Library]]
-- [[_COMMUNITY_PPC Planner Stage|PPC Planner Stage]]
-- [[_COMMUNITY_Root TypeScript Config|Root TypeScript Config]]
-- [[_COMMUNITY_Matplotlib Version|Matplotlib Version]]
-- [[_COMMUNITY_Application Entry Point|Application Entry Point]]
-- [[_COMMUNITY_Application Middleware|Application Middleware]]
+- [[_COMMUNITY_HTTP Server and Job Queue|HTTP Server and Job Queue]]
+- [[_COMMUNITY_Frontend Pipeline Hooks|Frontend Pipeline Hooks]]
+- [[_COMMUNITY_NPM Dev Dependencies|NPM Dev Dependencies]]
+- [[_COMMUNITY_SQLite Database Client|SQLite Database Client]]
+- [[_COMMUNITY_Analysis Pipeline Service|Analysis Pipeline Service]]
+- [[_COMMUNITY_Database Schema Definitions|Database Schema Definitions]]
+- [[_COMMUNITY_TypeScript Server Config|TypeScript Server Config]]
+- [[_COMMUNITY_NPM Dependencies|NPM Dependencies]]
+- [[_COMMUNITY_TypeScript App Config|TypeScript App Config]]
+- [[_COMMUNITY_Landing Page UI Components|Landing Page UI Components]]
+- [[_COMMUNITY_TypeScript Node Config|TypeScript Node Config]]
+- [[_COMMUNITY_Prospect Operations Service|Prospect Operations Service]]
+- [[_COMMUNITY_Listing Operations Service|Listing Operations Service]]
+- [[_COMMUNITY_Prospect & Activity Repositories|Prospect & Activity Repositories]]
+- [[_COMMUNITY_Booking Operations Service|Booking Operations Service]]
+- [[_COMMUNITY_Pipeline Status Repository|Pipeline Status Repository]]
+- [[_COMMUNITY_Prospect Data Simulator|Prospect Data Simulator]]
+- [[_COMMUNITY_Drizzle Schema & Brand Repo|Drizzle Schema & Brand Repo]]
+- [[_COMMUNITY_Prospect Landing Page|Prospect Landing Page]]
+- [[_COMMUNITY_Analysis Operations Repository|Analysis Operations Repository]]
+- [[_COMMUNITY_Rufus Queries Repository|Rufus Queries Repository]]
+- [[_COMMUNITY_Autopsy Stage Component|Autopsy Stage Component]]
+- [[_COMMUNITY_Memory Caching Service|Memory Caching Service]]
+- [[_COMMUNITY_Hero & Scan Animation Components|Hero & Scan Animation Components]]
+- [[_COMMUNITY_Transform Preview Component|Transform Preview Component]]
+- [[_COMMUNITY_Brand Style Injector Component|Brand Style Injector Component]]
+- [[_COMMUNITY_Bundling Blueprint Component|Bundling Blueprint Component]]
+- [[_COMMUNITY_Free Q&A Component|Free Q&A Component]]
+- [[_COMMUNITY_PPC Planner Stage Component|PPC Planner Stage Component]]
+- [[_COMMUNITY_Roadmap Stage Component|Roadmap Stage Component]]
 - [[_COMMUNITY_Scroll Reveal Hook|Scroll Reveal Hook]]
-- [[_COMMUNITY_Main Frontend Entry|Main Frontend Entry]]
-- [[_COMMUNITY_AI Orchestration System|AI Orchestration System]]
-- [[_COMMUNITY_Marketing Strategy Image|Marketing Strategy Image]]
-- [[_COMMUNITY_Optimization Comparison Image|Optimization Comparison Image]]
-- [[_COMMUNITY_Profitability Image|Profitability Image]]
+- [[_COMMUNITY_TypeScript Config File|TypeScript Config File]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `db` - 23 edges
-2. `RawListingData` - 20 edges
-3. `run()` - 19 edges
-4. `run()` - 17 edges
-5. `compilerOptions` - 17 edges
-6. `AgentRole` - 16 edges
-7. `Logger` - 16 edges
-8. `compilerOptions` - 16 edges
-9. `compilerOptions` - 15 edges
-10. `Agent` - 14 edges
+1. `AgentRole` - 19 edges
+2. `Logger` - 18 edges
+3. `Agent` - 17 edges
+4. `compilerOptions` - 17 edges
+5. `compilerOptions` - 16 edges
+6. `compilerOptions` - 16 edges
+7. `RawListingData` - 15 edges
+8. `EvaluationResult` - 13 edges
+9. `Evaluator` - 13 edges
+10. `db` - 12 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `run()` --calls--> `generateAllStageCopy()`  [INFERRED]
-  scripts/testEndToEnd.ts → api/services/copywriter.ts
-- `run()` --calls--> `buildCatalogGraph()`  [INFERRED]
-  scripts/runOptimization.ts → api/services/catalogGraph.ts
-- `run()` --calls--> `buildCatalogGraph()`  [INFERRED]
-  scripts/testEndToEnd.ts → api/services/catalogGraph.ts
-- `run()` --calls--> `fetchCompetitors()`  [INFERRED]
-  scripts/runOptimization.ts → api/services/competitor.ts
-- `run()` --calls--> `fetchCompetitors()`  [INFERRED]
-  scripts/testEndToEnd.ts → api/services/competitor.ts
+- `AnalysisMetrics` --references--> `SemanticGap`  [EXTRACTED]
+  api/services/domain/analysisService.ts → api/agents/types.ts
+- `AnalysisInput` --references--> `SemanticGap`  [EXTRACTED]
+  api/services/copywriter.ts → api/agents/types.ts
+- `PipelineOutputs` --references--> `AnalysisResult`  [EXTRACTED]
+  api/services/domain/analysisService.ts → api/agents/types.ts
+- `LandingPageComposerProps` --references--> `ProspectData`  [EXTRACTED]
+  src/components/landing/LandingPageComposer.tsx → src/types/prospect.ts
+- `ApifyFetcherAgent` --implements--> `Agent`  [EXTRACTED]
+  api/agents/agents/apifyFetcher.ts → api/agents/types.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (55 total, 14 thin omitted)
+## Communities (41 total, 6 thin omitted)
 
-### Community 0 - "Agent-based Data Fetching"
-Cohesion: 0.09
-Nodes (35): ApifyFetcherAgent, safeJsonParse(), CompetitorAnalystAgent, ListingFetcherAgent, OptimizationOrchestrator, STAGE_NAMES, STAGES, PreprocessorAgent (+27 more)
+### Community 0 - "AI Agents and Orchestration"
+Cohesion: 0.11
+Nodes (30): ApifyFetcherAgent, safeJsonParse(), CompetitorAnalystAgent, ContentOptimizerAgent, EmbeddingGeneratorAgent, ListingFetcherAgent, OptimizationOrchestrator, STAGE_NAMES (+22 more)
 
-### Community 1 - "Database and API Setup"
+### Community 1 - "tRPC and Authentication"
 Cohesion: 0.06
-Nodes (47): apiKeyProcedure, t, BookingRecord, BrandSettingsRecord, CatalogLinkRecord, db, dbDir, __dirname (+39 more)
+Nodes (38): apiKeyProcedure, Context, createContext(), t, JWTPayload, verifyToken(), apiKeyProcedure, authProcedure (+30 more)
 
-### Community 2 - "Logging and Event Bus"
+### Community 2 - "AI Agent Evaluators"
+Cohesion: 0.10
+Nodes (25): ApifyFetcherEvaluator, CompetitorAnalystEvaluator, ContentOptimizerEvaluator, EmbeddingGeneratorEvaluator, PreprocessorEvaluator, SemanticAnalyzerEvaluator, EvaluationResult, Evaluator (+17 more)
+
+### Community 3 - "Logging and Event Bus"
+Cohesion: 0.08
+Nodes (19): eventBus, MemoryEventBus, LogContext, Logger, LogLevel, DomainEvent, EventBus, breakers (+11 more)
+
+### Community 4 - "HTTP Server and Job Queue"
 Cohesion: 0.06
-Nodes (25): eventBus, MemoryEventBus, LogContext, Logger, LogLevel, generateId(), pipelineQueue, safeJsonParse() (+17 more)
+Nodes (23): app, httpServer, port, DELETE, GET, OPTIONS, POST, PUT (+15 more)
 
-### Community 3 - "Frontend Dependencies"
-Cohesion: 0.04
-Nodes (46): dependencies, better-sqlite3, clsx, hono, lucide-react, puppeteer, react, react-dom (+38 more)
+### Community 5 - "Frontend Pipeline Hooks"
+Cohesion: 0.06
+Nodes (19): AppRouter, ErrorBoundary, Props, State, PipelineJob, PipelineStageState, PipelineStatus, usePipeline() (+11 more)
 
-### Community 4 - "Scraper and Router Execution"
-Cohesion: 0.09
-Nodes (31): rufusTrackerRouter, scraperRouter, getArg(), run(), __dirname, envPath, run(), safeJsonParse() (+23 more)
+### Community 6 - "NPM Dev Dependencies"
+Cohesion: 0.05
+Nodes (36): devDependencies, autoprefixer, drizzle-kit, eslint, @eslint/js, eslint-plugin-react-hooks, eslint-plugin-react-refresh, globals (+28 more)
 
-### Community 5 - "HTTP Server Setup"
-Cohesion: 0.09
-Nodes (15): app, httpServer, port, DELETE, GET, OPTIONS, POST, PUT (+7 more)
+### Community 7 - "SQLite Database Client"
+Cohesion: 0.08
+Nodes (22): BookingRecord, BrandSettingsRecord, CatalogLinkRecord, db, dbDir, __dirname, JobQueueRecord, ListingAnalysisRecord (+14 more)
 
-### Community 6 - "Prospect Data Simulation"
-Cohesion: 0.17
-Nodes (15): StageFreeQAsProps, BundlingItem, CompetitorComparison, CosmoNodeData, FreeQAItem, PipelineProspect, ProspectData, ProspectIssue (+7 more)
+### Community 8 - "Analysis Pipeline Service"
+Cohesion: 0.14
+Nodes (23): AnalysisMetrics, buildAnalysisInsertInput(), buildProspectName(), buildRawListing(), computeMetrics(), executePipeline(), extractPipelineOutputs(), fetchListing() (+15 more)
 
-### Community 7 - "Frontend TypeScript Config"
+### Community 9 - "Database Schema Definitions"
+Cohesion: 0.13
+Nodes (20): bookings, brandSettings, catalogLinks, jobs, listingAnalyses, listings, pipelineJobs, pipelineJobStages (+12 more)
+
+### Community 10 - "TypeScript Server Config"
+Cohesion: 0.10
+Nodes (19): compilerOptions, baseUrl, declaration, declarationMap, esModuleInterop, forceConsistentCasingInFileNames, module, moduleResolution (+11 more)
+
+### Community 11 - "NPM Dependencies"
+Cohesion: 0.11
+Nodes (19): dependencies, better-sqlite3, clsx, drizzle-orm, hono, lucide-react, pg, postgres (+11 more)
+
+### Community 12 - "TypeScript App Config"
 Cohesion: 0.11
 Nodes (18): compilerOptions, allowImportingTsExtensions, erasableSyntaxOnly, jsx, lib, module, moduleDetection, moduleResolution (+10 more)
 
-### Community 8 - "Backend TypeScript Config"
-Cohesion: 0.11
-Nodes (18): compilerOptions, baseUrl, declaration, esModuleInterop, forceConsistentCasingInFileNames, module, moduleResolution, outDir (+10 more)
+### Community 13 - "Landing Page UI Components"
+Cohesion: 0.12
+Nodes (8): FloatingCTAProps, LandingPageComposerProps, ProgressBarProps, STAGE_LABELS, StageBleedCalculatorProps, StageProofWallProps, testimonials, ProspectData
 
-### Community 9 - "System Architecture Overview"
-Cohesion: 0.13
-Nodes (16): 04 — Architecture, AI/ML Pipeline, AI Pipeline, API Specification, Business, Database ERD, Database Schema, Deployment & DevOps (+8 more)
-
-### Community 10 - "Node TypeScript Config"
+### Community 14 - "TypeScript Node Config"
 Cohesion: 0.11
 Nodes (17): compilerOptions, allowImportingTsExtensions, erasableSyntaxOnly, lib, module, moduleDetection, moduleResolution, noEmit (+9 more)
 
-### Community 11 - "Admin Dashboard & Pipeline"
+### Community 15 - "Prospect Operations Service"
+Cohesion: 0.16
+Nodes (8): InsertProspectInput, createProspect(), CreateProspectInput, generateSlug(), ListProspectsOptions, recordActivity(), ProspectDetails, triggerWebhook()
+
+### Community 16 - "Listing Operations Service"
+Cohesion: 0.18
+Nodes (3): InsertListingInput, ListingRecord, CreateListingInput
+
+### Community 17 - "Prospect & Activity Repositories"
+Cohesion: 0.22
+Nodes (5): create(), buildCountQuery(), buildItemsQuery(), buildWhereClause(), list()
+
+### Community 18 - "Booking Operations Service"
+Cohesion: 0.21
+Nodes (3): BookingRecord, InsertBookingInput, CreateBookingInput
+
+### Community 19 - "Pipeline Status Repository"
 Cohesion: 0.17
-Nodes (6): PipelineJob, PipelineStageState, revenueOptions, PipelineStatusPanel(), trpc, BookingFormData
+Nodes (4): InsertPipelineJobInput, InsertPipelineJobStageInput, PipelineJobRecord, PipelineJobStageRecord
 
-### Community 12 - "Pipeline Engine Core"
+### Community 20 - "Prospect Data Simulator"
+Cohesion: 0.30
+Nodes (7): StageRufusSimulatorProps, CompetitorComparison, PipelineProspect, ProspectIssue, ProspectOpportunity, SimulatorScenario, StageCopyData
+
+### Community 21 - "Drizzle Schema & Brand Repo"
 Cohesion: 0.25
-Nodes (8): PipelineEngine, safeJson(), PipelineJob, STAGE_ORDER, StageContext, StageDefinition, StageExecutor, StageName
+Nodes (4): db, pool, BrandSettingsRecord, InsertBrandSettingsInput
 
-### Community 13 - "Application Error Handling"
-Cohesion: 0.15
-Nodes (4): ErrorBoundary, Props, State, TRPCProvider()
+### Community 22 - "Prospect Landing Page"
+Cohesion: 0.24
+Nodes (5): useActivityTracker(), MOCK_PROSPECT_DATA, mapBackendToProspectData(), safeJsonParse(), ProspectLanding()
 
-### Community 14 - "Landing Page Components"
-Cohesion: 0.14
-Nodes (11): FloatingCTAProps, StageBleedCalculatorProps, StageProofWallProps, testimonials, steps, mapBackendToProspectData(), safeJsonParse(), BrandStyleInjector() (+3 more)
+### Community 23 - "Analysis Operations Repository"
+Cohesion: 0.22
+Nodes (5): InsertAnalysisInput, ListingAnalysisRecord, StageCopy, buildCopyUpdate(), updateCopy()
 
-### Community 15 - "Project Documentation"
-Cohesion: 0.18
-Nodes (12): docs/01-product/README.md, docs/01-product/requirements.md, docs/02-research/amazon-ai-optimization.md, docs/02-research/README.md, docs/03-business/financial-analysis.md, docs/03-business/marketing-playbook.md, docs/03-business/README.md, docs/README.md (+4 more)
+### Community 24 - "Rufus Queries Repository"
+Cohesion: 0.20
+Nodes (4): InsertRufusQueryInput, InsertRufusQueryRunInput, RufusQueryRecord, RufusQueryRunRecord
 
-### Community 16 - "REPL and Logging"
-Cohesion: 0.26
-Nodes (11): colors, formatDuration(), log(), main(), printBanner(), rl, setupEventListeners(), showLogs() (+3 more)
+### Community 25 - "Autopsy Stage Component"
+Cohesion: 0.36
+Nodes (9): AnimatedScore(), AnimatedScoreProps, getScoreColor(), getScoreLevel(), StageAutopsy(), StageAutopsyProps, CosmoNodeData, ProspectScoreBreakdown (+1 more)
 
-### Community 17 - "Technical Architecture Guide"
-Cohesion: 0.18
-Nodes (11): Technical Architecture, Development Setup Guide, Deployment & DevOps Guide, Sentry Integration Examples, backend/boot.ts, backend/index.ts, backend/middleware.ts, backend/trpc.ts (+3 more)
-
-### Community 18 - "Caching Service"
+### Community 26 - "Memory Caching Service"
 Cohesion: 0.27
 Nodes (3): cache, CacheEntry, CacheService
 
-### Community 19 - "System Integration Architecture"
-Cohesion: 0.20
-Nodes (10): Amazon Selling Partner API (SP-API), ASIN Analysis Flow, Authentication Flow, Deployment Architecture, Technical Architecture Document (TAD), OpenAI API, Paddle Payments, Payment Flow (+2 more)
+### Community 27 - "Hero & Scan Animation Components"
+Cohesion: 0.29
+Nodes (4): StageHeroProps, SCAN_LINES, StageScanAnimationProps, ProspectListing
 
-### Community 20 - "Autopsy Stage Scoring"
-Cohesion: 0.83
-Nodes (3): AnimatedScore(), getScoreColor(), getScoreLevel()
+### Community 28 - "Transform Preview Component"
+Cohesion: 0.53
+Nodes (5): getScoreColor(), getScoreLevel(), StageTransformPreview(), StageTransformPreviewProps, TransformSnippet
 
-### Community 24 - "Matplotlib Library"
-Cohesion: 1.00
-Nodes (3): Matplotlib, Matplotlib, Matplotlib
+### Community 29 - "Brand Style Injector Component"
+Cohesion: 0.60
+Nodes (4): BrandStyleInjector(), BrandStyleInjectorProps, isValidCssColor(), isValidDataUrl()
 
 ## Knowledge Gaps
-- **221 isolated node(s):** `STAGES`, `STAGE_NAMES`, `TaskStatus`, `QAPair`, `OptimizationReport` (+216 more)
+- **198 isolated node(s):** `STAGES`, `STAGE_NAMES`, `TaskStatus`, `QAPair`, `OptimizationReport` (+193 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **14 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `db` connect `Database and API Setup` to `Agent-based Data Fetching`, `Logging and Event Bus`, `Scraper and Router Execution`, `HTTP Server Setup`, `Pipeline Engine Core`?**
-  _High betweenness centrality (0.036) - this node is a cross-community bridge._
-- **Why does `PipelineState` connect `Agent-based Data Fetching` to `REPL and Logging`, `Admin Dashboard & Pipeline`, `Pipeline Engine Core`?**
-  _High betweenness centrality (0.035) - this node is a cross-community bridge._
-- **Why does `Logger` connect `Logging and Event Bus` to `Agent-based Data Fetching`, `Database and API Setup`, `Pipeline Engine Core`?**
-  _High betweenness centrality (0.024) - this node is a cross-community bridge._
-- **Are the 7 inferred relationships involving `run()` (e.g. with `buildCatalogGraph()` and `fetchCompetitors()`) actually correct?**
-  _`run()` has 7 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 6 inferred relationships involving `run()` (e.g. with `buildCatalogGraph()` and `fetchCompetitors()`) actually correct?**
-  _`run()` has 6 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `Logger` connect `Logging and Event Bus` to `tRPC and Authentication`, `AI Agent Evaluators`, `HTTP Server and Job Queue`, `Drizzle Schema & Brand Repo`?**
+  _High betweenness centrality (0.039) - this node is a cross-community bridge._
+- **Why does `db` connect `SQLite Database Client` to `AI Agents and Orchestration`, `Logging and Event Bus`, `HTTP Server and Job Queue`?**
+  _High betweenness centrality (0.023) - this node is a cross-community bridge._
+- **Why does `AppRouter` connect `Frontend Pipeline Hooks` to `tRPC and Authentication`, `HTTP Server and Job Queue`?**
+  _High betweenness centrality (0.021) - this node is a cross-community bridge._
 - **What connects `STAGES`, `STAGE_NAMES`, `TaskStatus` to the rest of the system?**
-  _221 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Agent-based Data Fetching` be split into smaller, more focused modules?**
-  _Cohesion score 0.0925553319919517 - nodes in this community are weakly interconnected._
+  _198 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `AI Agents and Orchestration` be split into smaller, more focused modules?**
+  _Cohesion score 0.1115811739820201 - nodes in this community are weakly interconnected._
+- **Should `tRPC and Authentication` be split into smaller, more focused modules?**
+  _Cohesion score 0.05669199298655757 - nodes in this community are weakly interconnected._
+- **Should `AI Agent Evaluators` be split into smaller, more focused modules?**
+  _Cohesion score 0.09724238026124818 - nodes in this community are weakly interconnected._

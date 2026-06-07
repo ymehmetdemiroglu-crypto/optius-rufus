@@ -181,6 +181,9 @@ export interface RufusQueryRunRecord {
   queryId: number;
   asinRankings: string; // JSON representation of ranking objects
   sovPercent: number;
+  cosmoReadinessScore?: number;
+  qaCoverageRatio?: number;
+  rufusAnsweredRate?: number;
   createdAt: string;
 }
 

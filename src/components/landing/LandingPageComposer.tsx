@@ -9,13 +9,14 @@ import StageTransformPreview from './StageTransformPreview';
 import StageFreeQAs from './StageFreeQAs';
 import StagePPCPlanner from './StagePPCPlanner';
 import StageBundlingBlueprint from './StageBundlingBlueprint';
+import StageAEOPDFAudit from './StageAEOPDFAudit';
 import StageRoadmap from './StageRoadmap';
 import StageProofWall from './StageProofWall';
 import StageBookCall from './StageBookCall';
 import FloatingCTA from './FloatingCTA';
 import BrandStyleInjector from './BrandStyleInjector';
 
-const TOTAL_STAGES = 11;
+const TOTAL_STAGES = 12;
 
 interface LandingPageComposerProps {
   prospect: ProspectData;
@@ -138,12 +139,21 @@ export default function LandingPageComposer({
             />
           </div>
 
+          <div id="stage-aeo-audit">
+            <StageAEOPDFAudit
+              prospect={prospect}
+              brandData={brandData}
+              visible={isPrint || currentStage >= 8}
+              isPrint={isPrint}
+            />
+          </div>
+
           <div id="stage-roadmap">
             <StageRoadmap
               headline={stageCopy.roadmapHeadline}
               body={stageCopy.roadmapBody}
               prospectName={prospect.name}
-              visible={isPrint || currentStage >= 8}
+              visible={isPrint || currentStage >= 9}
             />
           </div>
 
@@ -152,7 +162,7 @@ export default function LandingPageComposer({
               headline={stageCopy.socialProofHeadline}
               urgencyCTA={stageCopy.urgencyCTA}
               onOpenBooking={scrollToBooking}
-              visible={isPrint || currentStage >= 9}
+              visible={isPrint || currentStage >= 10}
             />
           </div>
 
@@ -166,13 +176,13 @@ export default function LandingPageComposer({
               prospectEmail={prospect.email || ''}
               packageType={prospect.packageType}
               pricePoint={prospect.pricePoint}
-              visible={currentStage >= 10}
+              visible={currentStage >= 11}
             />
           )}
 
           {!isPrint && (
             <FloatingCTA
-              visible={currentStage >= 1 && currentStage < 10}
+              visible={currentStage >= 1 && currentStage < 11}
               onClick={scrollToBooking}
             />
           )}

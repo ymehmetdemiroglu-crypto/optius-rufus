@@ -17,6 +17,9 @@ export interface SimulatedQueryData {
 export interface RufusSOVResult {
   questions: SimulatedQueryData[];
   sovPercent: number;
+  cosmoReadinessScore: number;
+  qaCoverageRatio: number;
+  rufusAnsweredRate: number;
 }
 
 export async function simulateRufusSOV(
@@ -95,6 +98,10 @@ YOUR TASKS:
    - "recommended": true (for rank 1, or close rank 2 if both are good), otherwise false.
    - "reason": A 1-2 sentence justification in natural shopping assistant language explaining why Rufus ranked them this way (e.g., "Recommended because the listing details specify third-party test verification, unlike Competitor X").
 4. Calculate "sovPercent" as the percentage of times the target product ("target_product") was ranked #1 (out of 10 queries).
+5. Calculate the following metrics for the target product:
+   - "cosmoReadinessScore": An integer from 0 to 100 indicating how thoroughly the target product's listing copy and A+ content populate structured Amazon COSMO attributes (functional use, target audience, safety/certificates).
+   - "qaCoverageRatio": An integer from 0 to 100 representing the estimated coverage of key customer concerns (safety, usage details, comparative benefits) that are explicitly answered by the listing.
+   - "rufusAnsweredRate": An integer from 0 to 100 reflecting the percentage of simulated queries where Rufus could formulate a direct, confident recommendation for the target product without hedging or recommending competitors due to metadata gaps.
 
 Return ONLY a valid JSON object matching this schema:
 {
@@ -109,7 +116,10 @@ Return ONLY a valid JSON object matching this schema:
     },
     ...
   ],
-  "sovPercent": 40.0
+  "sovPercent": 40.0,
+  "cosmoReadinessScore": 75,
+  "qaCoverageRatio": 80,
+  "rufusAnsweredRate": 90
 }
   `;
 
@@ -240,5 +250,8 @@ function generateFallbackSOV(
   return {
     questions,
     sovPercent: Math.round((winCount / queryTemplates.length) * 100),
+    cosmoReadinessScore: 68,
+    qaCoverageRatio: 55,
+    rufusAnsweredRate: 70,
   };
 }

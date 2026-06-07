@@ -83,6 +83,9 @@ export async function getSOVHistoryForProspect(
   createdAt: Date | null;
   asinRankings: unknown;
   sovPercent: number;
+  cosmoReadinessScore: number | null;
+  qaCoverageRatio: number | null;
+  rufusAnsweredRate: number | null;
 }>> {
   try {
     const result = await pgDb
@@ -93,6 +96,9 @@ export async function getSOVHistoryForProspect(
         createdAt: schema.rufusQueries.createdAt,
         asinRankings: schema.rufusQueryRuns.asinRankings,
         sovPercent: schema.rufusQueryRuns.sovPercent,
+        cosmoReadinessScore: schema.rufusQueryRuns.cosmoReadinessScore,
+        qaCoverageRatio: schema.rufusQueryRuns.qaCoverageRatio,
+        rufusAnsweredRate: schema.rufusQueryRuns.rufusAnsweredRate,
       })
       .from(schema.rufusQueries)
       .innerJoin(

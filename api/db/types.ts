@@ -148,6 +148,9 @@ export interface RufusQueryRunRecord {
   queryId: number;
   asinRankings: string;
   sovPercent: number;
+  cosmoReadinessScore?: number;
+  qaCoverageRatio?: number;
+  rufusAnsweredRate?: number;
   createdAt: string;
 }
 

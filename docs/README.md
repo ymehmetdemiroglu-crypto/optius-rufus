@@ -88,8 +88,8 @@ Monitoring:   Sentry + Grafana + Prometheus
 
 | Metric | Value |
 |--------|-------|
-| **Documents** | 14 comprehensive technical & business docs |
-| **Diagrams** | 13 visual assets |
+| **Documents** | 15 comprehensive technical & business docs |
+| **Diagrams** | 16 visual assets |
 | **API Endpoints** | 30+ tRPC procedures |
 | **Database Tables** | 11 tables |
 | **Frontend Pages** | 8 route-level pages |

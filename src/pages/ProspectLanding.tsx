@@ -61,7 +61,7 @@ export default function ProspectLanding(): JSX.Element {
 
     const stageNames = [
       'hero', 'autopsy', 'bleed', 'simulator', 'transform',
-      'free-qas', 'ppc-planner', 'bundling', 'roadmap', 'proof', 'book',
+      'free-qas', 'ppc-planner', 'bundling', 'aeo-audit', 'roadmap', 'proof', 'book',
     ];
 
     const stageIds = [
@@ -73,6 +73,7 @@ export default function ProspectLanding(): JSX.Element {
       'stage-free-qas',
       'stage-ppc-planner',
       'stage-bundling',
+      'stage-aeo-audit',
       'stage-roadmap',
       'stage-proof',
       'stage-book',

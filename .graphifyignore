@@ -1,0 +1,28 @@
+# Exclude LLM session exports and agent diaries
+kimi-export-*.md
+
+# Exclude scratchpad files
+scratch/
+
+# Exclude documentation, research, business requirements, and PDFs
+docs/
+*.pdf
+
+# Exclude developer examples and automation scripts
+examples/
+scripts/
+
+# Exclude HTML entry point and helper instructions
+CLAUDE.md
+index.html
+
+# Exclude assets, public files, and static media
+public/
+src/assets/
+
+# Exclude build output and agent configuration folders
+dist/
+.agents/
+.claude/
+.vercel/
+node_modules/

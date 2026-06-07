@@ -407,11 +407,26 @@ function AuditLaunchBox({ onAuditLaunched }: { onAuditLaunched: () => void }) {
 function ProspectDetailPanel({ prospectId }: { prospectId: number }) {
   const [simulating, setSimulating] = useState(false);
   
+  // PPC Planner Control Box states
+  const [dailyBudget, setDailyBudget] = useState(50);
+  const [biddingStrategy, setBiddingStrategy] = useState("dynamicBiddingUpDown");
+  const [rankBooster, setRankBooster] = useState(true);
+
+  // Q&A Checklist state
+  const [qaItems, setQaItems] = useState([
+    { id: 1, text: "Dosage limits & safety warning seeded", checked: true },
+    { id: 2, text: "Taste profile / aftertaste details addressed", checked: true },
+    { id: 3, text: "Routine integration & timing instructions clarified", checked: false },
+    { id: 4, text: "Direct comparison with standard category products seeded", checked: false },
+    { id: 5, text: "Form advantages (e.g. capsules vs gummies) explained", checked: false }
+  ]);
+
   // tRPC Queries & Mutations
   const { data: detailData, isLoading } = trpc.prospects.getById.useQuery({ id: prospectId });
   const { data: sovHistory, refetch: refetchSOV } = trpc.rufusTracker.getSOVHistory.useQuery({ prospectId });
   const { data: graphData, refetch: refetchGraph } = trpc.catalogGraph.getGraph.useQuery({ prospectId });
-  
+  const { data: brandSettings } = trpc.branding.getSettings.useQuery();
+
   const runSOV = trpc.rufusTracker.runSOVSimulation.useMutation({
     onSuccess: () => {
       refetchSOV();
@@ -428,96 +443,51 @@ function ProspectDetailPanel({ prospectId }: { prospectId: number }) {
     });
   };
 
-  const handleDownloadBulkSheet = () => {
-    if (!detailData?.analysis) return;
-    
-    // Parse PPC keywords safely from SQLite
-    const keywords = (() => {
-      try {
-        const parsedData = JSON.parse(detailData.analysis.copyPpcKeywords || "[]");
-        return Array.isArray(parsedData) ? parsedData : [];
-      } catch {
-        return [];
-      }
-    })() as any[]; // eslint-disable-line @typescript-eslint/no-explicit-any -- keywords array typing
-
-    if (keywords.length === 0) {
-      alert("No keywords analyzed for this listing yet. Run analysis first!");
-      return;
+  // Sync checklist with database Q&A coverage ratio
+  useEffect(() => {
+    if (sovHistory) {
+      const initialCoverage = sovHistory.currentQaCoverage || 40;
+      const checkedLength = Math.round((initialCoverage / 100) * qaItems.length);
+      setQaItems(prev => prev.map((item, idx) => ({
+        ...item,
+        checked: idx < checkedLength
+      })));
     }
+  }, [prospectId, sovHistory]);
 
-    // Retrieve parsed semantic gaps to inject negative keywords
-    const gaps = (() => {
-      try {
-        const parsedData = JSON.parse(detailData.analysis.gaps || "[]");
-        return Array.isArray(parsedData) ? parsedData : [];
-      } catch {
-        return [];
+  const checkedCount = qaItems.filter(item => item.checked).length;
+  const localQaCoverageRatio = Math.round((checkedCount / qaItems.length) * 100);
+
+  const toggleQaItem = (id: number) => {
+    setQaItems(prev => prev.map(item => item.id === id ? { ...item, checked: !item.checked } : item));
+  };
+
+  const { refetch: fetchBulkSheet } = trpc.ppc.downloadBulkSheet.useQuery({
+    prospectId,
+    dailyBudget,
+    biddingStrategy,
+    rankBooster,
+  }, { enabled: false });
+
+  const handleExportPPC = async () => {
+    try {
+      const { data } = await fetchBulkSheet();
+      if (data && data.csv) {
+        const blob = new Blob([data.csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = data.filename || `ppc_bulk_sheet_${prospectId}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      } else {
+        alert("Could not generate bulk sheet.");
       }
-    })() as any[]; // eslint-disable-line @typescript-eslint/no-explicit-any -- gaps list mapping
-
-    const asin = detailData.listing.asin;
-    const brand = (detailData.listing.brand || "Brand").toUpperCase();
-    const campaignName = `OR_${brand}_${asin}_COSMO_EXACT`;
-
-    // Amazon Bulk Sheet Header (v3.0 standard Sponsored Products columns)
-    const csvRows = [
-      "Product,Entity,Operation,Campaign,Ad Group,Bid,Keyword Text,Match Type,SKU,Budget,Bidding Strategy",
-    ];
-
-    // 1. Campaign Row
-    csvRows.push(
-      `Sponsored Products,Campaign,Create,${campaignName},,,,50.00,,Dynamic bids - down only`
-    );
-
-    // Group keywords into Ad Groups by matched intent dimension
-    const adGroups: Record<string, any[]> = {}; // eslint-disable-line @typescript-eslint/no-explicit-any -- group dynamic keywords
-    keywords.forEach((k) => {
-      const adGroup = k.placement === "title" ? "Intent_Sleep_Quality" : k.placement === "bullet" ? "Intent_Leg_Cramps" : "Intent_General_Support";
-      if (!adGroups[adGroup]) adGroups[adGroup] = [];
-      adGroups[adGroup].push(k);
-    });
-
-    Object.entries(adGroups).forEach(([adGroupName, kwList]) => {
-      // 2. Ad Group Row
-      csvRows.push(
-        `Sponsored Products,Ad Group,Create,${campaignName},${adGroupName},1.20,,,,`
-      );
-
-      // 3. Product Ad Row (merging SKU/ASIN)
-      csvRows.push(
-        `Sponsored Products,Product Ad,Create,${campaignName},${adGroupName},,,,,${asin}`
-      );
-
-      // 4. Keyword targeting rows
-      kwList.forEach((kw) => {
-        csvRows.push(
-          `Sponsored Products,Keyword,Create,${campaignName},${adGroupName},${(kw.bid || 1.15).toFixed(2)},${kw.keyword},Exact,,`
-        );
-      });
-    });
-
-    // 5. Inject Campaign Negative Phrase Exclusion row based on gaps
-    const criticalGaps = gaps.filter(g => g.priority === "critical" || g.priority === "high");
-    if (criticalGaps.length > 0) {
-      // Find what they are deficient in and add phrases as negative target
-      const negativeWords = criticalGaps.map(g => g.dimension.split("_")[0]).filter(Boolean);
-      negativeWords.slice(0, 3).forEach((word) => {
-        csvRows.push(
-          `Sponsored Products,Campaign negative keyword,Create,${campaignName},,,,${word},Negative Phrase,`
-        );
-      });
+    } catch (err) {
+      alert("Failed to export bulk sheet: " + err);
     }
-
-    // Trigger standard browser CSV download
-    const csvContent = csvRows.join("\n");
-    const encodedUri = "data:text/csv;charset=utf-8," + encodeURIComponent(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `amazon_ads_bulksheet_${asin}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   if (isLoading) {
@@ -532,6 +502,10 @@ function ProspectDetailPanel({ prospectId }: { prospectId: number }) {
   if (!detailData?.prospect) return null;
 
   const { prospect, listing, analysis } = detailData;
+
+  const agencyName = brandSettings?.companyName || "Optimus Rufus";
+  const agencyWebsite = brandSettings?.website || "www.optimusrufus.com";
+  const primaryColor = brandSettings?.primaryColor || "#b8860b";
 
   return (
     <div className="space-y-8">
@@ -582,30 +556,204 @@ function ProspectDetailPanel({ prospectId }: { prospectId: number }) {
         )}
 
         <PipelineStatusPanel prospectId={prospect.id} />
+      </div>
 
-        <div className="flex flex-wrap gap-4 pt-2 border-t-[2px] border-brand-dark/10">
+      {/* PPC Planner Control Box Card */}
+      <div className="brutalist-card bg-white space-y-4">
+        <h3 className="font-display font-black text-lg uppercase tracking-wider border-b-[2px] border-brand-dark pb-2">
+          PPC Planner Control Box
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Daily Budget Slider */}
+          <div className="space-y-1">
+            <label className="font-mono text-[10px] uppercase font-bold text-gray-500 block">
+              Daily Budget: ${dailyBudget}
+            </label>
+            <input 
+              type="range" 
+              min={10} 
+              max={500} 
+              step={5} 
+              value={dailyBudget}
+              onChange={(e) => setDailyBudget(Number(e.target.value))}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-dark"
+            />
+          </div>
+
+          {/* Bidding Strategy Dropdown */}
+          <div className="space-y-1">
+            <label className="font-mono text-[10px] uppercase font-bold text-gray-500 block">
+              Bidding Strategy
+            </label>
+            <select 
+              value={biddingStrategy}
+              onChange={(e) => setBiddingStrategy(e.target.value)}
+              className="brutalist-input h-10 py-1 text-xs bg-white cursor-pointer"
+            >
+              <option value="dynamicBiddingUpDown">Dynamic Bidding (Up/Down)</option>
+              <option value="dynamicBiddingDownOnly">Dynamic Bidding (Down Only)</option>
+              <option value="fixedBids">Fixed Bids</option>
+            </select>
+          </div>
+
+          {/* Rank Booster Toggle */}
+          <div className="flex items-center justify-between md:justify-center gap-3">
+            <label className="font-mono text-[10px] uppercase font-bold text-gray-500">
+              Rank Booster (Page 2 Conquesting)
+            </label>
+            <input 
+              type="checkbox"
+              checked={rankBooster}
+              onChange={(e) => setRankBooster(e.target.checked)}
+              className="w-5 h-5 accent-brand-dark cursor-pointer"
+            />
+          </div>
+        </div>
+
+        <div className="pt-2 flex gap-4">
+          <button 
+            onClick={handleExportPPC}
+            className="brutalist-btn w-full flex items-center justify-center gap-2 text-sm"
+            disabled={!analysis}
+          >
+            <Download size={16} /> Export AEO Compliant PPC Bulk Sheet
+          </button>
+        </div>
+      </div>
+
+      {/* AEO Audit Exporter Overlay Info Card */}
+      <div className="brutalist-card bg-brand-dark text-white space-y-4">
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="font-display font-black text-lg uppercase tracking-wider text-brand-gold">
+              White-Labeled AEO Audit Exporter
+            </h3>
+            <p className="font-mono text-[10px] text-white/60 mt-1">
+              Active Theme: {agencyName} ({agencyWebsite})
+            </p>
+          </div>
+          <span 
+            className="h-4 w-4 rounded-full border border-white inline-block shadow-sm"
+            style={{ backgroundColor: primaryColor }}
+          />
+        </div>
+        <p className="font-mono text-xs text-white/70 leading-relaxed">
+          The PDF download is fully customized with your brand settings. The layout includes custom SVG Vector Semantic Gap charts, Rufus Funnels, and Q&A checklists tailored for agency presentation.
+        </p>
+        <div className="flex gap-4">
           <a 
             href={`/p/${prospect.slug}`} 
             target="_blank" 
             rel="noreferrer"
-            className="brutalist-btn-secondary flex items-center gap-2"
+            className="bg-white text-brand-dark font-mono text-xs font-black uppercase px-4 py-2 border-2 border-brand-dark hover:translate-x-[1px] hover:translate-y-[1px] cursor-pointer flex items-center gap-2"
           >
-            <ExternalLink size={14} /> View Landing Page
+            <ExternalLink size={14} /> Live Landing Page
           </a>
           <a 
             href={`/api/pdf/${prospect.slug}`} 
-            className="brutalist-btn-secondary flex items-center gap-2"
+            className="bg-brand-gold text-brand-dark font-mono text-xs font-black uppercase px-4 py-2 border-2 border-brand-dark hover:translate-x-[1px] hover:translate-y-[1px] cursor-pointer flex items-center gap-2"
             download
           >
-            <Download size={14} /> Download PDF Audit
+            <Download size={14} /> Download PDF Audit Report
           </a>
-          <button 
-            onClick={handleDownloadBulkSheet}
-            className="brutalist-btn-secondary flex items-center gap-2"
-            disabled={!analysis}
-          >
-            <Download size={14} /> Export PPC Bulk Sheet
-          </button>
+        </div>
+      </div>
+
+      {/* A9 vs A10 & Rufus Funnel Visualizer (Side-by-Side Grid) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* A9 vs A10 Weighting Widget */}
+        <div className="brutalist-card bg-white space-y-4">
+          <h4 className="font-display font-black text-sm uppercase tracking-wide border-b border-brand-dark/10 pb-1.5 text-brand-blue">
+            A9 vs A10 Algorithm Weighting
+          </h4>
+          <p className="font-mono text-[10px] text-gray-500 leading-normal">
+            A10 explicitly weights organic sales highest and down-prioritizes PPC-attributed sales compared to A9, making conquesting Page 2 organic positions the key priority.
+          </p>
+          <div className="space-y-3 font-mono text-xs">
+            {/* Metric 1 */}
+            <div className="space-y-1">
+              <div className="flex justify-between font-bold">
+                <span>Organic Sales Weight</span>
+                <span>A9: 95% | A10: 95%</span>
+              </div>
+              <div className="w-full bg-gray-100 border border-brand-dark h-2.5">
+                <div className="h-full bg-green-500" style={{ width: "95%" }} />
+              </div>
+            </div>
+            {/* Metric 2 */}
+            <div className="space-y-1">
+              <div className="flex justify-between font-bold">
+                <span>PPC Sales Weight</span>
+                <span>A9: 85% | A10: 55%</span>
+              </div>
+              <div className="w-full bg-gray-100 border border-brand-dark h-2.5 flex">
+                <div className="h-full bg-brand-gold" style={{ width: "55%" }} />
+                <div className="h-full bg-gray-300 opacity-50" style={{ width: "30%" }} />
+              </div>
+            </div>
+            {/* Metric 3 */}
+            <div className="space-y-1">
+              <div className="flex justify-between font-bold">
+                <span>External Converting Traffic</span>
+                <span>A9: 45% | A10: 85%</span>
+              </div>
+              <div className="w-full bg-gray-100 border border-brand-dark h-2.5 flex">
+                <div className="h-full bg-blue-500" style={{ width: "85%" }} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Rufus Funnel Visualization */}
+        <div className="brutalist-card bg-white space-y-4">
+          <h4 className="font-display font-black text-sm uppercase tracking-wide border-b border-brand-dark/10 pb-1.5 text-brand-blue">
+            Rufus Recommendation Funnel
+          </h4>
+          <div className="flex flex-col gap-1.5 font-mono text-[10px] font-bold">
+            <div className="bg-green-500/10 text-green-800 border border-green-300 p-1.5 text-center">
+              Layer 4: Personalization (Intent Match)
+            </div>
+            <div className="bg-yellow-500/10 text-yellow-800 border border-yellow-300 p-1.5 text-center mx-2">
+              Layer 3: RAG Retrieval Support (Trust Verification)
+            </div>
+            <div className="bg-blue-500/10 text-blue-800 border border-blue-300 p-1.5 text-center mx-4">
+              Layer 2: COSMO Graph Validation (Context Node)
+            </div>
+            <div className="bg-purple-500/10 text-purple-800 border border-purple-300 p-1.5 text-center mx-6">
+              Layer 1: Indexing & Eligibility (A9/A10 baselines)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Interactive Q&A Seeding Checklist Card */}
+      <div className="brutalist-card bg-white space-y-4">
+        <div className="flex justify-between items-center border-b border-brand-dark/10 pb-2">
+          <h3 className="font-display font-black text-lg uppercase tracking-wider">
+            Q&A Optimization Pipeline
+          </h3>
+          <span className="font-mono text-xs font-black bg-brand-blue text-white px-2 py-0.5 border border-brand-dark">
+            Coverage: {localQaCoverageRatio}% {localQaCoverageRatio >= 75 ? "🎯 TARGET MET" : "⚠️ NEED 75%+"}
+          </span>
+        </div>
+        <p className="font-mono text-xs text-gray-500">
+          Listings with 15+ answered Q&As are recommended **3.2× more often** by Rufus. Check the actions completed to update the pipeline:
+        </p>
+
+        <div className="space-y-2 font-mono text-xs">
+          {qaItems.map((item) => (
+            <div key={item.id} className="flex gap-3 items-center">
+              <input 
+                type="checkbox"
+                checked={item.checked}
+                onChange={() => toggleQaItem(item.id)}
+                className="w-4 h-4 accent-brand-blue cursor-pointer"
+              />
+              <span className={item.checked ? "line-through text-gray-400" : "font-bold text-brand-dark"}>
+                {item.text}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -637,18 +785,26 @@ function ProspectDetailPanel({ prospectId }: { prospectId: number }) {
         {sovHistory?.history && sovHistory.history.length > 0 ? (
           <div className="space-y-6">
             {/* Current SOV Badge */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="border-[2px] border-brand-dark p-4 bg-[#fafafa]">
-                <h4 className="font-mono text-[10px] uppercase font-bold text-gray-500">Calculated Rufus SOV</h4>
+                <h4 className="font-mono text-[10px] uppercase font-bold text-gray-500">Rufus SOV</h4>
                 <p className="font-display font-black text-3xl text-brand-dark mt-1">{sovHistory.currentSOV}%</p>
-                <p className="font-mono text-[9px] text-gray-400 mt-2">Target product won {Math.round(sovHistory.currentSOV / 10)} out of 10 category queries.</p>
+                <p className="font-mono text-[9px] text-gray-400 mt-2">Win rate out of 10 queries.</p>
               </div>
               <div className="border-[2px] border-brand-dark p-4 bg-[#fafafa]">
-                <h4 className="font-mono text-[10px] uppercase font-bold text-gray-500">Last Simulation Date</h4>
-                <p className="font-display font-black text-lg text-brand-dark mt-1">
-                  {new Date(sovHistory.history[0]?.createdAt).toLocaleDateString()}
-                </p>
-                <p className="font-mono text-[9px] text-gray-400 mt-2.5">Category: {sovHistory.history[0]?.category}</p>
+                <h4 className="font-mono text-[10px] uppercase font-bold text-gray-500">COSMO Readiness</h4>
+                <p className="font-display font-black text-3xl text-brand-dark mt-1">{sovHistory.currentCosmoReadiness}%</p>
+                <p className="font-mono text-[9px] text-gray-400 mt-2">Intent nodes coverage.</p>
+              </div>
+              <div className="border-[2px] border-brand-dark p-4 bg-[#fafafa]">
+                <h4 className="font-mono text-[10px] uppercase font-bold text-gray-500">Q&A Coverage</h4>
+                <p className="font-display font-black text-3xl text-brand-dark mt-1">{sovHistory.currentQaCoverage}%</p>
+                <p className="font-mono text-[9px] text-gray-400 mt-2">Target query coverage.</p>
+              </div>
+              <div className="border-[2px] border-brand-dark p-4 bg-[#fafafa]">
+                <h4 className="font-mono text-[10px] uppercase font-bold text-gray-500">Rufus Recommendation</h4>
+                <p className="font-display font-black text-3xl text-brand-dark mt-1">{sovHistory.currentRufusAnsweredRate}%</p>
+                <p className="font-mono text-[9px] text-gray-400 mt-2">Confidence recommendation rate.</p>
               </div>
             </div>
 

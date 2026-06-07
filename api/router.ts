@@ -8,6 +8,7 @@ import { bookingRouter } from "./routers/booking.js";
 import { brandingRouter } from "./routers/branding.js";
 import { rufusTrackerRouter } from "./routers/rufusTracker.js";
 import { catalogGraphRouter } from "./routers/catalogGraphRouter.js";
+import { ppcRouter } from "./routers/ppcRouter.js";
 
 export const appRouter = router({
   agents: agentsRouter,
@@ -19,6 +20,7 @@ export const appRouter = router({
   branding: brandingRouter,
   rufusTracker: rufusTrackerRouter,
   catalogGraph: catalogGraphRouter,
+  ppc: ppcRouter,
 });
 
 export type AppRouter = typeof appRouter;
