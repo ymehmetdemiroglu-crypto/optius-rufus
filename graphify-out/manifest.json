@@ -210,9 +210,9 @@
     "semantic_hash": "cca04f36bd085863f94d5c86cd4eac69"
   },
   "api/services/copywriter.ts": {
-    "mtime": 1780648346.723697,
-    "ast_hash": "5346a847608693ca161f7852e707ae82",
-    "semantic_hash": "5346a847608693ca161f7852e707ae82"
+    "mtime": 1780847280.8754978,
+    "ast_hash": "aacd9982d94fbb0ac3d22c724dae2761",
+    "semantic_hash": ""
   },
   "api/services/embedding.ts": {
     "mtime": 1780221758.7154708,
@@ -365,9 +365,9 @@
     "semantic_hash": "2cca727b3cc0bb29bbe92aeb58b22feb"
   },
   "src/App.tsx": {
-    "mtime": 1780761411.6789155,
-    "ast_hash": "8f2c0e0adaa76a617d689fb1bd8f9cd7",
-    "semantic_hash": "8f2c0e0adaa76a617d689fb1bd8f9cd7"
+    "mtime": 1780847574.1273587,
+    "ast_hash": "0ae594a396c2d49623464bb13619a793",
+    "semantic_hash": ""
   },
   "src/components/ErrorBoundary.tsx": {
     "mtime": 1780761391.604068,
@@ -480,13 +480,13 @@
     "semantic_hash": ""
   },
   "src/pages/InvitationOnly.tsx": {
-    "mtime": 1780338761.8132248,
-    "ast_hash": "eb70e58e9e1cbfde6850812a7b3203bb",
-    "semantic_hash": "eb70e58e9e1cbfde6850812a7b3203bb"
+    "mtime": 1780847300.3541887,
+    "ast_hash": "59d2f74eb87ce5c97a52faec979c5886",
+    "semantic_hash": ""
   },
   "src/pages/ProspectLanding.tsx": {
-    "mtime": 1780846513.788977,
-    "ast_hash": "83f89f62de7caba3866617827fa71dad",
+    "mtime": 1780848401.1904166,
+    "ast_hash": "f5c9ed95e61d1ea03584f21bc4fa70b4",
     "semantic_hash": ""
   },
   "src/providers/trpc.tsx": {
@@ -595,9 +595,9 @@
     "semantic_hash": "6841385f975cf4b6c44e619970a59e00"
   },
   "api/db/drizzle.ts": {
-    "mtime": 1780824587.2743375,
-    "ast_hash": "ff487908dab72b6eb84d7ef4937308ef",
-    "semantic_hash": "ff487908dab72b6eb84d7ef4937308ef"
+    "mtime": 1780847883.1794612,
+    "ast_hash": "6e26fb80628aa42038511b5f17915bef",
+    "semantic_hash": ""
   },
   "api/db/migrate.ts": {
     "mtime": 1780825203.7498517,
@@ -720,8 +720,8 @@
     "semantic_hash": "125a1e75ddc02768fe60413ce87f383e"
   },
   "src/components/landing/LandingPageComposer.tsx": {
-    "mtime": 1780846524.1048963,
-    "ast_hash": "40c2685bb25f7e183c0499d40710fc85",
+    "mtime": 1780848396.9050934,
+    "ast_hash": "0ed3dfc90568baf5fb3aa688526ed28e",
     "semantic_hash": ""
   },
   "src/components/landing/ReportNotFound.tsx": {

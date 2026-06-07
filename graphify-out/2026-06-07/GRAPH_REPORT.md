@@ -1,15 +1,16 @@
-# Graph Report - .  (2026-06-07)
+# Graph Report - optimus rufus webapp  (2026-06-07)
 
 ## Corpus Check
-- cluster-only mode — file stats not available
+- 132 files · ~49,138 words
+- Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 701 nodes · 1309 edges · 41 communities (35 shown, 6 thin omitted)
+- 716 nodes · 1344 edges · 51 communities (41 shown, 10 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a3c102e0`
+- Built from commit: `3549b862`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -50,6 +51,16 @@
 - [[_COMMUNITY_Roadmap Stage Component|Roadmap Stage Component]]
 - [[_COMMUNITY_Scroll Reveal Hook|Scroll Reveal Hook]]
 - [[_COMMUNITY_TypeScript Config File|TypeScript Config File]]
+- [[_COMMUNITY_Community 41|Community 41]]
+- [[_COMMUNITY_Community 42|Community 42]]
+- [[_COMMUNITY_Community 43|Community 43]]
+- [[_COMMUNITY_Community 44|Community 44]]
+- [[_COMMUNITY_Community 45|Community 45]]
+- [[_COMMUNITY_Community 46|Community 46]]
+- [[_COMMUNITY_Community 47|Community 47]]
+- [[_COMMUNITY_Community 48|Community 48]]
+- [[_COMMUNITY_Community 49|Community 49]]
+- [[_COMMUNITY_Community 50|Community 50]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `AgentRole` - 19 edges
@@ -70,47 +81,47 @@
   api/services/copywriter.ts → api/agents/types.ts
 - `PipelineOutputs` --references--> `AnalysisResult`  [EXTRACTED]
   api/services/domain/analysisService.ts → api/agents/types.ts
-- `LandingPageComposerProps` --references--> `ProspectData`  [EXTRACTED]
-  src/components/landing/LandingPageComposer.tsx → src/types/prospect.ts
-- `ApifyFetcherAgent` --implements--> `Agent`  [EXTRACTED]
-  api/agents/agents/apifyFetcher.ts → api/agents/types.ts
+- `MemoryEventBus` --implements--> `EventBus`  [EXTRACTED]
+  api/infra/eventBus.ts → api/infra/types.ts
+- `SQLiteJobQueue` --implements--> `JobQueue`  [EXTRACTED]
+  api/infra/queue.ts → api/infra/types.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (41 total, 6 thin omitted)
+## Communities (51 total, 10 thin omitted)
 
 ### Community 0 - "AI Agents and Orchestration"
 Cohesion: 0.11
-Nodes (30): ApifyFetcherAgent, safeJsonParse(), CompetitorAnalystAgent, ContentOptimizerAgent, EmbeddingGeneratorAgent, ListingFetcherAgent, OptimizationOrchestrator, STAGE_NAMES (+22 more)
+Nodes (31): ApifyFetcherAgent, safeJsonParse(), CompetitorAnalystAgent, ContentOptimizerAgent, EmbeddingGeneratorAgent, ListingFetcherAgent, OptimizationOrchestrator, STAGE_NAMES (+23 more)
 
 ### Community 1 - "tRPC and Authentication"
 Cohesion: 0.06
-Nodes (38): apiKeyProcedure, Context, createContext(), t, JWTPayload, verifyToken(), apiKeyProcedure, authProcedure (+30 more)
+Nodes (34): AppRouter, apiKeyProcedure, Context, createContext(), t, JWTPayload, verifyToken(), apiKeyProcedure (+26 more)
 
 ### Community 2 - "AI Agent Evaluators"
-Cohesion: 0.10
-Nodes (25): ApifyFetcherEvaluator, CompetitorAnalystEvaluator, ContentOptimizerEvaluator, EmbeddingGeneratorEvaluator, PreprocessorEvaluator, SemanticAnalyzerEvaluator, EvaluationResult, Evaluator (+17 more)
+Cohesion: 0.14
+Nodes (20): ApifyFetcherEvaluator, CompetitorAnalystEvaluator, ContentOptimizerEvaluator, EmbeddingGeneratorEvaluator, PreprocessorEvaluator, SemanticAnalyzerEvaluator, EvaluationResult, Evaluator (+12 more)
 
 ### Community 3 - "Logging and Event Bus"
-Cohesion: 0.08
-Nodes (19): eventBus, MemoryEventBus, LogContext, Logger, LogLevel, DomainEvent, EventBus, breakers (+11 more)
+Cohesion: 0.21
+Nodes (11): eventBus, LogContext, LogLevel, breakers, CircuitBreakerOptions, CircuitState, getCircuitBreaker(), callLlm() (+3 more)
 
 ### Community 4 - "HTTP Server and Job Queue"
-Cohesion: 0.06
-Nodes (23): app, httpServer, port, DELETE, GET, OPTIONS, POST, PUT (+15 more)
+Cohesion: 0.17
+Nodes (10): app, DELETE, GET, OPTIONS, POST, PUT, includeFiles, functions (+2 more)
 
 ### Community 5 - "Frontend Pipeline Hooks"
-Cohesion: 0.06
-Nodes (19): AppRouter, ErrorBoundary, Props, State, PipelineJob, PipelineStageState, PipelineStatus, usePipeline() (+11 more)
+Cohesion: 0.07
+Nodes (18): ErrorBoundary, Props, State, PipelineJob, PipelineStageState, PipelineStatus, usePipeline(), UsePipelineOptions (+10 more)
 
 ### Community 6 - "NPM Dev Dependencies"
-Cohesion: 0.05
-Nodes (36): devDependencies, autoprefixer, drizzle-kit, eslint, @eslint/js, eslint-plugin-react-hooks, eslint-plugin-react-refresh, globals (+28 more)
+Cohesion: 0.10
+Nodes (21): devDependencies, autoprefixer, drizzle-kit, eslint, @eslint/js, eslint-plugin-react-hooks, eslint-plugin-react-refresh, globals (+13 more)
 
 ### Community 7 - "SQLite Database Client"
 Cohesion: 0.08
-Nodes (22): BookingRecord, BrandSettingsRecord, CatalogLinkRecord, db, dbDir, __dirname, JobQueueRecord, ListingAnalysisRecord (+14 more)
+Nodes (16): BookingRecord, BrandSettingsRecord, CatalogLinkRecord, dbDir, __dirname, JobQueueRecord, ListingAnalysisRecord, ListingRecord (+8 more)
 
 ### Community 8 - "Analysis Pipeline Service"
 Cohesion: 0.14
@@ -125,16 +136,16 @@ Cohesion: 0.10
 Nodes (19): compilerOptions, baseUrl, declaration, declarationMap, esModuleInterop, forceConsistentCasingInFileNames, module, moduleResolution (+11 more)
 
 ### Community 11 - "NPM Dependencies"
-Cohesion: 0.11
-Nodes (19): dependencies, better-sqlite3, clsx, drizzle-orm, hono, lucide-react, pg, postgres (+11 more)
+Cohesion: 0.06
+Nodes (34): dependencies, better-sqlite3, clsx, drizzle-orm, hono, lucide-react, pg, postgres (+26 more)
 
 ### Community 12 - "TypeScript App Config"
 Cohesion: 0.11
 Nodes (18): compilerOptions, allowImportingTsExtensions, erasableSyntaxOnly, jsx, lib, module, moduleDetection, moduleResolution (+10 more)
 
 ### Community 13 - "Landing Page UI Components"
-Cohesion: 0.12
-Nodes (8): FloatingCTAProps, LandingPageComposerProps, ProgressBarProps, STAGE_LABELS, StageBleedCalculatorProps, StageProofWallProps, testimonials, ProspectData
+Cohesion: 0.19
+Nodes (5): FloatingCTAProps, LandingPageComposerProps, StageAEOPDFAuditProps, StageBleedCalculatorProps, ProspectData
 
 ### Community 14 - "TypeScript Node Config"
 Cohesion: 0.11
@@ -145,8 +156,8 @@ Cohesion: 0.16
 Nodes (8): InsertProspectInput, createProspect(), CreateProspectInput, generateSlug(), ListProspectsOptions, recordActivity(), ProspectDetails, triggerWebhook()
 
 ### Community 16 - "Listing Operations Service"
-Cohesion: 0.18
-Nodes (3): InsertListingInput, ListingRecord, CreateListingInput
+Cohesion: 0.11
+Nodes (9): InsertListingInput, ListingRecord, CreateListingInput, ppcRouter, convertPlanToCsv(), generateNegatives(), generatePpcPlan(), PpcKeywordData (+1 more)
 
 ### Community 17 - "Prospect & Activity Repositories"
 Cohesion: 0.22
@@ -161,16 +172,16 @@ Cohesion: 0.17
 Nodes (4): InsertPipelineJobInput, InsertPipelineJobStageInput, PipelineJobRecord, PipelineJobStageRecord
 
 ### Community 20 - "Prospect Data Simulator"
-Cohesion: 0.30
-Nodes (7): StageRufusSimulatorProps, CompetitorComparison, PipelineProspect, ProspectIssue, ProspectOpportunity, SimulatorScenario, StageCopyData
+Cohesion: 0.23
+Nodes (9): StageBundlingBlueprintProps, StageRufusSimulatorProps, BundlingItem, CompetitorComparison, PipelineProspect, ProspectIssue, ProspectOpportunity, SimulatorScenario (+1 more)
 
 ### Community 21 - "Drizzle Schema & Brand Repo"
-Cohesion: 0.25
+Cohesion: 0.23
 Nodes (4): db, pool, BrandSettingsRecord, InsertBrandSettingsInput
 
 ### Community 22 - "Prospect Landing Page"
-Cohesion: 0.24
-Nodes (5): useActivityTracker(), MOCK_PROSPECT_DATA, mapBackendToProspectData(), safeJsonParse(), ProspectLanding()
+Cohesion: 0.27
+Nodes (9): catalogGraphRouter, buildCatalogGraph(), calculateCosineSimilarity(), CatalogLinkInput, CatalogLinkResult, delay(), generateEmbedding(), hashString() (+1 more)
 
 ### Community 23 - "Analysis Operations Repository"
 Cohesion: 0.22
@@ -200,25 +211,49 @@ Nodes (5): getScoreColor(), getScoreLevel(), StageTransformPreview(), StageTrans
 Cohesion: 0.60
 Nodes (4): BrandStyleInjector(), BrandStyleInjectorProps, isValidCssColor(), isValidDataUrl()
 
+### Community 30 - "Bundling Blueprint Component"
+Cohesion: 0.27
+Nodes (3): PipelineEngine, PipelineJob, StageName
+
+### Community 41 - "Community 41"
+Cohesion: 0.24
+Nodes (5): useActivityTracker(), MOCK_PROSPECT_DATA, mapBackendToProspectData(), safeJsonParse(), ProspectLanding()
+
+### Community 44 - "Community 44"
+Cohesion: 0.25
+Nodes (3): safeJsonParse(), SQLiteJobQueue, Job
+
+### Community 45 - "Community 45"
+Cohesion: 0.22
+Nodes (4): db, TIER_BUDGETS_CENTS, TokenBudgetExceededError, TokenBudgetService
+
+### Community 46 - "Community 46"
+Cohesion: 0.22
+Nodes (8): generateId(), pipelineQueue, webhookQueue, DomainEvent, JobOpts, JobQueue, stageExecutors, PipelineStageState
+
+### Community 48 - "Community 48"
+Cohesion: 0.17
+Nodes (5): httpServer, port, QueueWorker, generatePdf(), pipelineSseHandler()
+
 ## Knowledge Gaps
-- **198 isolated node(s):** `STAGES`, `STAGE_NAMES`, `TaskStatus`, `QAPair`, `OptimizationReport` (+193 more)
+- **200 isolated node(s):** `STAGES`, `STAGE_NAMES`, `TaskStatus`, `QAPair`, `OptimizationReport` (+195 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **10 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Logger` connect `Logging and Event Bus` to `tRPC and Authentication`, `AI Agent Evaluators`, `HTTP Server and Job Queue`, `Drizzle Schema & Brand Repo`?**
+- **Why does `Logger` connect `Community 47` to `AI Agent Evaluators`, `Logging and Event Bus`, `Community 45`, `Community 46`, `Drizzle Schema & Brand Repo`?**
   _High betweenness centrality (0.039) - this node is a cross-community bridge._
-- **Why does `db` connect `SQLite Database Client` to `AI Agents and Orchestration`, `Logging and Event Bus`, `HTTP Server and Job Queue`?**
-  _High betweenness centrality (0.023) - this node is a cross-community bridge._
-- **Why does `AppRouter` connect `Frontend Pipeline Hooks` to `tRPC and Authentication`, `HTTP Server and Job Queue`?**
-  _High betweenness centrality (0.021) - this node is a cross-community bridge._
+- **Why does `AppRouter` connect `tRPC and Authentication` to `Community 48`, `Frontend Pipeline Hooks`?**
+  _High betweenness centrality (0.027) - this node is a cross-community bridge._
+- **Why does `db` connect `Community 45` to `AI Agents and Orchestration`, `tRPC and Authentication`, `SQLite Database Client`, `Community 46`, `Community 48`?**
+  _High betweenness centrality (0.022) - this node is a cross-community bridge._
 - **What connects `STAGES`, `STAGE_NAMES`, `TaskStatus` to the rest of the system?**
-  _198 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _200 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `AI Agents and Orchestration` be split into smaller, more focused modules?**
-  _Cohesion score 0.1115811739820201 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.1076388888888889 - nodes in this community are weakly interconnected._
 - **Should `tRPC and Authentication` be split into smaller, more focused modules?**
-  _Cohesion score 0.05669199298655757 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06334841628959276 - nodes in this community are weakly interconnected._
 - **Should `AI Agent Evaluators` be split into smaller, more focused modules?**
-  _Cohesion score 0.09724238026124818 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.14414414414414414 - nodes in this community are weakly interconnected._

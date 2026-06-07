@@ -11,7 +11,8 @@ import LandingPageComposer from '../components/landing/LandingPageComposer';
 import ReportNotFound from '../components/landing/ReportNotFound';
 
 export default function ProspectLanding(): JSX.Element {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug: urlSlug } = useParams<{ slug: string }>();
+  const slug = urlSlug || 'mock-prospect';
   const [searchParams] = useSearchParams();
   const isPrint = searchParams.get('print') === 'true';
 
@@ -80,11 +81,33 @@ export default function ProspectLanding(): JSX.Element {
     ];
 
     const handleScroll = () => {
-      const scrollY = window.scrollY + window.innerHeight * 0.4;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = document.documentElement.clientHeight;
+      const scrollY = window.scrollY;
 
+      // Check if we are close to the bottom of the scrollable area
+      // or if the page is not scrollable at all
+      const isAtBottom = scrollHeight - clientHeight <= 0 || (scrollY + clientHeight >= scrollHeight - 50);
+
+      if (isAtBottom) {
+        // Find the highest stage index that is currently rendered and visible in the DOM
+        for (let i = stageIds.length - 1; i >= 0; i--) {
+          const el = document.getElementById(stageIds[i]);
+          if (el && el.offsetHeight > 0) {
+            if (i !== currentStage) {
+              setCurrentStage(i);
+              trackerRef.current.trackScrollStage(i, stageNames[i]);
+            }
+            break;
+          }
+        }
+        return;
+      }
+
+      const scrollTarget = scrollY + clientHeight * 0.4;
       for (let i = stageIds.length - 1; i >= 0; i--) {
         const el = document.getElementById(stageIds[i]);
-        if (el && el.offsetTop <= scrollY) {
+        if (el && el.offsetTop <= scrollTarget) {
           if (i !== currentStage) {
             setCurrentStage(i);
             trackerRef.current.trackScrollStage(i, stageNames[i]);

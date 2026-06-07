@@ -60,9 +60,9 @@
     "semantic_hash": "a9f7999b1ed0774f733bd5d397fb4b50"
   },
   "api/db/client.ts": {
-    "mtime": 1780826811.543484,
-    "ast_hash": "dd1873cf43ee5d98b93fdeaa224fd1cd",
-    "semantic_hash": "dd1873cf43ee5d98b93fdeaa224fd1cd"
+    "mtime": 1780846428.0693045,
+    "ast_hash": "bdeefe0eef69bcd56be88ff9baab1e6a",
+    "semantic_hash": ""
   },
   "api/db/migrations/001_add_indexes.sql": {
     "mtime": 1780759654.9221046,
@@ -80,9 +80,9 @@
     "semantic_hash": "91bcc4c4fe5c53d76e49cb168051f580"
   },
   "api/db/schema.ts": {
-    "mtime": 1780824042.5179138,
-    "ast_hash": "beb48b685af36fa8919d6d50eb42b6a5",
-    "semantic_hash": "beb48b685af36fa8919d6d50eb42b6a5"
+    "mtime": 1780846420.9242182,
+    "ast_hash": "b664235ceaebd6e4ee8c4f8b2ebede0c",
+    "semantic_hash": ""
   },
   "api/index.ts": {
     "mtime": 1780502414.380068,
@@ -125,9 +125,9 @@
     "semantic_hash": "2209812ee3f712ebde4ab670fdf6f716"
   },
   "api/router.ts": {
-    "mtime": 1780667510.499869,
-    "ast_hash": "ab9f22434e1d4746762c8b33e95573c6",
-    "semantic_hash": "ab9f22434e1d4746762c8b33e95573c6"
+    "mtime": 1780846472.9188862,
+    "ast_hash": "73c29c2ab98991da6ffcda78edb07f6c",
+    "semantic_hash": ""
   },
   "api/routers/agents.ts": {
     "mtime": 1780828828.8446035,
@@ -165,9 +165,9 @@
     "semantic_hash": "9a3f6e07aa1c9aaa811309833652bb06"
   },
   "api/routers/rufusTracker.ts": {
-    "mtime": 1780829966.6644194,
-    "ast_hash": "2a4aaf94bc9bc7be12c603e07ade8168",
-    "semantic_hash": "2a4aaf94bc9bc7be12c603e07ade8168"
+    "mtime": 1780846439.967458,
+    "ast_hash": "f5a11d6a7400fa5349f7ac77328b4f36",
+    "semantic_hash": ""
   },
   "api/routers/scraper.ts": {
     "mtime": 1780828891.0377386,
@@ -210,9 +210,9 @@
     "semantic_hash": "cca04f36bd085863f94d5c86cd4eac69"
   },
   "api/services/copywriter.ts": {
-    "mtime": 1780648346.723697,
-    "ast_hash": "5346a847608693ca161f7852e707ae82",
-    "semantic_hash": "5346a847608693ca161f7852e707ae82"
+    "mtime": 1780847280.8754978,
+    "ast_hash": "aacd9982d94fbb0ac3d22c724dae2761",
+    "semantic_hash": ""
   },
   "api/services/embedding.ts": {
     "mtime": 1780221758.7154708,
@@ -235,9 +235,9 @@
     "semantic_hash": "7491e807e66555f0b12172abc1438d7e"
   },
   "api/services/rufusSimulator.ts": {
-    "mtime": 1780828911.5007136,
-    "ast_hash": "fccc6b17e58d38859230bab0b95768a5",
-    "semantic_hash": "fccc6b17e58d38859230bab0b95768a5"
+    "mtime": 1780838500.3412359,
+    "ast_hash": "263211b3d6652d3af24db0814fabb6a2",
+    "semantic_hash": ""
   },
   "api/services/scraper.ts": {
     "mtime": 1780771386.469553,
@@ -365,9 +365,9 @@
     "semantic_hash": "2cca727b3cc0bb29bbe92aeb58b22feb"
   },
   "src/App.tsx": {
-    "mtime": 1780761411.6789155,
-    "ast_hash": "8f2c0e0adaa76a617d689fb1bd8f9cd7",
-    "semantic_hash": "8f2c0e0adaa76a617d689fb1bd8f9cd7"
+    "mtime": 1780847574.1273587,
+    "ast_hash": "0ae594a396c2d49623464bb13619a793",
+    "semantic_hash": ""
   },
   "src/components/ErrorBoundary.tsx": {
     "mtime": 1780761391.604068,
@@ -475,19 +475,19 @@
     "semantic_hash": "787e5a07efeb2bf6209d5937195f2f68"
   },
   "src/pages/AdminDashboard.tsx": {
-    "mtime": 1780829240.8074937,
-    "ast_hash": "d2e4e69267a084ef02080134c8a6cae2",
-    "semantic_hash": "d2e4e69267a084ef02080134c8a6cae2"
+    "mtime": 1780846550.91067,
+    "ast_hash": "88b9815b054df7563f2873dc7aa7595f",
+    "semantic_hash": ""
   },
   "src/pages/InvitationOnly.tsx": {
-    "mtime": 1780338761.8132248,
-    "ast_hash": "eb70e58e9e1cbfde6850812a7b3203bb",
-    "semantic_hash": "eb70e58e9e1cbfde6850812a7b3203bb"
+    "mtime": 1780847300.3541887,
+    "ast_hash": "59d2f74eb87ce5c97a52faec979c5886",
+    "semantic_hash": ""
   },
   "src/pages/ProspectLanding.tsx": {
-    "mtime": 1780827304.9711099,
-    "ast_hash": "786b4b7eda4da3d481ba5b69e4561760",
-    "semantic_hash": "786b4b7eda4da3d481ba5b69e4561760"
+    "mtime": 1780847578.6822236,
+    "ast_hash": "d1fd8d76ddd3e183f638ff77e343ec22",
+    "semantic_hash": ""
   },
   "src/providers/trpc.tsx": {
     "mtime": 1780576309.3191433,
@@ -595,9 +595,9 @@
     "semantic_hash": "6841385f975cf4b6c44e619970a59e00"
   },
   "api/db/drizzle.ts": {
-    "mtime": 1780824587.2743375,
-    "ast_hash": "ff487908dab72b6eb84d7ef4937308ef",
-    "semantic_hash": "ff487908dab72b6eb84d7ef4937308ef"
+    "mtime": 1780847883.1794612,
+    "ast_hash": "6e26fb80628aa42038511b5f17915bef",
+    "semantic_hash": ""
   },
   "api/db/migrate.ts": {
     "mtime": 1780825203.7498517,
@@ -650,9 +650,9 @@
     "semantic_hash": "b253461c30286ba6684f6a48f68283ef"
   },
   "api/db/repositories/rufusRepository.ts": {
-    "mtime": 1780829690.36983,
-    "ast_hash": "d0d9ce36274faf6e2e398a33835bea7d",
-    "semantic_hash": "d0d9ce36274faf6e2e398a33835bea7d"
+    "mtime": 1780846434.8449934,
+    "ast_hash": "3848ef03942fa17a29e245130c5567bd",
+    "semantic_hash": ""
   },
   "api/db/transaction.ts": {
     "mtime": 1780826728.346163,
@@ -660,9 +660,9 @@
     "semantic_hash": "a91349acf918638ba99e6e019d099e39"
   },
   "api/db/types.ts": {
-    "mtime": 1780829769.7761185,
-    "ast_hash": "b234b8623718bb66fec7104d8b083a45",
-    "semantic_hash": "b234b8623718bb66fec7104d8b083a45"
+    "mtime": 1780846424.5864637,
+    "ast_hash": "8c54aceef4d65ef597ecedca4dd5020a",
+    "semantic_hash": ""
   },
   "api/pipeline/definitions.ts": {
     "mtime": 1780828717.7327967,
@@ -720,9 +720,9 @@
     "semantic_hash": "125a1e75ddc02768fe60413ce87f383e"
   },
   "src/components/landing/LandingPageComposer.tsx": {
-    "mtime": 1780827143.525715,
-    "ast_hash": "7988d20094093f7ee91a2362c8eec1bc",
-    "semantic_hash": "7988d20094093f7ee91a2362c8eec1bc"
+    "mtime": 1780846524.1048963,
+    "ast_hash": "40c2685bb25f7e183c0499d40710fc85",
+    "semantic_hash": ""
   },
   "src/components/landing/ReportNotFound.tsx": {
     "mtime": 1780827271.538637,
@@ -982,6 +982,31 @@
   "src/assets/vite.svg": {
     "mtime": 1778819461.7797866,
     "ast_hash": "9960a24288958394ac50e57ff638b036",
+    "semantic_hash": ""
+  },
+  "api/routers/__tests__/rufusTracker.test.ts": {
+    "mtime": 1780846597.9765868,
+    "ast_hash": "1fa6330413e345302944fb5ffcc68a16",
+    "semantic_hash": ""
+  },
+  "api/routers/ppcRouter.ts": {
+    "mtime": 1780846468.8618069,
+    "ast_hash": "c1845b0a9e2dc4411a39faaa17c57b4f",
+    "semantic_hash": ""
+  },
+  "api/services/__tests__/ppcPlannerService.test.ts": {
+    "mtime": 1780846560.3217888,
+    "ast_hash": "f17a7f508ad15e86476565a2e299a732",
+    "semantic_hash": ""
+  },
+  "api/services/ppcPlannerService.ts": {
+    "mtime": 1780846461.1808872,
+    "ast_hash": "818ac816f26a76306dcd3e17bdb34c57",
+    "semantic_hash": ""
+  },
+  "src/components/landing/StageAEOPDFAudit.tsx": {
+    "mtime": 1780846504.0593362,
+    "ast_hash": "0c0e4eadf43d73a310a9642ad3e944f7",
     "semantic_hash": ""
   }
 }

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import type { JSX } from 'react';
 import type { ProspectData } from '../../types/prospect';
 import ProgressBar from './ProgressBar';
@@ -42,6 +43,12 @@ export default function LandingPageComposer({
   scanComplete,
 }: LandingPageComposerProps): JSX.Element {
   const { stageCopy } = prospect;
+
+  const [maxStage, setMaxStage] = useState(currentStage);
+
+  useEffect(() => {
+    setMaxStage((prev) => Math.max(prev, currentStage));
+  }, [currentStage]);
 
   const estimatedTraffic = Math.max(2000, (prospect.listing.reviewCount || 100) * 20);
   const conversionGap = Math.max(1.5, (100 - prospect.scores.overallScore) / 15);
@@ -93,7 +100,7 @@ export default function LandingPageComposer({
               defaultPrice={prospect.listing.price}
               defaultTraffic={estimatedTraffic}
               conversionGap={conversionGap}
-              visible={isPrint || currentStage >= 2}
+              visible={isPrint || maxStage >= 0}
             />
           </div>
 
@@ -101,7 +108,7 @@ export default function LandingPageComposer({
             <StageRufusSimulator
               intro={stageCopy.simulatorIntro}
               scenarios={stageCopy.simulatorScenarios}
-              visible={isPrint || currentStage >= 3}
+              visible={isPrint || maxStage >= 1}
               competitorAudit={stageCopy.competitorAudit}
             />
           </div>
@@ -112,14 +119,14 @@ export default function LandingPageComposer({
               before={stageCopy.transformBefore}
               after={stageCopy.transformAfter}
               contentScore={prospect.scores.contentScore}
-              visible={isPrint || currentStage >= 4}
+              visible={isPrint || maxStage >= 2}
             />
           </div>
 
           <div id="stage-free-qas">
             <StageFreeQAs
               freeQAs={stageCopy.freeQAs}
-              visible={isPrint || currentStage >= 5}
+              visible={isPrint || maxStage >= 3}
               onCopyQA={onCopyQA}
             />
           </div>
@@ -127,7 +134,7 @@ export default function LandingPageComposer({
           <div id="stage-ppc-planner">
             <StagePPCPlanner
               ppcKeywords={stageCopy.ppcKeywords}
-              visible={isPrint || currentStage >= 6}
+              visible={isPrint || maxStage >= 4}
               onDownloadPPC={onDownloadPPC}
             />
           </div>
@@ -135,7 +142,7 @@ export default function LandingPageComposer({
           <div id="stage-bundling">
             <StageBundlingBlueprint
               cosmoBundling={stageCopy.cosmoBundling}
-              visible={isPrint || currentStage >= 7}
+              visible={isPrint || maxStage >= 5}
             />
           </div>
 
@@ -143,7 +150,7 @@ export default function LandingPageComposer({
             <StageAEOPDFAudit
               prospect={prospect}
               brandData={brandData}
-              visible={isPrint || currentStage >= 8}
+              visible={isPrint || maxStage >= 6}
               isPrint={isPrint}
             />
           </div>
@@ -153,7 +160,7 @@ export default function LandingPageComposer({
               headline={stageCopy.roadmapHeadline}
               body={stageCopy.roadmapBody}
               prospectName={prospect.name}
-              visible={isPrint || currentStage >= 9}
+              visible={isPrint || maxStage >= 7}
             />
           </div>
 
@@ -162,7 +169,7 @@ export default function LandingPageComposer({
               headline={stageCopy.socialProofHeadline}
               urgencyCTA={stageCopy.urgencyCTA}
               onOpenBooking={scrollToBooking}
-              visible={isPrint || currentStage >= 10}
+              visible={isPrint || maxStage >= 8}
             />
           </div>
 
@@ -176,13 +183,13 @@ export default function LandingPageComposer({
               prospectEmail={prospect.email || ''}
               packageType={prospect.packageType}
               pricePoint={prospect.pricePoint}
-              visible={currentStage >= 11}
+              visible={maxStage >= 9}
             />
           )}
 
           {!isPrint && (
             <FloatingCTA
-              visible={currentStage >= 1 && currentStage < 11}
+              visible={maxStage >= 1 && currentStage < 11}
               onClick={scrollToBooking}
             />
           )}

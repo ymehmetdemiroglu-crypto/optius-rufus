@@ -1,7 +1,6 @@
 import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { TRPCProvider } from './providers/trpc';
-import InvitationOnly from './pages/InvitationOnly';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 const ProspectLanding = lazy(() => import('./pages/ProspectLanding'));
@@ -30,11 +29,11 @@ export default function App() {
               {/* Personalized prospect landing pages */}
               <Route path="/p/:slug" element={<ProspectLanding />} />
 
-              {/* Root: Invitation-only landing */}
-              <Route path="/" element={<InvitationOnly />} />
+              {/* Root: Main landing (using mock-prospect as default) */}
+              <Route path="/" element={<ProspectLanding />} />
 
-              {/* Catch-all: show invitation page */}
-              <Route path="*" element={<InvitationOnly />} />
+              {/* Catch-all */}
+              <Route path="*" element={<ProspectLanding />} />
             </Routes>
           </Suspense>
         </ErrorBoundary>

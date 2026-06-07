@@ -5,19 +5,33 @@ import { logger } from "../infra/logger.js";
 
 const databaseUrl = process.env.DATABASE_URL;
 
-if (!databaseUrl) {
-  throw new Error(
-    "DATABASE_URL is required but not set. " +
-      "Add it to your .env file (e.g., postgres://user:pass@localhost:5432/optimus)"
+let dbInstance: any;
+
+if (databaseUrl) {
+  const pool = new Pool({
+    connectionString: databaseUrl,
+  });
+
+  pool.on("error", (err) => {
+    logger.error("Unexpected PostgreSQL pool error", { error: err.message });
+  });
+
+  dbInstance = drizzle(pool, { schema });
+} else {
+  logger.warn(
+    "⚠️ DATABASE_URL is not set. All database queries will fail. " +
+      "Please configure DATABASE_URL in your environment."
   );
+
+  // Create a proxy dbInstance that logs a warning on query execution instead of crashing at import time
+  dbInstance = new Proxy({}, {
+    get(target, prop) {
+      return (...args: any[]) => {
+        logger.error(`❌ Database query failed: DATABASE_URL is not set. Cannot perform "${String(prop)}" operation.`);
+        throw new Error("Database not connected. DATABASE_URL environment variable is missing.");
+      };
+    }
+  });
 }
 
-const pool = new Pool({
-  connectionString: databaseUrl,
-});
-
-pool.on("error", (err) => {
-  logger.error("Unexpected PostgreSQL pool error", { error: err.message });
-});
-
-export const db = drizzle(pool, { schema });
+export const db = dbInstance;
