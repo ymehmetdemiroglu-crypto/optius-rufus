@@ -4,8 +4,8 @@ import * as schema from "../schema.js";
 import type {
   ListingAnalysisRecord,
   InsertAnalysisInput,
-  StageCopy,
 } from "../types.js";
+import type { StageCopy } from "../../services/copywriter.js";
 
 export async function create(
   input: InsertAnalysisInput

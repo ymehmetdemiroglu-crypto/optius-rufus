@@ -53,14 +53,14 @@ describe("PipelineEngine - Concurrent DAG Execution", () => {
     };
 
     // All stages start as pending
-    const mockStages = [
-      { jobId, stageName: "fetch", status: "pending" },
-      { jobId, stageName: "preprocess", status: "pending" },
-      { jobId, stageName: "embedding", status: "pending" },
-      { jobId, stageName: "semantic", status: "pending" },
-      { jobId, stageName: "optimize", status: "pending" },
-      { jobId, stageName: "competitor", status: "pending" },
-    ];
+    const mockStages: Record<string, import("../../pipeline/types.js").PipelineStageState> = {
+      fetch: { status: "pending" },
+      preprocess: { status: "pending" },
+      embedding: { status: "pending" },
+      semantic: { status: "pending" },
+      optimize: { status: "pending" },
+      competitor: { status: "pending" },
+    };
 
     vi.mocked(pipelineRepo.getJob).mockResolvedValue(mockJobRecord as any);
     vi.mocked(pipelineRepo.getStagesForJob).mockResolvedValue(mockStages as any);
@@ -150,14 +150,14 @@ describe("PipelineEngine - Concurrent DAG Execution", () => {
       updatedAt: new Date().toISOString(),
     };
 
-    const mockStages = [
-      { jobId, stageName: "fetch", status: "pending" },
-      { jobId, stageName: "preprocess", status: "pending" },
-      { jobId, stageName: "embedding", status: "pending" },
-      { jobId, stageName: "semantic", status: "pending" },
-      { jobId, stageName: "optimize", status: "pending" },
-      { jobId, stageName: "competitor", status: "pending" },
-    ];
+    const mockStages: Record<string, import("../../pipeline/types.js").PipelineStageState> = {
+      fetch: { status: "pending" },
+      preprocess: { status: "pending" },
+      embedding: { status: "pending" },
+      semantic: { status: "pending" },
+      optimize: { status: "pending" },
+      competitor: { status: "pending" },
+    };
 
     vi.mocked(pipelineRepo.getJob).mockResolvedValue(mockJobRecord as any);
     vi.mocked(pipelineRepo.getStagesForJob).mockResolvedValue(mockStages as any);
@@ -250,17 +250,17 @@ describe("PipelineEngine - Concurrent DAG Execution", () => {
     };
 
     // First run results: all completed
-    const mockStages = [
-      { jobId, stageName: "fetch", status: "completed", outputJSON: { asin: "B00003" } },
+    const mockStages: Record<string, import("../../pipeline/types.js").PipelineStageState> = {
+      fetch: { status: "completed", output: { asin: "B00003" } },
       // preprocess is pending (the user clicked retry on it, clearing its status to pending!)
-      { jobId, stageName: "preprocess", status: "pending" },
+      preprocess: { status: "pending" },
       // embedding, semantic, optimize were completed previously, but depend on preprocess!
-      { jobId, stageName: "embedding", status: "completed", outputJSON: [0.1] },
-      { jobId, stageName: "semantic", status: "completed", outputJSON: { score: 90 } },
-      { jobId, stageName: "optimize", status: "completed", outputJSON: { optimized: true } },
+      embedding: { status: "completed", output: [0.1] },
+      semantic: { status: "completed", output: { score: 90 } },
+      optimize: { status: "completed", output: { optimized: true } },
       // competitor was completed previously and does NOT depend on preprocess
-      { jobId, stageName: "competitor", status: "completed", outputJSON: [] },
-    ];
+      competitor: { status: "completed", output: [] },
+    };
 
     vi.mocked(pipelineRepo.getJob).mockResolvedValue(mockJobRecord as any);
     vi.mocked(pipelineRepo.getStagesForJob).mockResolvedValue(mockStages as any);

@@ -1,24 +1,114 @@
-import { ApifyFetcherAgent } from "../agents/agents/apifyFetcher.js";
-import { ListingFetcherAgent } from "../agents/agents/listingFetcher.js";
-import { PreprocessorAgent } from "../agents/agents/preprocessor.js";
-import { EmbeddingGeneratorAgent } from "../agents/agents/embeddingGenerator.js";
-import { SemanticAnalyzerAgent } from "../agents/agents/semanticAnalyzer.js";
-import { ContentOptimizerAgent } from "../agents/agents/contentOptimizer.js";
-import { CompetitorAnalystAgent } from "../agents/agents/competitorAnalyst.js";
+import { scrapeAmazonListing } from "../services/scraper.js";
+import { generateEmbedding } from "../services/embedding.js";
+import { analyzeSemanticGaps } from "../services/analysis.js";
+import { generateOptimizedContent } from "../services/optimization.js";
+import { fetchCompetitors } from "../services/competitor.js";
 import { generateAllStageCopy } from "../services/copywriter.js";
 import { logger } from "../infra/logger.js";
 import { eventBus } from "../infra/eventBus.js";
 import * as listingService from "../services/domain/listingService.js";
 import * as prospectService from "../services/domain/prospectService.js";
-import type { StageExecutor, StageContext, StageOutput, RawListingData, CleanedText, AnalysisResult, OptimizedContent, CompetitorBenchmark } from "./types.js";
-import {
-  ApifyFetcherEvaluator,
-  PreprocessorEvaluator,
-  EmbeddingGeneratorEvaluator,
-  SemanticAnalyzerEvaluator,
-  ContentOptimizerEvaluator,
-  CompetitorAnalystEvaluator,
-} from "../agents/evaluators/index.js";
+import { executeWithRetry } from "./executeWithRetry.js";
+import type {
+  StageExecutor,
+  StageContext,
+  StageOutput,
+  RawListingData,
+  CleanedText,
+  AnalysisResult,
+  OptimizedContent,
+  CompetitorBenchmark,
+} from "./types.js";
+
+function safeJsonParse<T>(str: string | null | undefined, fallback: T): T {
+  if (!str) return fallback;
+  try {
+    return JSON.parse(str) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+function getMockListingData(asin?: string): RawListingData {
+  return {
+    asin: asin || "B000000000",
+    title: "Premium Magnesium Glycinate Supplement — 400mg per Serving, 180 Capsules",
+    bullets: [
+      "High Absorption Magnesium Glycinate: Gentle on the stomach and easily absorbed.",
+      "Supports Restful Sleep & Relaxation: Promotes calmness and helps you fall asleep faster.",
+      "Muscle Recovery & Cramp Relief: Ideal for athletes to reduce muscle soreness.",
+      "Third-Party Tested & Non-GMO: Made in a GMP-certified facility.",
+      "180 Capsules — 3-Month Supply: Each serving delivers 400mg of elemental magnesium.",
+    ],
+    description: "<p>Our Premium Magnesium Glycinate supplement...</p>",
+    brand: "NutraWell",
+    category: "Health & Household",
+    subcategory: "Vitamins & Dietary Supplements",
+    images: ["image1.jpg", "image2.jpg"],
+    price: 24.99,
+    rating: 4.6,
+    reviewCount: 3420,
+    attributes: {},
+  };
+}
+
+function mapListingRecordToRawListingData(row: {
+  asin: string;
+  title?: string | null;
+  bullets?: string | null;
+  description?: string | null;
+  brand?: string | null;
+  category?: string | null;
+  price?: number | null;
+  rating?: number | null;
+  reviewCount?: number | null;
+  images?: string | null;
+  rawScrapeData?: string | null;
+}): RawListingData {
+  return {
+    asin: row.asin,
+    title: row.title || "",
+    bullets: safeJsonParse(row.bullets, []),
+    description: row.description || "",
+    brand: row.brand || "",
+    category: row.category || "",
+    subcategory: row.category || "",
+    images: safeJsonParse(row.images, []),
+    price: row.price ?? 0,
+    rating: row.rating ?? 0,
+    reviewCount: row.reviewCount ?? 0,
+    attributes: safeJsonParse(row.rawScrapeData, {}),
+  };
+}
+
+function mapScrapedDataToRawListingData(data: {
+  asin: string;
+  title: string;
+  bullets: string[];
+  description: string;
+  brand: string;
+  category: string;
+  price: number;
+  rating: number;
+  reviewCount: number;
+  images: string[];
+  rawScrapeData?: string;
+}): RawListingData {
+  return {
+    asin: data.asin,
+    title: data.title,
+    bullets: data.bullets,
+    description: data.description,
+    brand: data.brand,
+    category: data.category,
+    subcategory: data.category,
+    images: data.images,
+    price: data.price,
+    rating: data.rating,
+    reviewCount: data.reviewCount,
+    attributes: data.rawScrapeData ? JSON.parse(data.rawScrapeData) : {},
+  };
+}
 
 export const stageExecutors: StageExecutor[] = [
   {
@@ -29,48 +119,39 @@ export const stageExecutors: StageExecutor[] = [
       eventBus.emit("stage:start", { jobId: ctx.jobId, stage: "fetch" }, ctx.correlationId);
 
       try {
-        const agent = ctx.listingId
-          ? new ApifyFetcherAgent()
-          : new ListingFetcherAgent();
-
-        const input = ctx.listingId
-          ? { listingId: ctx.listingId }
-          : { asin: ctx.stageOutputs.rawListing?.asin ?? "", marketplace: "US" };
-
-        const evaluator = new ApifyFetcherEvaluator();
-
-        let output: RawListingData | undefined;
-        let attempts = 1;
-        let approved = false;
-        let issues: string[] = [];
-
-        while (attempts <= 3 && !approved) {
-          try {
-            output = await agent.execute(input) as RawListingData;
-            const evaluation = await evaluator.evaluate(output);
-            if (evaluation.approved) {
-              approved = true;
+        const output = await executeWithRetry<RawListingData>(
+          async () => {
+            if (ctx.listingId) {
+              const listing = await listingService.getListingById(ctx.listingId);
+              if (listing) {
+                return mapListingRecordToRawListingData(listing);
+              } else {
+                return getMockListingData();
+              }
             } else {
-              issues = evaluation.issues;
-              logger.warn(`Stage fetch evaluation failed on attempt ${attempts}`, { jobId: ctx.jobId, issues, score: evaluation.score });
-              eventBus.emit("review:warning", {
-                stage: "fetch",
-                issues,
-                score: evaluation.score,
-              });
-              attempts++;
+              const asin = ctx.stageOutputs.rawListing?.asin ?? "";
+              const marketplace = "US";
+              if (!asin || !/^[A-Z0-9]{10}$/.test(asin)) {
+                throw new Error(`Invalid ASIN format: ${asin}`);
+              }
+              const scraped = await scrapeAmazonListing(asin, marketplace);
+              return mapScrapedDataToRawListingData(scraped);
             }
-          } catch (execErr) {
-            const message = execErr instanceof Error ? execErr.message : String(execErr);
-            issues = [`Agent execution error: ${message}`];
-            logger.error(`Agent execution failed in stage fetch (attempt ${attempts}): ${message}`, { jobId: ctx.jobId });
-            attempts++;
-          }
-        }
-
-        if (!approved || !output) {
-          throw new Error(`Stage fetch failed evaluation after 3 attempts. Issues: ${issues.join("; ")}`);
-        }
+          },
+          (output) => {
+            const evalIssues: string[] = [];
+            const evalSuggestions: string[] = [];
+            if (!output.title || output.title.length < 10) evalIssues.push("Title is too short or empty");
+            if (!output.bullets || output.bullets.length < 3) evalIssues.push("Too few bullet points (minimum 3)");
+            if (!output.brand) evalIssues.push("Missing brand information");
+            if (output.bullets && output.bullets.some((b) => b.length < 20)) {
+              evalSuggestions.push("Some bullets are very short; consider expanding with details");
+            }
+            const score = Math.max(0, 100 - evalIssues.length * 25 - evalSuggestions.length * 5);
+            return { approved: evalIssues.length === 0, issues: evalIssues, score };
+          },
+          { stage: "fetch", ctx }
+        );
 
         eventBus.emit("stage:complete", { jobId: ctx.jobId, stage: "fetch" }, ctx.correlationId);
         return output;
@@ -92,40 +173,40 @@ export const stageExecutors: StageExecutor[] = [
           throw new Error("Missing dependency output: rawListing");
         }
 
-        const agent = new PreprocessorAgent();
-        const evaluator = new PreprocessorEvaluator();
+        const data = ctx.stageOutputs.rawListing;
 
-        let output: CleanedText | undefined;
-        let attempts = 1;
-        let approved = false;
-        let issues: string[] = [];
+        const output = await executeWithRetry<CleanedText>(
+          async () => {
+            const rawText = [
+              data.title,
+              ...data.bullets,
+              data.description,
+              data.brand,
+              data.category,
+              data.subcategory,
+            ].join(" ");
 
-        while (attempts <= 3 && !approved) {
-          try {
-            output = await agent.execute(ctx.stageOutputs.rawListing) as CleanedText;
-            const evaluation = await evaluator.evaluate(output);
-            if (evaluation.approved) {
-              approved = true;
-            } else {
-              issues = evaluation.issues;
-              logger.warn(`Stage preprocess evaluation failed on attempt ${attempts}`, { jobId: ctx.jobId, issues, score: evaluation.score });
-              eventBus.emit("review:warning", {
-                stage: "preprocess",
-                issues,
-                score: evaluation.score,
-              });
-              attempts++;
-            }
-          } catch (execErr) {
-            const message = execErr instanceof Error ? execErr.message : String(execErr);
-            issues = [`Agent execution error: ${message}`];
-            attempts++;
-          }
-        }
+            const noHtml = rawText.replace(/<[^>]+>/g, " ");
+            const lowercased = noHtml.toLowerCase();
+            const normalized = lowercased
+              .replace(/[\u2018\u2019]/g, "'")
+              .replace(/[\u201C\u201D]/g, '"')
+              .replace(/[\u2013\u2014]/g, "-");
+            const cleaned = normalized.replace(/\s+/g, " ").trim();
+            const truncated = cleaned.slice(0, 32000);
 
-        if (!approved || !output) {
-          throw new Error(`Stage preprocess failed evaluation after 3 attempts. Issues: ${issues.join("; ")}`);
-        }
+            return { text: truncated, source: data };
+          },
+          (output) => {
+            const evalIssues: string[] = [];
+            if (!output.text) evalIssues.push("Cleaned text is empty or undefined");
+            else if (output.text.length < 100) evalIssues.push("Preprocessed text is too short (< 100 chars)");
+            if (output.text.includes("<")) evalIssues.push("HTML tags may not have been fully removed");
+            const score = Math.max(0, 100 - evalIssues.length * 30);
+            return { approved: evalIssues.length === 0, issues: evalIssues, score };
+          },
+          { stage: "preprocess", ctx }
+        );
 
         eventBus.emit("stage:complete", { jobId: ctx.jobId, stage: "preprocess" }, ctx.correlationId);
         return output;
@@ -147,40 +228,26 @@ export const stageExecutors: StageExecutor[] = [
           throw new Error("Missing dependency output: cleaned");
         }
 
-        const agent = new EmbeddingGeneratorAgent();
-        const evaluator = new EmbeddingGeneratorEvaluator();
-
-        let output: number[] | undefined;
-        let attempts = 1;
-        let approved = false;
-        let issues: string[] = [];
-
-        while (attempts <= 3 && !approved) {
-          try {
-            output = await agent.execute(ctx.stageOutputs.cleaned) as number[];
-            const evaluation = await evaluator.evaluate(output);
-            if (evaluation.approved) {
-              approved = true;
-            } else {
-              issues = evaluation.issues;
-              logger.warn(`Stage embedding evaluation failed on attempt ${attempts}`, { jobId: ctx.jobId, issues, score: evaluation.score });
-              eventBus.emit("review:warning", {
-                stage: "embedding",
-                issues,
-                score: evaluation.score,
-              });
-              attempts++;
+        const output = await executeWithRetry<number[]>(
+          async () => {
+            const text = ctx.stageOutputs.cleaned!.text;
+            if (!text || text.length < 10) {
+              throw new Error("Text too short for embedding generation");
             }
-          } catch (execErr) {
-            const message = execErr instanceof Error ? execErr.message : String(execErr);
-            issues = [`Agent execution error: ${message}`];
-            attempts++;
-          }
-        }
-
-        if (!approved || !output) {
-          throw new Error(`Stage embedding failed evaluation after 3 attempts. Issues: ${issues.join("; ")}`);
-        }
+            return await generateEmbedding(text);
+          },
+          (output) => {
+            const evalIssues: string[] = [];
+            if (!output || !Array.isArray(output)) evalIssues.push("Embedding vector is not an array or is empty");
+            else {
+              if (output.length !== 1536) evalIssues.push(`Wrong embedding dimension: ${output.length} (expected 1536)`);
+              if (output.some((v) => !Number.isFinite(v))) evalIssues.push("Embedding contains non-finite values");
+            }
+            const score = output && Array.isArray(output) && output.length === 1536 && output.every((v) => Number.isFinite(v)) ? 100 : 0;
+            return { approved: evalIssues.length === 0, issues: evalIssues, score };
+          },
+          { stage: "embedding", ctx }
+        );
 
         // Persist embedding to listings table
         if (ctx.stageOutputs.rawListing && Array.isArray(output)) {
@@ -210,43 +277,27 @@ export const stageExecutors: StageExecutor[] = [
           throw new Error("Missing dependency outputs: embedding or cleaned");
         }
 
-        const agent = new SemanticAnalyzerAgent();
-        const evaluator = new SemanticAnalyzerEvaluator();
-
-        let output: AnalysisResult | undefined;
-        let attempts = 1;
-        let approved = false;
-        let issues: string[] = [];
-
-        while (attempts <= 3 && !approved) {
-          try {
-            output = await agent.execute({
-              embedding: ctx.stageOutputs.embedding,
-              text: ctx.stageOutputs.cleaned,
-            }) as AnalysisResult;
-            const evaluation = await evaluator.evaluate(output);
-            if (evaluation.approved) {
-              approved = true;
-            } else {
-              issues = evaluation.issues;
-              logger.warn(`Stage semantic evaluation failed on attempt ${attempts}`, { jobId: ctx.jobId, issues, score: evaluation.score });
-              eventBus.emit("review:warning", {
-                stage: "semantic",
-                issues,
-                score: evaluation.score,
-              });
-              attempts++;
+        const output = await executeWithRetry<AnalysisResult>(
+          async () => {
+            return await analyzeSemanticGaps(ctx.stageOutputs.embedding!, ctx.stageOutputs.cleaned!);
+          },
+          (output) => {
+            const evalIssues: string[] = [];
+            const evalSuggestions: string[] = [];
+            if (!output) evalIssues.push("Analysis result is empty or undefined");
+            else {
+              if (output.rufusScore < 0 || output.rufusScore > 100) evalIssues.push(`Rufus score out of range: ${output.rufusScore}`);
+              if (!output.semanticGaps || output.semanticGaps.length === 0) evalIssues.push("No semantic gaps detected — suspicious for a real listing");
+              if (output.rufusScore < 40) evalSuggestions.push("Listing has significant room for improvement; prioritize critical gaps");
+              if (output.semanticGaps && !output.semanticGaps.some((g) => g.priority === "critical" || g.priority === "high")) {
+                evalSuggestions.push("No high-priority gaps found; verify dimension coverage");
+              }
             }
-          } catch (execErr) {
-            const message = execErr instanceof Error ? execErr.message : String(execErr);
-            issues = [`Agent execution error: ${message}`];
-            attempts++;
-          }
-        }
-
-        if (!approved || !output) {
-          throw new Error(`Stage semantic failed evaluation after 3 attempts. Issues: ${issues.join("; ")}`);
-        }
+            const score = output ? Math.max(0, 100 - evalIssues.length * 30 - Math.max(0, 40 - output.rufusScore)) : 0;
+            return { approved: evalIssues.length === 0, issues: evalIssues, score };
+          },
+          { stage: "semantic", ctx }
+        );
 
         eventBus.emit("stage:complete", { jobId: ctx.jobId, stage: "semantic" }, ctx.correlationId);
         return output;
@@ -268,7 +319,6 @@ export const stageExecutors: StageExecutor[] = [
           throw new Error("Missing dependency outputs: analysis or rawListing");
         }
 
-        // Fetch prospect details using domain service instead of raw DB
         const prospectData = await prospectService.getProspectById(ctx.prospectId);
         const prospect = prospectData.prospect;
         const prospectName = prospect.firstName || prospect.email?.split("@")[0] || "there";
@@ -282,43 +332,25 @@ export const stageExecutors: StageExecutor[] = [
           prospectName
         );
 
-        const agent = new ContentOptimizerAgent();
-        const evaluator = new ContentOptimizerEvaluator();
-
-        let agentOutput: OptimizedContent | undefined;
-        let attempts = 1;
-        let approved = false;
-        let issues: string[] = [];
-
-        while (attempts <= 3 && !approved) {
-          try {
-            agentOutput = await agent.execute({
-              gaps: analysis.semanticGaps,
-              listing,
-            }) as OptimizedContent;
-            const evaluation = await evaluator.evaluate(agentOutput);
-            if (evaluation.approved) {
-              approved = true;
-            } else {
-              issues = evaluation.issues;
-              logger.warn(`Stage optimize evaluation failed on attempt ${attempts}`, { jobId: ctx.jobId, issues, score: evaluation.score });
-              eventBus.emit("review:warning", {
-                stage: "optimize",
-                issues,
-                score: evaluation.score,
-              });
-              attempts++;
+        const agentOutput = await executeWithRetry<OptimizedContent>(
+          async () => {
+            return await generateOptimizedContent(analysis.semanticGaps, listing);
+          },
+          (agentOutput) => {
+            const evalIssues: string[] = [];
+            const evalSuggestions: string[] = [];
+            if (!agentOutput) evalIssues.push("Optimized content is empty or undefined");
+            else {
+              if (agentOutput.title && agentOutput.title.length > 200) evalIssues.push(`Title exceeds Amazon limit: ${agentOutput.title.length} chars`);
+              if (!agentOutput.bullets || agentOutput.bullets.length !== 5) evalIssues.push(`Expected 5 bullets, got ${agentOutput.bullets ? agentOutput.bullets.length : 0}`);
+              if (!agentOutput.qas || agentOutput.qas.length < 3) evalIssues.push(`Expected at least 3 QAs, got ${agentOutput.qas ? agentOutput.qas.length : 0}`);
+              if (agentOutput.bullets && agentOutput.bullets.some((b) => b.length < 30)) evalSuggestions.push("Some bullets are quite short; consider adding more detail");
             }
-          } catch (execErr) {
-            const message = execErr instanceof Error ? execErr.message : String(execErr);
-            issues = [`Agent execution error: ${message}`];
-            attempts++;
-          }
-        }
-
-        if (!approved || !agentOutput) {
-          throw new Error(`Stage optimize failed evaluation after 3 attempts. Issues: ${issues.join("; ")}`);
-        }
+            const score = agentOutput ? Math.max(0, 100 - evalIssues.length * 25 - evalSuggestions.length * 5) : 0;
+            return { approved: evalIssues.length === 0, issues: evalIssues, score };
+          },
+          { stage: "optimize", ctx }
+        );
 
         const output = {
           ...agentOutput,
@@ -341,43 +373,29 @@ export const stageExecutors: StageExecutor[] = [
       eventBus.emit("stage:start", { jobId: ctx.jobId, stage: "competitor" }, ctx.correlationId);
 
       try {
-        const agent = new CompetitorAnalystAgent();
-        const evaluator = new CompetitorAnalystEvaluator();
-
-        let output: CompetitorBenchmark[] | undefined;
-        let attempts = 1;
-        let approved = false;
-        let issues: string[] = [];
-
-        while (attempts <= 3 && !approved) {
-          try {
-            output = await agent.execute({
-              asin: ctx.stageOutputs.rawListing?.asin ?? "",
-              category: ctx.stageOutputs.rawListing?.category ?? "",
-            }) as CompetitorBenchmark[];
-            const evaluation = await evaluator.evaluate(output);
-            if (evaluation.approved) {
-              approved = true;
-            } else {
-              issues = evaluation.issues;
-              logger.warn(`Stage competitor evaluation failed on attempt ${attempts}`, { jobId: ctx.jobId, issues, score: evaluation.score });
-              eventBus.emit("review:warning", {
-                stage: "competitor",
-                issues,
-                score: evaluation.score,
-              });
-              attempts++;
+        const output = await executeWithRetry<CompetitorBenchmark[]>(
+          async () => {
+            return await fetchCompetitors(
+              ctx.stageOutputs.rawListing?.asin ?? "",
+              ctx.stageOutputs.rawListing?.category ?? ""
+            );
+          },
+          (output) => {
+            const evalIssues: string[] = [];
+            const evalSuggestions: string[] = [];
+            if (!output || !Array.isArray(output)) evalIssues.push("Competitors list is not an array or is empty");
+            else {
+              if (output.length > 5) evalIssues.push(`Too many competitors: ${output.length} (max 5)`);
+              for (const comp of output) {
+                if (comp.score < 0 || comp.score > 100) evalIssues.push(`Invalid score for ${comp.asin}: ${comp.score}`);
+              }
+              if (output.length === 0) evalSuggestions.push("No competitors found; category may be too niche or API issue");
             }
-          } catch (execErr) {
-            const message = execErr instanceof Error ? execErr.message : String(execErr);
-            issues = [`Agent execution error: ${message}`];
-            attempts++;
-          }
-        }
-
-        if (!approved || !output) {
-          throw new Error(`Stage competitor failed evaluation after 3 attempts. Issues: ${issues.join("; ")}`);
-        }
+            const score = output ? Math.max(0, 100 - evalIssues.length * 30) : 0;
+            return { approved: evalIssues.length === 0, issues: evalIssues, score };
+          },
+          { stage: "competitor", ctx }
+        );
 
         eventBus.emit("stage:complete", { jobId: ctx.jobId, stage: "competitor" }, ctx.correlationId);
         return output;

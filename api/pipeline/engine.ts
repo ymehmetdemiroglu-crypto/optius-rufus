@@ -87,18 +87,7 @@ export class PipelineEngine {
       const row = await pipelineRepo.getJob(jobId);
       if (!row) return null;
 
-      const stageRows = await pipelineRepo.getStagesForJob(jobId);
-
-      const stages: PipelineJob["stages"] = {} as PipelineJob["stages"];
-      for (const sr of stageRows) {
-        stages[sr.stageName as StageName] = {
-          status: sr.status as PipelineStageState["status"],
-          output: sr.outputJSON ? (sr.outputJSON as StageOutput[keyof StageOutput]) : undefined,
-          errorMessage: sr.errorMessage ? String(sr.errorMessage) : undefined,
-          startedAt: sr.startedAt ? new Date(sr.startedAt).toISOString() : undefined,
-          completedAt: sr.completedAt ? new Date(sr.completedAt).toISOString() : undefined,
-        };
-      }
+      const stages = await pipelineRepo.getStagesForJob(jobId);
 
       return {
         id: Number(row.id),
@@ -107,7 +96,7 @@ export class PipelineEngine {
         packageType: String(row.packageType ?? "package_2"),
         status: String(row.status) as PipelineJob["status"],
         currentStage: row.currentStage ? (String(row.currentStage) as StageName) : undefined,
-        stages,
+        stages: stages as PipelineJob["stages"],
         tokenUsage: Number(row.tokenUsage ?? 0),
         errorLog: row.errorLog ? String(row.errorLog) : undefined,
         createdAt: row.createdAt ? new Date(row.createdAt).toISOString() : "",

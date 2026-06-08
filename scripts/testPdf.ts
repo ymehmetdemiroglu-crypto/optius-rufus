@@ -1,4 +1,4 @@
-import { generatePdf } from "../api/services/pdf.js";
+import { generatePdf } from "../api/infra/pdf.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";

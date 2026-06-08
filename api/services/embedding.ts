@@ -1,24 +1,28 @@
+import { callEmbedding } from "./llmGateway.js";
+
 /**
- * Stub: Generate embedding vector using OpenAI API.
- * In production, this calls text-embedding-3-small.
+ * Generate embedding vector via the centralized LLM gateway.
+ * Prefers OpenRouter, falls back to OpenAI, then deterministic fallback.
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
-  await delay(300 + Math.random() * 200);
+  try {
+    return await callEmbedding(text.slice(0, 8000), { service: "embedding" });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.warn(`[Embedding] API call failed: ${message}. Using deterministic fallback.`);
+    return generateFallbackEmbedding(text);
+  }
+}
 
-  // Return a deterministic pseudo-random 1536-dim vector based on text hash
+function generateFallbackEmbedding(text: string): number[] {
   const seed = hashString(text);
   const rng = seededRandom(seed);
   const vector: number[] = [];
   for (let i = 0; i < 1536; i++) {
     vector.push(rng() * 2 - 1);
   }
-  // Normalize to unit length
   const norm = Math.sqrt(vector.reduce((sum, v) => sum + v * v, 0));
   return vector.map((v) => v / norm);
-}
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function hashString(str: string): number {

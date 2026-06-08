@@ -164,32 +164,6 @@ export interface CatalogLinkRecord {
   createdAt: string;
 }
 
-export interface PipelineJobRecord {
-  id: number;
-  prospectId: number;
-  listingId?: number;
-  packageType?: string;
-  status: string;
-  currentStage?: string;
-  stagesJSON?: string;
-  tokenUsage: number;
-  errorLog?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface PipelineJobStageRecord {
-  id: number;
-  jobId: number;
-  stageName: string;
-  status: string;
-  outputJSON?: string;
-  errorMessage?: string;
-  startedAt?: string;
-  completedAt?: string;
-  createdAt: string;
-}
-
 export interface UsageEventRecord {
   id: number;
   prospectId: number;
@@ -228,43 +202,10 @@ export type InsertProspectInput = InferInsertModel<typeof prospects>;
 export type InsertListingInput = InferInsertModel<typeof listings>;
 export type InsertAnalysisInput = InferInsertModel<typeof listingAnalyses>;
 export type InsertBookingInput = InferInsertModel<typeof bookings>;
-export type InsertActivityInput = InferInsertModel<typeof prospectActivities>;
 export type InsertBrandSettingsInput = InferInsertModel<typeof brandSettings>;
 export type InsertRufusQueryInput = InferInsertModel<typeof rufusQueries>;
 export type InsertRufusQueryRunInput = InferInsertModel<typeof rufusQueryRuns>;
 export type InsertCatalogLinkInput = InferInsertModel<typeof catalogLinks>;
 export type InsertPipelineJobInput = InferInsertModel<typeof pipelineJobs>;
 export type InsertPipelineJobStageInput = InferInsertModel<typeof pipelineJobStages>;
-export type InsertUsageEventInput = InferInsertModel<typeof usageEvents>;
-export type InsertJobQueueInput = InferInsertModel<typeof jobs>;
 
-// ── Helper types ──
-
-export interface StageCopy {
-  personalizedHook?: string;
-  problemNarrative?: string;
-  solutionPitch?: string;
-  urgencyCTA?: string;
-  heroHeadline?: string;
-  heroSubheadline?: string;
-  autopsyHeadline?: string;
-  autopsyBody?: string;
-  bleedHeadline?: string;
-  bleedBody?: string;
-  simulatorIntro?: string;
-  simulatorScenarios?: unknown;
-  transformHeadline?: string;
-  transformBefore?: unknown;
-  transformAfter?: unknown;
-  roadmapHeadline?: string;
-  roadmapBody?: string;
-  socialProofHeadline?: string;
-  ctaHeadline?: string;
-  ctaGuarantee?: string;
-  freeQAs?: string;
-  reviewSentiment?: string;
-  competitorAudit?: string;
-  ppcKeywords?: string;
-  cosmoBundling?: string;
-  cosmoGraphData?: string;
-}

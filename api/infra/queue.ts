@@ -1,5 +1,4 @@
-import { db } from "../db/client.js";
-import { SqliteJobRepository, type JobRepository } from "./jobRepository.js";
+import { PgJobRepository, type JobRepository } from "./jobRepository.js";
 import type { Job, JobOpts, JobQueue } from "./types.js";
 
 function generateId(): string {
@@ -10,7 +9,7 @@ export class SQLiteJobQueue implements JobQueue {
   private queueName: string;
   private repo: JobRepository;
 
-  constructor(queueName: string, repo: JobRepository = new SqliteJobRepository(db)) {
+  constructor(queueName: string, repo: JobRepository = new PgJobRepository()) {
     this.queueName = queueName;
     this.repo = repo;
   }

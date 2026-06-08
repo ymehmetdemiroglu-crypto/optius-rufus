@@ -1,8 +1,5 @@
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini";
-
-import type { RawListingData, SemanticGap } from "../agents/types.js";
+import { callLlm } from "./llmGateway.js";
+import type { RawListingData, SemanticGap } from "../pipeline/types.js";
 
 interface AnalysisInput {
   rufusScore: number;
@@ -60,10 +57,6 @@ export async function generateAllStageCopy(
 ): Promise<StageCopy> {
   const fallback = buildFallbackCopy(analysis, listing, prospectName);
 
-  if (!OPENAI_API_KEY && !OPENROUTER_API_KEY) {
-    return fallback;
-  }
-
   const topGaps = (analysis.semanticGaps || [])
     .slice(0, 5)
     .map((g) => `${g.dimension} (gap: ${Math.round(g.gap * 100)}%)`)
@@ -116,27 +109,8 @@ CRITICAL RULES:
 Return ONLY a valid JSON object.`;
 
   try {
-    const url = OPENROUTER_API_KEY
-      ? "https://openrouter.ai/api/v1/chat/completions"
-      : "https://api.openai.com/v1/chat/completions";
-    const apiKey = OPENROUTER_API_KEY || OPENAI_API_KEY;
-    const model = OPENROUTER_API_KEY ? OPENROUTER_MODEL : "gpt-4o-mini";
-
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    };
-
-    if (OPENROUTER_API_KEY) {
-      headers["HTTP-Referer"] = "https://github.com/ymehmetdemiroglu-crypto/optius-rufus";
-      headers["X-Title"] = "Optimus Rufus";
-    }
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        model,
+    const llmResponse = await callLlm(
+      {
         messages: [
           {
             role: "system",
@@ -148,19 +122,11 @@ Return ONLY a valid JSON object.`;
         temperature: 0.85,
         max_tokens: 3000,
         response_format: { type: "json_object" },
-      }),
-    });
+      },
+      { service: "copywriter", estimatedCostCents: 30 }
+    );
 
-    if (!response.ok) {
-      console.error(`LLM API error: ${response.status} ${await response.text()}`);
-      return fallback;
-    }
-
-    const data = (await response.json()) as {
-      choices: Array<{ message: { content: string } }>;
-    };
-
-    const content = JSON.parse(data.choices[0].message.content);
+    const content = JSON.parse(llmResponse.content);
 
     return {
       heroHeadline: content.heroHeadline || fallback.heroHeadline,

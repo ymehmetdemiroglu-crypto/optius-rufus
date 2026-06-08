@@ -1,6 +1,5 @@
 import { z } from "zod";
-import { db } from "../db/client.js";
-import type { ProspectRecord } from "../db/types.js";
+import * as prospectRepo from "../db/repositories/prospectRepository.js";
 import { createContact, enrollInSequence, getSequences } from "../services/apollo.js";
 import { router, publicProcedure } from "../trpc.js";
 
@@ -8,7 +7,7 @@ export const apolloRouter = router({
   createContact: publicProcedure
     .input(z.object({ prospectId: z.number().int() }))
     .mutation(async ({ input }) => {
-      const prospect = db.prepare("SELECT * FROM prospects WHERE id = ?").get(input.prospectId) as ProspectRecord | undefined;
+      const prospect = await prospectRepo.getById(input.prospectId);
       if (!prospect) {
         throw new Error(`Prospect not found: ${input.prospectId}`);
       }
@@ -20,10 +19,15 @@ export const apolloRouter = router({
         company: prospect.company || undefined,
       });
 
-      db.prepare("UPDATE prospects SET apolloContactId = ?, status = 'emailed' WHERE id = ?").run(contact.id, input.prospectId);
+      await prospectRepo.updateApolloFields(input.prospectId, {
+        apolloContactId: contact.id,
+        status: "emailed",
+      });
+
+      const updated = await prospectRepo.getById(input.prospectId);
       return {
         contactId: contact.id,
-        prospect: db.prepare("SELECT * FROM prospects WHERE id = ?").get(input.prospectId) as ProspectRecord | undefined,
+        prospect: updated,
       };
     }),
 
@@ -35,7 +39,7 @@ export const apolloRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const prospect = db.prepare("SELECT * FROM prospects WHERE id = ?").get(input.prospectId) as ProspectRecord | undefined;
+      const prospect = await prospectRepo.getById(input.prospectId);
       if (!prospect) {
         throw new Error(`Prospect not found: ${input.prospectId}`);
       }
@@ -44,11 +48,15 @@ export const apolloRouter = router({
       }
 
       const enrollment = await enrollInSequence(prospect.apolloContactId, input.sequenceId);
-      db.prepare("UPDATE prospects SET apolloSequenceId = ?, status = 'emailed' WHERE id = ?").run(input.sequenceId, input.prospectId);
+      await prospectRepo.updateApolloFields(input.prospectId, {
+        apolloSequenceId: input.sequenceId,
+        status: "emailed",
+      });
 
+      const updated = await prospectRepo.getById(input.prospectId);
       return {
         enrollmentId: enrollment.id,
-        prospect: db.prepare("SELECT * FROM prospects WHERE id = ?").get(input.prospectId) as ProspectRecord | undefined,
+        prospect: updated,
       };
     }),
 
@@ -58,4 +66,3 @@ export const apolloRouter = router({
       return getSequences();
     }),
 });
-

@@ -1,7 +1,7 @@
 import "../api/db/schema.js";
 import { db } from "../api/db/client.js";
 import { generateAllStageCopy } from "../api/services/copywriter.js";
-import type { RawListingData } from "../api/agents/types.js";
+import type { RawListingData } from "../api/pipeline/types.js";
 
 async function run() {
   console.log("🧹 Cleaning up old goPure prospect data if it exists...");

@@ -7,9 +7,10 @@ import "./db/schema.js";
 import fs from "fs";
 import path from "path";
 
-import { generatePdf } from "./services/pdf.js";
+import { generatePdf } from "./infra/pdf.js";
 import { pipelineSseHandler } from "./sse/pipeline.js";
 import { queueWorker } from "./pipeline/worker.js";
+import { webhookWorker } from "./services/webhookWorker.js";
 import { db } from "./db/client.js";
 
 export const app = new Hono();
@@ -156,7 +157,8 @@ if (!process.env.VERCEL) {
     console.log(`📡 tRPC endpoint: http://localhost:${port}/api/trpc`);
     console.log(`📊 SSE endpoint: http://localhost:${port}/api/sse/pipeline/:jobId`);
 
-    // Start background job worker for non-serverless environments
+    // Start background job workers for non-serverless environments
     queueWorker.start();
+    webhookWorker.start();
   });
 }

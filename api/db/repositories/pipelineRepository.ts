@@ -2,21 +2,20 @@ import { eq, and, desc } from "drizzle-orm";
 import { db as pgDb } from "../drizzle.js";
 import * as schema from "../schema.js";
 import type {
-  PipelineJobRecord,
   InsertPipelineJobInput,
   InsertPipelineJobStageInput,
-  PipelineJobStageRecord,
 } from "../types.js";
+import type { PipelineJob, PipelineStageState, StageOutput } from "../../pipeline/types.js";
 
 export async function createJob(
   input: InsertPipelineJobInput
-): Promise<PipelineJobRecord> {
+): Promise<PipelineJob> {
   try {
     const result = await pgDb
       .insert(schema.pipelineJobs)
       .values(input)
       .returning();
-    return result[0] as unknown as PipelineJobRecord;
+    return result[0] as unknown as PipelineJob;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     throw new Error(`Failed to create pipeline job: ${message}`, { cause: err });
@@ -25,14 +24,14 @@ export async function createJob(
 
 export async function getJob(
   id: number
-): Promise<PipelineJobRecord | undefined> {
+): Promise<PipelineJob | undefined> {
   try {
     const result = await pgDb
       .select()
       .from(schema.pipelineJobs)
       .where(eq(schema.pipelineJobs.id, id))
       .limit(1);
-    return result[0] as unknown as PipelineJobRecord | undefined;
+    return result[0] as unknown as PipelineJob | undefined;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     throw new Error(`Failed to fetch pipeline job ${id}: ${message}`, { cause: err });
@@ -115,13 +114,32 @@ export async function updateStageStatus(
 
 export async function getStagesForJob(
   jobId: number
-): Promise<PipelineJobStageRecord[]> {
+): Promise<Record<string, PipelineStageState>> {
   try {
     const result = await pgDb
       .select()
       .from(schema.pipelineJobStages)
       .where(eq(schema.pipelineJobStages.jobId, jobId));
-    return result as unknown as PipelineJobStageRecord[];
+
+    const stages: Record<string, PipelineStageState> = {};
+    for (const row of result) {
+      stages[row.stageName] = {
+        status: row.status as PipelineStageState["status"],
+        output: row.outputJSON
+          ? (row.outputJSON as StageOutput[keyof StageOutput])
+          : undefined,
+        errorMessage: row.errorMessage
+          ? String(row.errorMessage)
+          : undefined,
+        startedAt: row.startedAt
+          ? new Date(row.startedAt).toISOString()
+          : undefined,
+        completedAt: row.completedAt
+          ? new Date(row.completedAt).toISOString()
+          : undefined,
+      };
+    }
+    return stages;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     throw new Error(`Failed to fetch stages for job ${jobId}: ${message}`, { cause: err });
@@ -130,7 +148,7 @@ export async function getStagesForJob(
 
 export async function getLatestJobForProspect(
   prospectId: number
-): Promise<PipelineJobRecord | undefined> {
+): Promise<PipelineJob | undefined> {
   try {
     const result = await pgDb
       .select()
@@ -138,7 +156,7 @@ export async function getLatestJobForProspect(
       .where(eq(schema.pipelineJobs.prospectId, prospectId))
       .orderBy(desc(schema.pipelineJobs.createdAt))
       .limit(1);
-    return result[0] as unknown as PipelineJobRecord | undefined;
+    return result[0] as unknown as PipelineJob | undefined;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     throw new Error(`Failed to fetch latest job for prospect ${prospectId}: ${message}`, { cause: err });

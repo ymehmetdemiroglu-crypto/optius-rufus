@@ -2,7 +2,7 @@ import * as prospectRepo from "../../db/repositories/prospectRepository.js";
 import * as listingRepo from "../../db/repositories/listingRepository.js";
 import * as analysisRepo from "../../db/repositories/analysisRepository.js";
 import * as bookingRepo from "../../db/repositories/bookingRepository.js";
-import { triggerWebhook } from "../webhook.js";
+import { eventBus } from "../../infra/eventBus.js";
 import type {
   ProspectRecord,
   ListingRecord,
@@ -187,41 +187,13 @@ export async function recordActivity(
   interestScore: number
 ): Promise<void> {
   // Persist activity to the database; failures are logged but not thrown
-  // so that webhook delivery is still attempted.
+  // so that event emission is still attempted.
   try {
     await prospectRepo.recordActivity(prospectId, eventType, eventData);
   } catch (err) {
     console.error("Failed to write activity to database:", err);
   }
 
-  // Fetch prospect details to populate webhook payload.
-  let prospectName = "Unknown Prospect";
-  let company: string | undefined;
-  let email: string | undefined;
-  try {
-    const prospect = await prospectRepo.getById(prospectId);
-    if (prospect) {
-      const name =
-        [prospect.firstName, prospect.lastName].filter(Boolean).join(" ") ||
-        prospect.email ||
-        "Unknown Prospect";
-      prospectName = name;
-      company = prospect.company ?? undefined;
-      email = prospect.email ?? undefined;
-    }
-  } catch (err) {
-    console.error("Failed to read prospect details for webhook:", err);
-  }
-
-  // Dispatch webhook notification.
-  try {
-    await triggerWebhook(
-      { name: prospectName, company, email },
-      eventType,
-      eventData,
-      interestScore
-    );
-  } catch (err) {
-    console.error("Failed to trigger webhook:", err);
-  }
+  // Emit async domain event for downstream webhook delivery
+  eventBus.emit("prospect:activity", { prospectId, eventType, eventData, interestScore });
 }

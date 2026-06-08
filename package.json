@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "repl": "tsx scripts/repl.ts",
     "dev:server": "tsx api/boot.ts",
     "dev:client": "vite",
     "dev": "vite",

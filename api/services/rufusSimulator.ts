@@ -1,6 +1,4 @@
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "openai/gpt-4o";
+import { callLlm } from "./llmGateway.js";
 
 export interface RufusRankingItem {
   asin: string;
@@ -70,11 +68,6 @@ export async function simulateRufusSOV(
     }
   ];
 
-  if (!OPENAI_API_KEY && !OPENROUTER_API_KEY) {
-    console.log(`[RufusSimulator] No API keys. Generating mock Rufus SOV simulation...`);
-    return generateFallbackSOV(listingTitle, defaultCompetitors, category);
-  }
-
   const prompt = `You are simulating Amazon Rufus, a conversational shopping assistant. 
 We want to evaluate how Rufus recommends a target product compared to 3 competitors on Amazon for 10 common user search queries in the category: "${category}".
 
@@ -124,27 +117,8 @@ Return ONLY a valid JSON object matching this schema:
   `;
 
   try {
-    const url = OPENROUTER_API_KEY
-      ? "https://openrouter.ai/api/v1/chat/completions"
-      : "https://api.openai.com/v1/chat/completions";
-    const apiKey = OPENROUTER_API_KEY || OPENAI_API_KEY;
-    const model = OPENROUTER_API_KEY ? OPENROUTER_MODEL : "gpt-4o-mini";
-
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    };
-
-    if (OPENROUTER_API_KEY) {
-      headers["HTTP-Referer"] = "https://github.com/ymehmetdemiroglu-crypto/optius-rufus";
-      headers["X-Title"] = "Optimus Rufus";
-    }
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        model,
+    const res = await callLlm(
+      {
         messages: [
           {
             role: "system",
@@ -155,18 +129,11 @@ Return ONLY a valid JSON object matching this schema:
         temperature: 0.3,
         max_tokens: 3000,
         response_format: { type: "json_object" },
-      }),
-    });
+      },
+      { service: "rufus-simulator", estimatedCostCents: 50 }
+    );
 
-    if (!response.ok) {
-      console.warn(`[RufusSimulator] API failed: ${response.status}. Using fallback.`);
-      return generateFallbackSOV(listingTitle, defaultCompetitors, category);
-    }
-
-    const resJson = await response.json();
-    const contentText = resJson.choices[0].message.content;
-    const parsed = JSON.parse(contentText) as RufusSOVResult;
-    
+    const parsed = JSON.parse(res.content) as RufusSOVResult;
     return parsed;
   } catch (err) {
     console.error("❌ [RufusSimulator] Error simulating Rufus SOV:", err);
@@ -302,40 +269,6 @@ export async function simulateSingleRufusQuery(
     }
   ];
 
-  if (!OPENAI_API_KEY && !OPENROUTER_API_KEY) {
-    const targetWins = queryText.toLowerCase().includes("organic") || queryText.toLowerCase().includes("absorption") || Math.random() > 0.4;
-    const rankings: RufusRankingItem[] = [
-      {
-        asin: "target_product",
-        rank: targetWins ? 1 : 2,
-        recommended: targetWins,
-        reason: targetWins
-          ? `Recommended first because the product listing explicitly details high bio-availability and optimizations targeting: "${queryText}".`
-          : `Not ranked first because Doctor's Best has a larger established history of customer reviews answering "${queryText}".`,
-      },
-      {
-        asin: defaultCompetitors[0].asin,
-        rank: !targetWins ? 1 : 2,
-        recommended: !targetWins,
-        reason: `${defaultCompetitors[0].brand} is a trusted alternative answering common questions on product purity.`,
-      },
-      {
-        asin: defaultCompetitors[1].asin,
-        rank: 3,
-        recommended: false,
-        reason: `Doctor's Best is a solid choice but falls slightly behind on custom comparative ingredient details.`,
-      },
-      {
-        asin: defaultCompetitors[2].asin,
-        rank: 4,
-        recommended: false,
-        reason: `BiOptimizers is a premium product but has a higher cost barrier for users looking for standard solutions.`,
-      },
-    ];
-    rankings.sort((a, b) => a.rank - b.rank);
-    return { queryText, rankings };
-  }
-
   const prompt = `You are Amazon Rufus, a conversational shopping assistant.
 We want to evaluate how Rufus recommends a target product compared to competitors on Amazon for a specific user search query: "${queryText}" in the category: "${category}".
 
@@ -370,27 +303,8 @@ Return ONLY a valid JSON object matching this schema:
   `;
 
   try {
-    const url = OPENROUTER_API_KEY
-      ? "https://openrouter.ai/api/v1/chat/completions"
-      : "https://api.openai.com/v1/chat/completions";
-    const apiKey = OPENROUTER_API_KEY || OPENAI_API_KEY;
-    const model = OPENROUTER_API_KEY ? OPENROUTER_MODEL : "gpt-4o-mini";
-
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    };
-
-    if (OPENROUTER_API_KEY) {
-      headers["HTTP-Referer"] = "https://github.com/ymehmetdemiroglu-crypto/optius-rufus";
-      headers["X-Title"] = "Optimus Rufus";
-    }
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        model,
+    const res = await callLlm(
+      {
         messages: [
           {
             role: "system",
@@ -401,16 +315,11 @@ Return ONLY a valid JSON object matching this schema:
         temperature: 0.3,
         max_tokens: 1500,
         response_format: { type: "json_object" },
-      }),
-    });
+      },
+      { service: "rufus-single-query", estimatedCostCents: 20 }
+    );
 
-    if (!response.ok) {
-      throw new Error(`API failed: ${response.status}`);
-    }
-
-    const resJson = await response.json();
-    const contentText = resJson.choices[0].message.content;
-    const parsed = JSON.parse(contentText) as SimulatedQueryData;
+    const parsed = JSON.parse(res.content) as SimulatedQueryData;
     return parsed;
   } catch (err) {
     console.error("Error running single Rufus simulation:", err);

@@ -1,5 +1,5 @@
-import { getCircuitBreaker } from "./circuitBreaker.js";
-import { tokenBudgetService } from "./tokenBudget.js";
+import { getCircuitBreaker } from "../infra/circuitBreaker.js";
+import { tokenBudgetService } from "../infra/tokenBudget.js";
 import { logger } from "../infra/logger.js";
 import { eventBus } from "../infra/eventBus.js";
 
@@ -23,10 +23,10 @@ interface LlmResponse {
 }
 
 interface LlmCallOptions {
-  prospectId: number;
+  prospectId?: number;
   jobId?: number;
   service: string;
-  estimatedCostCents: number;
+  estimatedCostCents?: number;
   correlationId?: string;
 }
 
@@ -41,8 +41,10 @@ export async function callLlm(
   request: LlmRequest,
   options: LlmCallOptions
 ): Promise<LlmResponse> {
-  // 1. Budget check
-  tokenBudgetService.checkBudget(options.prospectId, options.estimatedCostCents);
+  // 1. Budget check (only if prospectId is provided)
+  if (options.prospectId !== undefined && options.estimatedCostCents !== undefined) {
+    tokenBudgetService.checkBudget(options.prospectId, options.estimatedCostCents);
+  }
 
   // 2. Circuit breaker
   const breaker = getCircuitBreaker("llm-gateway");
@@ -111,15 +113,17 @@ export async function callLlm(
     // Estimate cost: $0.0015 per 1K tokens for gpt-4o-mini (very rough)
     const costCents = Math.ceil((totalTokens / 1000) * 0.15);
 
-    // Track usage
-    tokenBudgetService.trackUsage(
-      options.prospectId,
-      options.jobId,
-      options.service,
-      promptTokens,
-      completionTokens,
-      costCents
-    );
+    // Track usage (only if prospectId is provided)
+    if (options.prospectId !== undefined) {
+      tokenBudgetService.trackUsage(
+        options.prospectId,
+        options.jobId,
+        options.service,
+        promptTokens,
+        completionTokens,
+        costCents
+      );
+    }
 
     logger.info(`LLM request completed`, {
       service: options.service,
@@ -142,5 +146,115 @@ export async function callLlm(
       completionTokens,
       totalTokens,
     };
+  });
+}
+
+
+export async function callEmbedding(
+  text: string,
+  options: {
+    service: string;
+    prospectId?: number;
+    jobId?: number;
+    correlationId?: string;
+  }
+): Promise<number[]> {
+  const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+  const apiKey = OPENROUTER_API_KEY || OPENAI_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("No embedding API key configured (OPENROUTER_API_KEY or OPENAI_API_KEY)");
+  }
+
+  const url = OPENROUTER_API_KEY
+    ? "https://openrouter.ai/api/v1/embeddings"
+    : "https://api.openai.com/v1/embeddings";
+
+  const model = OPENROUTER_API_KEY
+    ? "openai/text-embedding-3-small"
+    : "text-embedding-3-small";
+
+  const breaker = getCircuitBreaker("llm-gateway");
+
+  return breaker.execute(async () => {
+    logger.info(`Embedding request started`, {
+      service: options.service,
+      prospectId: options.prospectId,
+      jobId: options.jobId,
+      correlationId: options.correlationId,
+    });
+
+    eventBus.emit(
+      "llm:request",
+      { service: options.service, model },
+      options.correlationId
+    );
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    };
+
+    if (OPENROUTER_API_KEY) {
+      headers["HTTP-Referer"] = "https://github.com/ymehmetdemiroglu-crypto/optius-rufus";
+      headers["X-Title"] = "Optimus Rufus";
+    }
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        input: text,
+        model,
+        dimensions: 1536,
+      }),
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`Embedding API error ${response.status}: ${errText}`);
+    }
+
+    const data = (await response.json()) as {
+      data: Array<{ embedding: number[] }>;
+      usage?: { total_tokens: number; prompt_tokens: number };
+    };
+
+    const embedding = data.data[0]?.embedding;
+    if (!Array.isArray(embedding) || embedding.length !== 1536) {
+      throw new Error(`Unexpected embedding shape: ${embedding?.length}`);
+    }
+
+    const totalTokens = data.usage?.total_tokens ?? data.usage?.prompt_tokens ?? 0;
+    const costCents = Math.ceil((totalTokens / 1000) * 0.002);
+
+    if (options.prospectId !== undefined) {
+      tokenBudgetService.trackUsage(
+        options.prospectId,
+        options.jobId,
+        options.service,
+        totalTokens,
+        0,
+        costCents
+      );
+    }
+
+    logger.info(`Embedding request completed`, {
+      service: options.service,
+      prospectId: options.prospectId,
+      jobId: options.jobId,
+      totalTokens,
+      costCents,
+      correlationId: options.correlationId,
+    });
+
+    eventBus.emit(
+      "llm:success",
+      { service: options.service, totalTokens, costCents },
+      options.correlationId
+    );
+
+    return embedding;
   });
 }

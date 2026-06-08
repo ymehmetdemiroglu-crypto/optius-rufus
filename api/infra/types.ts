@@ -7,6 +7,10 @@ export interface DomainEvent<T = unknown> {
   correlationId?: string;
 }
 
+/**
+ * Generic job-queue entry (e.g., BullMQ-style). This is intentionally separate
+ * from the domain-specific `PipelineJob` in `api/pipeline/types.ts`.
+ */
 export interface Job {
   id: string;
   name: string;

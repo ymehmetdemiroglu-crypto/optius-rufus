@@ -119,6 +119,39 @@ export async function incrementViews(slug: string): Promise<void> {
   }
 }
 
+export async function updateApolloFields(
+  id: number,
+  fields: {
+    apolloContactId?: string;
+    apolloSequenceId?: string;
+    status?: string;
+  }
+): Promise<void> {
+  try {
+    const setObj: Partial<typeof schema.prospects.$inferInsert> = {};
+    if (fields.apolloContactId !== undefined) {
+      setObj.apolloContactId = fields.apolloContactId;
+    }
+    if (fields.apolloSequenceId !== undefined) {
+      setObj.apolloSequenceId = fields.apolloSequenceId;
+    }
+    if (fields.status !== undefined) {
+      setObj.status = fields.status;
+    }
+
+    await pgDb
+      .update(schema.prospects)
+      .set(setObj)
+      .where(eq(schema.prospects.id, id));
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    throw new Error(
+      `Failed to update Apollo fields for prospect ${id}: ${message}`,
+      { cause: err }
+    );
+  }
+}
+
 export async function recordActivity(
   prospectId: number,
   eventType: string,

@@ -1,4 +1,7 @@
-import type Database from "better-sqlite3";
+import { eq, and, or, asc, lte, sql } from "drizzle-orm";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
+import { db } from "../db/drizzle.js";
+import * as schema from "../db/schema.js";
 import type { Job, JobOpts } from "./types.js";
 
 export interface JobRepository {
@@ -22,11 +25,11 @@ export interface JobRepository {
   markFailed(id: string, now: number, failedReason: string, stacktrace: string[]): Promise<void>;
 }
 
-export class SqliteJobRepository implements JobRepository {
-  private db: Database.Database;
+export class PgJobRepository implements JobRepository {
+  private db: NodePgDatabase<typeof schema>;
 
-  constructor(db: Database.Database) {
-    this.db = db;
+  constructor(dbInstance?: NodePgDatabase<typeof schema>) {
+    this.db = dbInstance ?? (db as NodePgDatabase<typeof schema>);
   }
 
   async add(
@@ -39,109 +42,137 @@ export class SqliteJobRepository implements JobRepository {
     now: number,
     delay: number
   ): Promise<void> {
-    this.db.prepare(
-      `INSERT INTO jobs (id, queue, name, dataJSON, optsJSON, delay, timestamp, maxAttempts, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')`
-    ).run(
+    await this.db.insert(schema.jobs).values({
       id,
       queue,
       name,
-      JSON.stringify(data),
-      JSON.stringify(opts),
+      dataJSON: data,
+      optsJSON: opts,
       delay,
-      now,
-      maxAttempts
-    );
+      timestamp: now,
+      maxAttempts,
+      status: "pending",
+    });
   }
 
   async get(id: string): Promise<Job | null> {
-    const row = this.db.prepare("SELECT * FROM jobs WHERE id = ?").get(id) as
-      | Record<string, unknown>
-      | undefined;
-    if (!row) return null;
-    return this.hydrate(row);
+    const rows = await this.db
+      .select()
+      .from(schema.jobs)
+      .where(eq(schema.jobs.id, id))
+      .limit(1);
+    if (!rows.length) return null;
+    return this.hydrate(rows[0]);
   }
 
   async updateProgress(id: string, progress: number): Promise<void> {
-    this.db.prepare("UPDATE jobs SET progress = ? WHERE id = ?").run(progress, id);
+    await this.db
+      .update(schema.jobs)
+      .set({ progress })
+      .where(eq(schema.jobs.id, id));
   }
 
   async pollNext(queue: string, now: number): Promise<Job | null> {
-    const row = this.db
-      .prepare(
-        `SELECT * FROM jobs
-         WHERE queue = ? AND status = 'pending' AND (delay = 0 OR timestamp + delay <= ?)
-         ORDER BY timestamp ASC
-         LIMIT 1`
+    const rows = await this.db
+      .select()
+      .from(schema.jobs)
+      .where(
+        and(
+          eq(schema.jobs.queue, queue),
+          eq(schema.jobs.status, "pending"),
+          or(
+            eq(schema.jobs.delay, 0),
+            lte(sql`${schema.jobs.timestamp} + ${schema.jobs.delay}`, now)
+          )
+        )
       )
-      .get(queue, now) as Record<string, unknown> | undefined;
+      .orderBy(asc(schema.jobs.timestamp))
+      .limit(1);
 
-    if (!row) return null;
-    return this.hydrate(row);
+    if (!rows.length) return null;
+    return this.hydrate(rows[0]);
   }
 
   async markActive(id: string, now: number): Promise<void> {
-    this.db.prepare("UPDATE jobs SET status = 'active', processedOn = ?, attempts = attempts + 1 WHERE id = ?")
-      .run(now, id);
+    await this.db
+      .update(schema.jobs)
+      .set({
+        status: "active",
+        processedOn: now,
+        attempts: sql`${schema.jobs.attempts} + 1`,
+      })
+      .where(eq(schema.jobs.id, id));
   }
 
   async markCompleted(id: string, now: number, returnValue: unknown): Promise<void> {
-    this.db.prepare(
-      "UPDATE jobs SET status = 'completed', finishedOn = ?, returnValueJSON = ? WHERE id = ?"
-    ).run(now, JSON.stringify(returnValue), id);
+    await this.db
+      .update(schema.jobs)
+      .set({
+        status: "completed",
+        finishedOn: now,
+        returnValueJSON: returnValue,
+      })
+      .where(eq(schema.jobs.id, id));
   }
 
   async getAttemptsInfo(id: string): Promise<{ attempts: number; maxAttempts: number } | null> {
-    const job = this.db.prepare("SELECT attempts, maxAttempts FROM jobs WHERE id = ?").get(id) as
-      | { attempts: number; maxAttempts: number }
-      | undefined;
-    if (!job) return null;
+    const rows = await this.db
+      .select({
+        attempts: schema.jobs.attempts,
+        maxAttempts: schema.jobs.maxAttempts,
+      })
+      .from(schema.jobs)
+      .where(eq(schema.jobs.id, id))
+      .limit(1);
+
+    if (!rows.length) return null;
     return {
-      attempts: Number(job.attempts),
-      maxAttempts: Number(job.maxAttempts),
+      attempts: Number(rows[0].attempts),
+      maxAttempts: Number(rows[0].maxAttempts),
     };
   }
 
   async requeue(id: string, backoff: number, failedReason: string, stacktrace: string[]): Promise<void> {
     const now = Date.now();
-    this.db.prepare(
-      `UPDATE jobs SET status = 'pending', timestamp = ?, delay = ?, failedReason = ?, stacktraceJSON = ? WHERE id = ?`
-    ).run(now, backoff, failedReason, JSON.stringify(stacktrace), id);
+    await this.db
+      .update(schema.jobs)
+      .set({
+        status: "pending",
+        timestamp: now,
+        delay: backoff,
+        failedReason,
+        stacktraceJSON: stacktrace,
+      })
+      .where(eq(schema.jobs.id, id));
   }
 
   async markFailed(id: string, now: number, failedReason: string, stacktrace: string[]): Promise<void> {
-    this.db.prepare(
-      `UPDATE jobs SET status = 'failed', finishedOn = ?, failedReason = ?, stacktraceJSON = ? WHERE id = ?`
-    ).run(now, failedReason, JSON.stringify(stacktrace), id);
+    await this.db
+      .update(schema.jobs)
+      .set({
+        status: "failed",
+        finishedOn: now,
+        failedReason,
+        stacktraceJSON: stacktrace,
+      })
+      .where(eq(schema.jobs.id, id));
   }
 
   private hydrate(row: Record<string, unknown>): Job {
     return {
       id: String(row.id),
       name: String(row.name),
-      data: this.safeJsonParse(String(row.dataJSON), {}),
-      opts: this.safeJsonParse(String(row.optsJSON), {}),
+      data: (row.dataJSON ?? {}) as unknown,
+      opts: (row.optsJSON ?? {}) as JobOpts,
       progress: Number(row.progress ?? 0),
       attempts: Number(row.attempts ?? 0),
       maxAttempts: Number(row.maxAttempts ?? 3),
       status: String(row.status) as Job["status"],
       processedOn: row.processedOn ? Number(row.processedOn) : undefined,
       finishedOn: row.finishedOn ? Number(row.finishedOn) : undefined,
-      returnValue: row.returnValueJSON
-        ? this.safeJsonParse(String(row.returnValueJSON), undefined)
-        : undefined,
+      returnValue: row.returnValueJSON ?? undefined,
       failedReason: row.failedReason ? String(row.failedReason) : undefined,
-      stacktrace: row.stacktraceJSON
-        ? this.safeJsonParse(String(row.stacktraceJSON), [])
-        : undefined,
+      stacktrace: (row.stacktraceJSON ?? []) as string[],
     };
-  }
-
-  private safeJsonParse<T>(text: string, fallback: T): T {
-    try {
-      return JSON.parse(text) as T;
-    } catch {
-      return fallback;
-    }
   }
 }

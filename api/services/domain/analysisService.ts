@@ -4,7 +4,7 @@ import type {
   RawListingData,
   AnalysisResult,
   SemanticGap,
-} from "../../agents/types.js";
+} from "../../pipeline/types.js";
 import type { PipelineJob } from "../../pipeline/types.js";
 import type { StageCopy } from "../copywriter.js";
 import * as listingRepo from "../../db/repositories/listingRepository.js";
@@ -397,10 +397,6 @@ export async function regenerateCopy(
 
   try {
     await analysisRepo.updateCopy(analysisId, {
-      personalizedHook: stageCopy.heroHeadline,
-      problemNarrative: stageCopy.autopsyBody,
-      solutionPitch: stageCopy.roadmapBody,
-      urgencyCTA: stageCopy.urgencyCTA,
       heroHeadline: stageCopy.heroHeadline,
       heroSubheadline: stageCopy.heroSubheadline,
       autopsyHeadline: stageCopy.autopsyHeadline,
