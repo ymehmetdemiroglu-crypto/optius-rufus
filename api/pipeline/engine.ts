@@ -134,29 +134,27 @@ export class PipelineEngine {
       await pipelineRepo.updateJobStatus(jobId, "running");
 
       const stageOutputs: StageOutput = {};
+      const stagePromises: Record<StageName, Promise<unknown>> = {} as any;
+      const executedStages = new Set<StageName>();
 
-      for (const stageDef of STAGE_ORDER) {
-        const stageState = job.stages[stageDef.name];
-
-        // Skip already completed stages, but load their output
-        if (stageState && stageState.status === "completed" && stageState.output) {
-          (stageOutputs as Record<string, unknown>)[stageDef.name] = stageState.output;
-          continue;
-        }
-
-        // Check dependencies
-        if (stageState) {
-          const missingDeps = stageDef.dependencies.filter(
-            (dep) => !stageOutputs[dep] && job.stages[dep]?.status !== "completed"
-          );
-          if (missingDeps.length > 0) {
-            throw new Error(
-              `Stage ${stageDef.name} cannot run: missing dependencies [${missingDeps.join(", ")}]`
-            );
+      const executeStage = async (stageDef: typeof STAGE_ORDER[number]): Promise<unknown> => {
+        if (stageDef.dependencies.length > 0) {
+          try {
+            await Promise.all(stageDef.dependencies.map((dep) => stagePromises[dep]));
+          } catch (depErr) {
+            const message = `Skipped: Dependency failed`;
+            await pipelineRepo.updateStageStatus(jobId, stageDef.name, "failed", null, message);
+            throw new Error(`Stage ${stageDef.name} skipped because dependency failed.`, { cause: depErr });
           }
         }
 
-        // Mark stage as running
+        const hasExecutedDeps = stageDef.dependencies.some((dep) => executedStages.has(dep));
+        const stageState = job.stages[stageDef.name];
+        if (!hasExecutedDeps && stageState && stageState.status === "completed" && stageState.output !== undefined) {
+          (stageOutputs as Record<string, unknown>)[stageDef.name] = stageState.output;
+          return stageState.output;
+        }
+
         await pipelineRepo.updateStageStatus(jobId, stageDef.name, "running");
         await pipelineRepo.updateJobStatus(jobId, "running", stageDef.name);
 
@@ -176,14 +174,12 @@ export class PipelineEngine {
         try {
           const output = await executor.execute(ctx);
           (stageOutputs as Record<string, unknown>)[stageDef.name] = output;
-
-          // Persist stage completion
           await pipelineRepo.updateStageStatus(jobId, stageDef.name, "completed", output);
+          executedStages.add(stageDef.name);
+          return output;
         } catch (stageErr) {
           const message = stageErr instanceof Error ? stageErr.message : String(stageErr);
-
           await pipelineRepo.updateStageStatus(jobId, stageDef.name, "failed", null, message);
-          await pipelineRepo.updateJobStatus(jobId, "failed", null, message);
 
           logger.error(`Pipeline stage failed`, {
             jobId,
@@ -192,13 +188,34 @@ export class PipelineEngine {
             correlationId,
           });
           eventBus.emit("pipeline:error", { jobId, stage: stageDef.name, error: message }, String(correlationId));
-          return;
+          throw stageErr;
         }
+      };
+
+      for (const stageDef of STAGE_ORDER) {
+        stagePromises[stageDef.name] = executeStage(stageDef);
       }
 
-      // All stages completed
-      await pipelineRepo.updateJobStatus(jobId, "completed", null);
+      const results = await Promise.allSettled(
+        STAGE_ORDER.map((stageDef) => stagePromises[stageDef.name])
+      );
 
+      const failures = results.filter((r) => r.status === "rejected");
+      if (failures.length > 0) {
+        const errorMsgs = failures.map((f) =>
+          (f as PromiseRejectedResult).reason instanceof Error
+            ? ((f as PromiseRejectedResult).reason as Error).message
+            : String((f as PromiseRejectedResult).reason)
+        );
+        const combinedError = `One or more stages failed: ${errorMsgs.join("; ")}`;
+
+        await pipelineRepo.updateJobStatus(jobId, "failed", null, combinedError);
+        logger.error(`Pipeline failed`, { jobId, error: combinedError, correlationId });
+        eventBus.emit("pipeline:error", { jobId, error: combinedError }, String(correlationId));
+        return;
+      }
+
+      await pipelineRepo.updateJobStatus(jobId, "completed", null);
       logger.info(`Pipeline completed`, { jobId, correlationId });
       eventBus.emit("pipeline:complete", { jobId }, String(correlationId));
     } catch (err) {

@@ -22,10 +22,10 @@ export class QueueWorker {
    * Returns true if a job was processed, false if queue is empty.
    */
   async processOne(): Promise<boolean> {
-    const job = pipelineQueue.pollNext();
+    const job = await pipelineQueue.pollNext();
     if (!job) return false;
 
-    pipelineQueue.markActive(job.id);
+    await pipelineQueue.markActive(job.id);
     logger.info(`Processing job ${job.id} (${job.name})`, { jobId: job.id });
 
     try {
@@ -36,13 +36,13 @@ export class QueueWorker {
         throw new Error(`Unknown job name: ${job.name}`);
       }
 
-      pipelineQueue.markCompleted(job.id, { success: true });
+      await pipelineQueue.markCompleted(job.id, { success: true });
       logger.info(`Job ${job.id} completed`, { jobId: job.id });
       return true;
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       const stack = err instanceof Error ? err.stack ?? "" : "";
-      pipelineQueue.markFailed(job.id, message, stack ? [stack] : []);
+      await pipelineQueue.markFailed(job.id, message, stack ? [stack] : []);
       logger.error(`Job ${job.id} failed`, { jobId: job.id, error: message });
       return true;
     }

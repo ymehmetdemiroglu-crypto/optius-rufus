@@ -255,3 +255,171 @@ function generateFallbackSOV(
     rufusAnsweredRate: 70,
   };
 }
+
+export async function simulateSingleRufusQuery(
+  queryText: string,
+  listingTitle: string,
+  listingBullets: string[],
+  listingDescription: string,
+  category: string,
+  competitors: Array<{
+    asin: string;
+    title: string;
+    brand: string;
+    price: number;
+    rating: number;
+    reviewCount: number;
+    score: number;
+  }>
+): Promise<SimulatedQueryData> {
+  const defaultCompetitors = competitors && competitors.length > 0 ? competitors : [
+    {
+      asin: "B07ABC1234",
+      title: "Nature's Bounty Magnesium 500mg, 200 Tablets",
+      brand: "Nature's Bounty",
+      price: 19.99,
+      rating: 4.5,
+      reviewCount: 12800,
+      score: 72,
+    },
+    {
+      asin: "B09DEF5678",
+      title: "Doctor's Best High Absorption Magnesium, 240 Veggie Caps",
+      brand: "Doctor's Best",
+      price: 21.5,
+      rating: 4.7,
+      reviewCount: 9500,
+      score: 78,
+    },
+    {
+      asin: "B10GHI9012",
+      title: "Magnesium Breakthrough — 7 Forms of Magnesium, 60 Caps",
+      brand: "BiOptimizers",
+      price: 39.99,
+      rating: 4.4,
+      reviewCount: 3200,
+      score: 65,
+    }
+  ];
+
+  if (!OPENAI_API_KEY && !OPENROUTER_API_KEY) {
+    const targetWins = queryText.toLowerCase().includes("organic") || queryText.toLowerCase().includes("absorption") || Math.random() > 0.4;
+    const rankings: RufusRankingItem[] = [
+      {
+        asin: "target_product",
+        rank: targetWins ? 1 : 2,
+        recommended: targetWins,
+        reason: targetWins
+          ? `Recommended first because the product listing explicitly details high bio-availability and optimizations targeting: "${queryText}".`
+          : `Not ranked first because Doctor's Best has a larger established history of customer reviews answering "${queryText}".`,
+      },
+      {
+        asin: defaultCompetitors[0].asin,
+        rank: !targetWins ? 1 : 2,
+        recommended: !targetWins,
+        reason: `${defaultCompetitors[0].brand} is a trusted alternative answering common questions on product purity.`,
+      },
+      {
+        asin: defaultCompetitors[1].asin,
+        rank: 3,
+        recommended: false,
+        reason: `Doctor's Best is a solid choice but falls slightly behind on custom comparative ingredient details.`,
+      },
+      {
+        asin: defaultCompetitors[2].asin,
+        rank: 4,
+        recommended: false,
+        reason: `BiOptimizers is a premium product but has a higher cost barrier for users looking for standard solutions.`,
+      },
+    ];
+    rankings.sort((a, b) => a.rank - b.rank);
+    return { queryText, rankings };
+  }
+
+  const prompt = `You are Amazon Rufus, a conversational shopping assistant.
+We want to evaluate how Rufus recommends a target product compared to competitors on Amazon for a specific user search query: "${queryText}" in the category: "${category}".
+
+TARGET PRODUCT:
+- Title: ${listingTitle}
+- Bullets: ${listingBullets.join(" | ")}
+- Description: ${listingDescription}
+
+COMPETITORS:
+${defaultCompetitors.map((c, i) => `- Competitor ${i + 1}: ASIN: ${c.asin}, Title: "${c.title}", Brand: "${c.brand}", Price: $${c.price}, Rating: ${c.rating}/5, Reviews: ${c.reviewCount}`).join("\n")}
+
+YOUR TASKS:
+Evaluate and rank the target product ("target_product") and the competitors based on:
+1. Copy richness: Does their metadata (title, bullets, description) answer the query explicitly?
+2. Return rate and review trust indicators (rating, review count).
+3. Price competitiveness.
+
+For each product, assign:
+- "rank": 1 (best), 2, 3, or 4.
+- "recommended": true (for rank 1, or close rank 2 if both are good), otherwise false.
+- "reason": A 1-2 sentence justification in natural shopping assistant language explaining why Rufus ranked them this way (e.g., "Recommended because the listing details specify third-party test verification, unlike Competitor X").
+
+Return ONLY a valid JSON object matching this schema:
+{
+  "queryText": "${queryText}",
+  "rankings": [
+    { "asin": "target_product", "rank": 1, "recommended": true, "reason": "Reason for rank..." },
+    { "asin": "B07ABC1234", "rank": 2, "recommended": false, "reason": "Reason for rank..." },
+    ...
+  ]
+}
+  `;
+
+  try {
+    const url = OPENROUTER_API_KEY
+      ? "https://openrouter.ai/api/v1/chat/completions"
+      : "https://api.openai.com/v1/chat/completions";
+    const apiKey = OPENROUTER_API_KEY || OPENAI_API_KEY;
+    const model = OPENROUTER_API_KEY ? OPENROUTER_MODEL : "gpt-4o-mini";
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    };
+
+    if (OPENROUTER_API_KEY) {
+      headers["HTTP-Referer"] = "https://github.com/ymehmetdemiroglu-crypto/optius-rufus";
+      headers["X-Title"] = "Optimus Rufus";
+    }
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        model,
+        messages: [
+          {
+            role: "system",
+            content: "You are Amazon Rufus, a conversational shopping assistant. You respond only with valid JSON. Never return markdown blocks.",
+          },
+          { role: "user", content: prompt },
+        ],
+        temperature: 0.3,
+        max_tokens: 1500,
+        response_format: { type: "json_object" },
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API failed: ${response.status}`);
+    }
+
+    const resJson = await response.json();
+    const contentText = resJson.choices[0].message.content;
+    const parsed = JSON.parse(contentText) as SimulatedQueryData;
+    return parsed;
+  } catch (err) {
+    console.error("Error running single Rufus simulation:", err);
+    const rankings = [
+      { asin: "target_product", rank: 1, recommended: true, reason: "Fallback recommended: Good copy matching." },
+      { asin: defaultCompetitors[0].asin, rank: 2, recommended: false, reason: "Fallback rank 2." },
+      { asin: defaultCompetitors[1].asin, rank: 3, recommended: false, reason: "Fallback rank 3." },
+      { asin: defaultCompetitors[2].asin, rank: 4, recommended: false, reason: "Fallback rank 4." },
+    ];
+    return { queryText, rankings };
+  }
+}

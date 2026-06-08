@@ -1,6 +1,7 @@
 import * as readline from "readline";
 import { OptimizationOrchestrator } from "../api/agents/orchestrator.js";
-import type { PipelineState } from "../api/agents/types.js";
+import type { PipelineState, AgentRole } from "../api/agents/types.js";
+import { simulateSingleRufusQuery } from "../api/services/rufusSimulator.js";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -18,7 +19,19 @@ const colors = {
   red: "\x1b[31m",
   cyan: "\x1b[36m",
   gray: "\x1b[90m",
+  magenta: "\x1b[35m",
   bold: "\x1b[1m",
+};
+
+const STAGE_NAMES: Record<AgentRole, string> = {
+  apify_fetcher: "ApifyFetcher",
+  listing_fetcher: "ListingFetcher",
+  preprocessor: "Preprocessor",
+  embedding_generator: "EmbeddingGenerator",
+  semantic_analyzer: "SemanticAnalyzer",
+  content_optimizer: "ContentOptimizer",
+  competitor_analyst: "CompetitorAnalyst",
+  reviewer: "Reviewer",
 };
 
 function timestamp(): string {
@@ -32,16 +45,17 @@ function log(msg: string) {
 
 function printBanner() {
   console.log(`
-${colors.cyan}${colors.bold}🤖 Amazon Listing Optimizer — Multi-Agent REPL${colors.reset}
+${colors.cyan}${colors.bold}═══ 🤖 Amazon Listing Optimizer — Multi-Agent REPL ═══${colors.reset}
 
-Commands:
-  ${colors.bold}optimize <ASIN> <marketplace>${colors.reset}  Run optimization pipeline
-  ${colors.bold}status${colors.reset}                          Show current pipeline state
-  ${colors.bold}retry${colors.reset}                           Retry failed stage
-  ${colors.bold}report${colors.reset}                          Show final optimization report
-  ${colors.bold}logs${colors.reset}                            Show agent execution logs
-  ${colors.bold}help${colors.reset}                            Show this help
-  ${colors.bold}quit${colors.reset}                            Exit REPL
+${colors.bold}Commands:${colors.reset}
+  ${colors.bold}optimize <ASIN> [marketplace]${colors.reset}  Run the concurrent multi-agent optimization pipeline
+  ${colors.bold}status${colors.reset}                        Show the status of the last run
+  ${colors.bold}retry <stage_role>${colors.reset}             Retry a failed stage (e.g. competitor_analyst) and resume
+  ${colors.bold}rufus <query>${colors.reset}                  Simulate a specific Rufus search query on the optimized product
+  ${colors.bold}report${colors.reset}                        Show the final optimization report
+  ${colors.bold}logs${colors.reset}                          Show detailed JSON logs
+  ${colors.bold}help${colors.reset}                          Show this command list
+  ${colors.bold}quit / exit${colors.reset}                   Close the REPL
 `);
 }
 
@@ -56,12 +70,13 @@ function setupEventListeners() {
   });
 
   orchestrator.on("stage:start", ({ name }) => {
-    log(`${stageIcon(name)} ${name}: Running...`);
+    log(`${stageIcon(name)} ${colors.cyan}${name}${colors.reset}: Starting...`);
   });
 
   orchestrator.on("stage:complete", ({ name, status, duration }) => {
     const icon = status === "completed" ? `${colors.green}✅${colors.reset}` : `${colors.red}❌${colors.reset}`;
-    log(`${icon} ${name}: ${status} — ${formatDuration(duration)}`);
+    const statusColor = status === "completed" ? colors.green : colors.red;
+    log(`${icon} ${colors.bold}${name}${colors.reset}: ${statusColor}${status}${colors.reset} — ${formatDuration(duration)}`);
   });
 
   orchestrator.on("review:complete", ({ name, approved, score, issues, suggestions }) => {
@@ -71,7 +86,9 @@ function setupEventListeners() {
         : `${colors.yellow}⚠️${colors.reset}`
       : `${colors.red}❌${colors.reset}`;
     const label = approved ? (issues.length === 0 ? "PASS" : "WARN") : "FAIL";
-    log(`🔍 Reviewer: ${name}... ${icon} ${label} (score: ${score})`);
+    const labelColor = approved ? (issues.length === 0 ? colors.green : colors.yellow) : colors.red;
+    
+    log(`🔍 Reviewer: ${colors.bold}${name}${colors.reset} ... ${icon} ${labelColor}${label}${colors.reset} (score: ${score})`);
     for (const issue of issues) {
       log(`   ${colors.red}Issue:${colors.reset} ${issue}`);
     }
@@ -87,23 +104,26 @@ function setupEventListeners() {
       const after = state.finalReport.optimizedRufusScore;
       const delta = after - before;
       const deltaColor = delta > 0 ? colors.green : delta < 0 ? colors.red : colors.yellow;
+      console.log();
       log(
-        `🏆 Pipeline complete! Rufus Score: ${before} ${deltaColor}→ ${after}${colors.reset} (${deltaColor}${delta > 0 ? "+" : ""}${delta}${colors.reset})`
+        `🏆 ${colors.green}${colors.bold}Pipeline Complete!${colors.reset} Rufus Score: ${before} ${deltaColor}→ ${after}${colors.reset} (${deltaColor}${delta > 0 ? "+" : ""}${delta}${colors.reset})`
       );
+      console.log(`Type ${colors.bold}'rufus <your question>'${colors.reset} to query the simulated shopping assistant!`);
     } else {
-      log(`${colors.yellow}⚠️ Pipeline completed but no final report generated${colors.reset}`);
+      log(`${colors.yellow}⚠️ Pipeline completed but no final report was generated.${colors.reset}`);
     }
     rl.prompt();
   });
 
   orchestrator.on("pipeline:error", (error: string) => {
-    log(`${colors.red}💥 Pipeline error: ${error}${colors.reset}`);
+    log(`${colors.red}💥 Pipeline Execution Interrupted: ${error}${colors.reset}`);
     rl.prompt();
   });
 }
 
 function stageIcon(name: string): string {
   const icons: Record<string, string> = {
+    ApifyFetcher: "📥",
     ListingFetcher: "📦",
     Preprocessor: "🧹",
     EmbeddingGenerator: "🔢",
@@ -116,6 +136,7 @@ function stageIcon(name: string): string {
 
 async function runOptimization(asin: string, marketplace: string) {
   try {
+    currentState = null;
     await orchestrator.runPipeline(asin, marketplace);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -130,18 +151,19 @@ function showStatus() {
     return;
   }
 
-  console.log(`\n${colors.bold}Pipeline Status${colors.reset}`);
-  console.log(`ASIN: ${currentState.asin}`);
+  console.log(`\n${colors.cyan}${colors.bold}═══ Current Pipeline Status ═══${colors.reset}`);
+  console.log(`ASIN:        ${currentState.asin}`);
   console.log(`Marketplace: ${currentState.marketplace}`);
-  console.log(`Stage: ${currentState.currentStage + 1} / 6`);
+  console.log(`Active State: ${currentState.error ? `${colors.red}Failed${colors.reset}` : "Active"}`);
+  console.log(`\n${colors.bold}Stages Status:${colors.reset}`);
 
   for (const task of currentState.tasks) {
-    const icon = task.status === "completed" ? "✅" : task.status === "failed" ? "❌" : "⏳";
+    const icon = task.status === "completed" ? `${colors.green}✅${colors.reset}` : task.status === "failed" ? `${colors.red}❌${colors.reset}` : "⏳";
     const duration =
       task.startedAt && task.completedAt
         ? formatDuration(task.completedAt.getTime() - task.startedAt.getTime())
         : "—";
-    console.log(`  ${icon} ${task.role} (${task.attempt} attempts) — ${duration}`);
+    console.log(`  ${icon} ${colors.bold}${STAGE_NAMES[task.role] || task.role}${colors.reset} (${task.attempt} attempts) — ${duration}`);
     if (task.error) {
       console.log(`     ${colors.red}Error: ${task.error}${colors.reset}`);
     }
@@ -152,37 +174,87 @@ function showStatus() {
 
 function showReport() {
   if (!currentState?.finalReport) {
-    console.log("No report available. Run a pipeline first.");
+    console.log("No report available. Run a successful pipeline first.");
     return;
   }
 
   const r = currentState.finalReport;
-  console.log(`\n${colors.cyan}${colors.bold}═══ Optimization Report ═══${colors.reset}`);
-  console.log(`ASIN:        ${r.asin}`);
-  console.log(`Marketplace: ${r.marketplace}`);
-  console.log(`Original Score: ${r.originalRufusScore}`);
-  console.log(`Optimized Score: ${colors.green}${r.optimizedRufusScore}${colors.reset}`);
-  console.log(`\n${colors.bold}Optimized Title:${colors.reset}`);
-  console.log(r.optimizedTitle);
-  console.log(`\n${colors.bold}Optimized Bullets:${colors.reset}`);
-  r.optimizedBullets.forEach((b, i) => console.log(`  ${i + 1}. ${b}`));
-  console.log(`\n${colors.bold}Q&A Suggestions:${colors.reset}`);
+  console.log(`\n${colors.cyan}${colors.bold}═══ 🏆 Optimus Rufus Final Report ═══${colors.reset}`);
+  console.log(`ASIN:           ${r.asin}`);
+  console.log(`Marketplace:    ${r.marketplace}`);
+  console.log(`Original Score: ${r.originalRufusScore} / 100`);
+  console.log(`Optimized Score: ${colors.green}${colors.bold}${r.optimizedRufusScore} / 100${colors.reset}`);
+  
+  console.log(`\n${colors.bold}✍️ Optimized Listing Title:${colors.reset}`);
+  console.log(`"${colors.green}${r.optimizedTitle}${colors.reset}"`);
+  
+  console.log(`\n${colors.bold}✍️ Optimized Listing Bullets:${colors.reset}`);
+  r.optimizedBullets.forEach((b, i) => console.log(`  ${colors.green}${i + 1}. ${b}${colors.reset}`));
+  
+  console.log(`\n${colors.bold}💬 Recommended Q&As (for Rufus injection):${colors.reset}`);
   r.optimizedQAs.forEach((qa, i) => {
     console.log(`  ${i + 1}. ${colors.bold}${qa.question}${colors.reset}`);
-    console.log(`     ${qa.optimizedAnswer}`);
+    console.log(`     👉 ${colors.gray}${qa.optimizedAnswer}${colors.reset}`);
   });
+
   if (r.competitorBenchmarks && r.competitorBenchmarks.length > 0) {
-    console.log(`\n${colors.bold}Competitor Benchmarks:${colors.reset}`);
+    console.log(`\n${colors.bold}🔎 Competitor Benchmarks:${colors.reset}`);
     r.competitorBenchmarks.forEach((c) => {
-      console.log(`  • ${c.brand} — Score: ${c.score}, Rating: ${c.rating}★ (${c.reviewCount} reviews)`);
+      console.log(`  • ${colors.bold}${c.brand}${colors.reset} (${c.asin}) — Score: ${c.score}/100, Rating: ${c.rating}★ (${c.reviewCount} reviews)`);
     });
   }
-  console.log(`\n${colors.bold}Semantic Gaps (${r.semanticGaps.length} found):${colors.reset}`);
+
+  console.log(`\n${colors.bold}📊 Identified Gaps & Recommendations (${r.semanticGaps.length}):${colors.reset}`);
   r.semanticGaps.slice(0, 5).forEach((g) => {
-    const color = g.priority === "critical" ? colors.red : g.priority === "high" ? colors.yellow : colors.gray;
-    console.log(`  ${color}[${g.priority}]${colors.reset} ${g.dimension}: ${g.recommendation}`);
+    const priorityColor = g.priority === "critical" ? colors.red : g.priority === "high" ? colors.yellow : colors.gray;
+    console.log(`  ${priorityColor}[${g.priority.toUpperCase()}]${colors.reset} ${colors.bold}${g.dimension}${colors.reset}: ${g.recommendation}`);
   });
   console.log();
+}
+
+async function runRufusQuery(queryText: string) {
+  if (!currentState?.finalReport) {
+    console.log("No optimized listing report available. Run 'optimize <ASIN>' first.");
+    rl.prompt();
+    return;
+  }
+
+  console.log(`\n💬 ${colors.cyan}${colors.bold}Simulating Amazon Rufus Shopping Assistant...${colors.reset}`);
+  console.log(`User query: "${colors.bold}${queryText}${colors.reset}"`);
+  console.log(`Evaluating optimized product copy against competitors...\n`);
+
+  const report = currentState.finalReport;
+  try {
+    const result = await simulateSingleRufusQuery(
+      queryText,
+      report.optimizedTitle,
+      report.optimizedBullets,
+      report.optimizedDescription || "",
+      "General",
+      report.competitorBenchmarks || []
+    );
+
+    console.log(`${colors.cyan}${colors.bold}═══ 🛍️ Simulated Rufus Search Results ═══${colors.reset}`);
+    console.log(`Query: "${colors.bold}${result.queryText}${colors.reset}"\n`);
+
+    result.rankings.forEach((rankItem) => {
+      const isTarget = rankItem.asin === "target_product";
+      const productLabel = isTarget
+        ? `${colors.green}${colors.bold}[Target Optimized Product]${colors.reset}`
+        : `${colors.bold}[Competitor ASIN: ${rankItem.asin}]${colors.reset}`;
+      const recLabel = rankItem.recommended
+        ? `${colors.green}${colors.bold}Recommended ✅${colors.reset}`
+        : `${colors.red}Not Recommended ❌${colors.reset}`;
+
+      console.log(`Rank #${rankItem.rank} | ${recLabel} | ${productLabel}`);
+      console.log(`🤖 ${colors.magenta}Rufus says:${colors.reset} "${rankItem.reason}"\n`);
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.log(`${colors.red}Error simulating query: ${msg}${colors.reset}`);
+  }
+
+  rl.prompt();
 }
 
 function showLogs() {
@@ -247,10 +319,46 @@ async function main() {
         rl.prompt();
         break;
 
-      case "retry":
-        console.log("Retry not yet implemented in REPL. Use the tRPC API or restart the pipeline.");
-        rl.prompt();
+      case "retry": {
+        const [stageRole] = args;
+        if (!currentState) {
+          console.log("No pipeline has been run yet.");
+          rl.prompt();
+          break;
+        }
+        if (!stageRole) {
+          console.log(`${colors.red}Error:${colors.reset} Specify which stage to retry (e.g. retry competitor_analyst).`);
+          rl.prompt();
+          break;
+        }
+        const role = stageRole as AgentRole;
+        if (!STAGE_NAMES[role]) {
+          console.log(`${colors.red}Error:${colors.reset} Invalid stage: "${stageRole}". Valid: ${Object.keys(STAGE_NAMES).join(", ")}`);
+          rl.prompt();
+          break;
+        }
+
+        console.log(`\n🔄 ${colors.yellow}Resuming pipeline and retrying stage ${STAGE_NAMES[role]}...${colors.reset}`);
+        try {
+          await orchestrator.resumePipeline(currentState);
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          log(`${colors.red}💥 Resume error: ${message}${colors.reset}`);
+          rl.prompt();
+        }
         break;
+      }
+
+      case "rufus": {
+        const queryText = args.join(" ");
+        if (!queryText) {
+          console.log(`${colors.red}Error:${colors.reset} Provide a search query. Example: rufus is it gluten free?`);
+          rl.prompt();
+          break;
+        }
+        await runRufusQuery(queryText);
+        break;
+      }
 
       case "report":
         showReport();

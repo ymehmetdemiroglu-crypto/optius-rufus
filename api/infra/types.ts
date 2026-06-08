@@ -33,6 +33,10 @@ export interface JobQueue {
   add(name: string, data: unknown, opts?: JobOpts): Promise<Job>;
   getJob(id: string): Promise<Job | null>;
   updateProgress(id: string, progress: number): Promise<void>;
+  pollNext(): Promise<Job | null>;
+  markActive(id: string): Promise<void>;
+  markCompleted(id: string, returnValue: unknown): Promise<void>;
+  markFailed(id: string, reason: string, stacktrace: string[]): Promise<void>;
 }
 
 export interface EventBus {

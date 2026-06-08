@@ -4,15 +4,6 @@
   "graph": {},
   "nodes": [
     {
-      "label": "orchestrator.test.ts",
-      "file_type": "code",
-      "source_file": "api/agents/__tests__/orchestrator.test.ts",
-      "source_location": "L1",
-      "id": "tests_orchestrator_test",
-      "community": 0,
-      "norm_label": "orchestrator.test.ts"
-    },
-    {
       "label": "apifyFetcher.ts",
       "file_type": "code",
       "source_file": "api/agents/agents/apifyFetcher.ts",
@@ -216,7 +207,7 @@
       "source_file": "api/agents/evaluators/apifyFetcherEvaluator.ts",
       "source_location": "L1",
       "id": "evaluators_apifyfetcherevaluator",
-      "community": 51,
+      "community": 1,
       "norm_label": "apifyfetcherevaluator.ts"
     },
     {
@@ -225,7 +216,7 @@
       "source_file": "api/agents/evaluators/apifyFetcherEvaluator.ts",
       "source_location": "L4",
       "id": "evaluators_apifyfetcherevaluator_apifyfetcherevaluator",
-      "community": 51,
+      "community": 1,
       "norm_label": "apifyfetcherevaluator"
     },
     {
@@ -234,7 +225,7 @@
       "source_file": "api/agents/evaluators/apifyFetcherEvaluator.ts",
       "source_location": "L5",
       "id": "evaluators_apifyfetcherevaluator_apifyfetcherevaluator_evaluate",
-      "community": 51,
+      "community": 1,
       "norm_label": ".evaluate()"
     },
     {
@@ -243,7 +234,7 @@
       "source_file": "api/agents/evaluators/competitorAnalystEvaluator.ts",
       "source_location": "L1",
       "id": "evaluators_competitoranalystevaluator",
-      "community": 51,
+      "community": 1,
       "norm_label": "competitoranalystevaluator.ts"
     },
     {
@@ -252,7 +243,7 @@
       "source_file": "api/agents/evaluators/competitorAnalystEvaluator.ts",
       "source_location": "L4",
       "id": "evaluators_competitoranalystevaluator_competitoranalystevaluator",
-      "community": 51,
+      "community": 1,
       "norm_label": "competitoranalystevaluator"
     },
     {
@@ -261,7 +252,7 @@
       "source_file": "api/agents/evaluators/competitorAnalystEvaluator.ts",
       "source_location": "L5",
       "id": "evaluators_competitoranalystevaluator_competitoranalystevaluator_evaluate",
-      "community": 51,
+      "community": 1,
       "norm_label": ".evaluate()"
     },
     {
@@ -270,7 +261,7 @@
       "source_file": "api/agents/evaluators/contentOptimizerEvaluator.ts",
       "source_location": "L1",
       "id": "evaluators_contentoptimizerevaluator",
-      "community": 51,
+      "community": 1,
       "norm_label": "contentoptimizerevaluator.ts"
     },
     {
@@ -279,7 +270,7 @@
       "source_file": "api/agents/evaluators/contentOptimizerEvaluator.ts",
       "source_location": "L4",
       "id": "evaluators_contentoptimizerevaluator_contentoptimizerevaluator",
-      "community": 51,
+      "community": 1,
       "norm_label": "contentoptimizerevaluator"
     },
     {
@@ -288,7 +279,7 @@
       "source_file": "api/agents/evaluators/contentOptimizerEvaluator.ts",
       "source_location": "L5",
       "id": "evaluators_contentoptimizerevaluator_contentoptimizerevaluator_evaluate",
-      "community": 51,
+      "community": 1,
       "norm_label": ".evaluate()"
     },
     {
@@ -297,7 +288,7 @@
       "source_file": "api/agents/evaluators/embeddingGeneratorEvaluator.ts",
       "source_location": "L1",
       "id": "evaluators_embeddinggeneratorevaluator",
-      "community": 51,
+      "community": 1,
       "norm_label": "embeddinggeneratorevaluator.ts"
     },
     {
@@ -306,7 +297,7 @@
       "source_file": "api/agents/evaluators/embeddingGeneratorEvaluator.ts",
       "source_location": "L3",
       "id": "evaluators_embeddinggeneratorevaluator_embeddinggeneratorevaluator",
-      "community": 51,
+      "community": 1,
       "norm_label": "embeddinggeneratorevaluator"
     },
     {
@@ -315,7 +306,7 @@
       "source_file": "api/agents/evaluators/embeddingGeneratorEvaluator.ts",
       "source_location": "L4",
       "id": "evaluators_embeddinggeneratorevaluator_embeddinggeneratorevaluator_evaluate",
-      "community": 51,
+      "community": 1,
       "norm_label": ".evaluate()"
     },
     {
@@ -324,7 +315,7 @@
       "source_file": "api/agents/evaluators/index.ts",
       "source_location": "L1",
       "id": "evaluators_index",
-      "community": 51,
+      "community": 1,
       "norm_label": "index.ts"
     },
     {
@@ -333,7 +324,7 @@
       "source_file": "api/agents/evaluators/preprocessorEvaluator.ts",
       "source_location": "L1",
       "id": "evaluators_preprocessorevaluator",
-      "community": 51,
+      "community": 1,
       "norm_label": "preprocessorevaluator.ts"
     },
     {
@@ -342,7 +333,7 @@
       "source_file": "api/agents/evaluators/preprocessorEvaluator.ts",
       "source_location": "L4",
       "id": "evaluators_preprocessorevaluator_preprocessorevaluator",
-      "community": 51,
+      "community": 1,
       "norm_label": "preprocessorevaluator"
     },
     {
@@ -351,7 +342,7 @@
       "source_file": "api/agents/evaluators/preprocessorEvaluator.ts",
       "source_location": "L5",
       "id": "evaluators_preprocessorevaluator_preprocessorevaluator_evaluate",
-      "community": 51,
+      "community": 1,
       "norm_label": ".evaluate()"
     },
     {
@@ -360,7 +351,7 @@
       "source_file": "api/agents/evaluators/semanticAnalyzerEvaluator.ts",
       "source_location": "L1",
       "id": "evaluators_semanticanalyzerevaluator",
-      "community": 51,
+      "community": 1,
       "norm_label": "semanticanalyzerevaluator.ts"
     },
     {
@@ -369,7 +360,7 @@
       "source_file": "api/agents/evaluators/semanticAnalyzerEvaluator.ts",
       "source_location": "L4",
       "id": "evaluators_semanticanalyzerevaluator_semanticanalyzerevaluator",
-      "community": 51,
+      "community": 1,
       "norm_label": "semanticanalyzerevaluator"
     },
     {
@@ -378,7 +369,7 @@
       "source_file": "api/agents/evaluators/semanticAnalyzerEvaluator.ts",
       "source_location": "L5",
       "id": "evaluators_semanticanalyzerevaluator_semanticanalyzerevaluator_evaluate",
-      "community": 51,
+      "community": 1,
       "norm_label": ".evaluate()"
     },
     {
@@ -387,7 +378,7 @@
       "source_file": "api/agents/evaluators/types.ts",
       "source_location": "L1",
       "id": "evaluators_types",
-      "community": 51,
+      "community": 1,
       "norm_label": "types.ts"
     },
     {
@@ -396,7 +387,7 @@
       "source_file": "api/agents/evaluators/types.ts",
       "source_location": "L1",
       "id": "evaluators_types_evaluationresult",
-      "community": 51,
+      "community": 1,
       "norm_label": "evaluationresult"
     },
     {
@@ -405,7 +396,7 @@
       "source_file": "api/agents/evaluators/types.ts",
       "source_location": "L9",
       "id": "evaluators_types_evaluator",
-      "community": 51,
+      "community": 1,
       "norm_label": "evaluator"
     },
     {
@@ -445,19 +436,10 @@
       "norm_label": "stage_names"
     },
     {
-      "label": "STAGE_DEPS",
-      "file_type": "code",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L36",
-      "id": "agents_orchestrator_stage_deps",
-      "community": 0,
-      "norm_label": "stage_deps"
-    },
-    {
       "label": "OptimizationOrchestrator",
       "file_type": "code",
       "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L47",
+      "source_location": "L36",
       "id": "agents_orchestrator_optimizationorchestrator",
       "community": 0,
       "norm_label": "optimizationorchestrator"
@@ -466,7 +448,7 @@
       "label": ".constructor()",
       "file_type": "code",
       "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L51",
+      "source_location": "L40",
       "id": "agents_orchestrator_optimizationorchestrator_constructor",
       "community": 0,
       "norm_label": ".constructor()"
@@ -475,52 +457,25 @@
       "label": ".runPipeline()",
       "file_type": "code",
       "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L60",
+      "source_location": "L49",
       "id": "agents_orchestrator_optimizationorchestrator_runpipeline",
       "community": 0,
       "norm_label": ".runpipeline()"
     },
     {
-      "label": ".resumePipeline()",
+      "label": ".createTask()",
       "file_type": "code",
       "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L77",
-      "id": "agents_orchestrator_optimizationorchestrator_resumepipeline",
+      "source_location": "L210",
+      "id": "agents_orchestrator_optimizationorchestrator_createtask",
       "community": 0,
-      "norm_label": ".resumepipeline()"
-    },
-    {
-      "label": ".executePipeline()",
-      "file_type": "code",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L104",
-      "id": "agents_orchestrator_optimizationorchestrator_executepipeline",
-      "community": 0,
-      "norm_label": ".executepipeline()"
-    },
-    {
-      "label": ".getTaskOutput()",
-      "file_type": "code",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L277",
-      "id": "agents_orchestrator_optimizationorchestrator_gettaskoutput",
-      "community": 0,
-      "norm_label": ".gettaskoutput()"
-    },
-    {
-      "label": ".getOrCreateTask()",
-      "file_type": "code",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L282",
-      "id": "agents_orchestrator_optimizationorchestrator_getorcreatetask",
-      "community": 0,
-      "norm_label": ".getorcreatetask()"
+      "norm_label": ".createtask()"
     },
     {
       "label": ".buildInput()",
       "file_type": "code",
       "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L304",
+      "source_location": "L227",
       "id": "agents_orchestrator_optimizationorchestrator_buildinput",
       "community": 0,
       "norm_label": ".buildinput()"
@@ -529,7 +484,7 @@
       "label": ".executeWithRetry()",
       "file_type": "code",
       "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L332",
+      "source_location": "L255",
       "id": "agents_orchestrator_optimizationorchestrator_executewithretry",
       "community": 0,
       "norm_label": ".executewithretry()"
@@ -538,7 +493,7 @@
       "label": ".reviewStage()",
       "file_type": "code",
       "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L363",
+      "source_location": "L286",
       "id": "agents_orchestrator_optimizationorchestrator_reviewstage",
       "community": 0,
       "norm_label": ".reviewstage()"
@@ -1647,7 +1602,7 @@
       "source_file": "api/db/types.ts",
       "source_location": "L20",
       "id": "db_types_prospectrecord",
-      "community": 22,
+      "community": 4,
       "norm_label": "prospectrecord"
     },
     {
@@ -1930,15 +1885,6 @@
       "norm_label": "options"
     },
     {
-      "label": "jobRepository.test.ts",
-      "file_type": "code",
-      "source_file": "api/infra/__tests__/jobRepository.test.ts",
-      "source_location": "L1",
-      "id": "tests_jobrepository_test",
-      "community": 15,
-      "norm_label": "jobrepository.test.ts"
-    },
-    {
       "label": "eventBus.ts",
       "file_type": "code",
       "source_file": "api/infra/eventBus.ts",
@@ -2104,7 +2050,7 @@
       "label": ".markFailed()",
       "file_type": "code",
       "source_file": "api/infra/jobRepository.ts",
-      "source_location": "L112",
+      "source_location": "L111",
       "id": "infra_jobrepository_sqlitejobrepository_markfailed",
       "community": 15,
       "norm_label": ".markfailed()"
@@ -2113,7 +2059,7 @@
       "label": ".hydrate()",
       "file_type": "code",
       "source_file": "api/infra/jobRepository.ts",
-      "source_location": "L118",
+      "source_location": "L117",
       "id": "infra_jobrepository_sqlitejobrepository_hydrate",
       "community": 15,
       "norm_label": ".hydrate()"
@@ -2122,7 +2068,7 @@
       "label": ".safeJsonParse()",
       "file_type": "code",
       "source_file": "api/infra/jobRepository.ts",
-      "source_location": "L140",
+      "source_location": "L139",
       "id": "infra_jobrepository_sqlitejobrepository_safejsonparse",
       "community": 15,
       "norm_label": ".safejsonparse()"
@@ -2322,7 +2268,7 @@
       "source_file": "api/infra/queue.ts",
       "source_location": "L87",
       "id": "infra_queue_pipelinequeue",
-      "community": 15,
+      "community": 50,
       "norm_label": "pipelinequeue"
     },
     {
@@ -2340,7 +2286,7 @@
       "source_file": "api/infra/types.ts",
       "source_location": "L1",
       "id": "infra_types",
-      "community": 2,
+      "community": 15,
       "norm_label": "types.ts"
     },
     {
@@ -2349,7 +2295,7 @@
       "source_file": "api/infra/types.ts",
       "source_location": "L3",
       "id": "infra_types_domainevent",
-      "community": 2,
+      "community": 15,
       "norm_label": "domainevent"
     },
     {
@@ -2482,7 +2428,7 @@
       "label": ".retryStage()",
       "file_type": "code",
       "source_file": "api/pipeline/engine.ts",
-      "source_location": "L237",
+      "source_location": "L234",
       "id": "pipeline_engine_pipelineengine_retrystage",
       "community": 1,
       "norm_label": ".retrystage()"
@@ -2565,7 +2511,7 @@
       "source_file": "api/pipeline/types.ts",
       "source_location": "L41",
       "id": "pipeline_types_semanticgap",
-      "community": 0,
+      "community": 5,
       "norm_label": "semanticgap"
     },
     {
@@ -2709,7 +2655,7 @@
       "source_file": "api/pipeline/worker.ts",
       "source_location": "L1",
       "id": "pipeline_worker",
-      "community": 15,
+      "community": 50,
       "norm_label": "worker.ts"
     },
     {
@@ -2790,7 +2736,7 @@
       "source_file": "api/routers/agents.ts",
       "source_location": "L1",
       "id": "routers_agents",
-      "community": 11,
+      "community": 50,
       "norm_label": "agents.ts"
     },
     {
@@ -2799,7 +2745,7 @@
       "source_file": "api/routers/agents.ts",
       "source_location": "L11",
       "id": "routers_agents_agentsrouter",
-      "community": 11,
+      "community": 50,
       "norm_label": "agentsrouter"
     },
     {
@@ -2826,7 +2772,7 @@
       "source_file": "api/routers/apollo.ts",
       "source_location": "L1",
       "id": "routers_apollo",
-      "community": 52,
+      "community": 4,
       "norm_label": "apollo.ts"
     },
     {
@@ -2835,7 +2781,7 @@
       "source_file": "api/routers/apollo.ts",
       "source_location": "L7",
       "id": "routers_apollo_apollorouter",
-      "community": 52,
+      "community": 4,
       "norm_label": "apollorouter"
     },
     {
@@ -2880,7 +2826,7 @@
       "source_file": "api/routers/catalogGraphRouter.ts",
       "source_location": "L1",
       "id": "routers_cataloggraphrouter",
-      "community": 21,
+      "community": 27,
       "norm_label": "cataloggraphrouter.ts"
     },
     {
@@ -2889,7 +2835,7 @@
       "source_file": "api/routers/catalogGraphRouter.ts",
       "source_location": "L9",
       "id": "routers_cataloggraphrouter_cataloggraphrouter",
-      "community": 21,
+      "community": 27,
       "norm_label": "cataloggraphrouter"
     },
     {
@@ -3042,7 +2988,7 @@
       "source_file": "api/services/apollo.ts",
       "source_location": "L1",
       "id": "services_apollo",
-      "community": 52,
+      "community": 4,
       "norm_label": "apollo.ts"
     },
     {
@@ -3051,7 +2997,7 @@
       "source_file": "api/services/apollo.ts",
       "source_location": "L4",
       "id": "services_apollo_apollofetch",
-      "community": 52,
+      "community": 4,
       "norm_label": "apollofetch()"
     },
     {
@@ -3060,7 +3006,7 @@
       "source_file": "api/services/apollo.ts",
       "source_location": "L22",
       "id": "services_apollo_createcontact",
-      "community": 52,
+      "community": 4,
       "norm_label": "createcontact()"
     },
     {
@@ -3069,7 +3015,7 @@
       "source_file": "api/services/apollo.ts",
       "source_location": "L38",
       "id": "services_apollo_enrollinsequence",
-      "community": 52,
+      "community": 4,
       "norm_label": "enrollinsequence()"
     },
     {
@@ -3078,7 +3024,7 @@
       "source_file": "api/services/apollo.ts",
       "source_location": "L52",
       "id": "services_apollo_getsequences",
-      "community": 52,
+      "community": 4,
       "norm_label": "getsequences()"
     },
     {
@@ -3321,7 +3267,7 @@
       "source_file": "api/services/competitor.ts",
       "source_location": "L1",
       "id": "services_competitor",
-      "community": 0,
+      "community": 27,
       "norm_label": "competitor.ts"
     },
     {
@@ -3330,7 +3276,7 @@
       "source_file": "api/services/competitor.ts",
       "source_location": "L7",
       "id": "services_competitor_fetchcompetitors",
-      "community": 0,
+      "community": 27,
       "norm_label": "fetchcompetitors()"
     },
     {
@@ -3348,7 +3294,7 @@
       "source_file": "api/services/copywriter.ts",
       "source_location": "L7",
       "id": "services_copywriter_analysisinput",
-      "community": 0,
+      "community": 5,
       "norm_label": "analysisinput"
     },
     {
@@ -3474,7 +3420,7 @@
       "source_file": "api/services/domain/analysisService.ts",
       "source_location": "L70",
       "id": "domain_analysisservice_analysismetrics",
-      "community": 0,
+      "community": 5,
       "norm_label": "analysismetrics"
     },
     {
@@ -4061,15 +4007,6 @@
       "id": "services_rufussimulator_generatefallbacksov",
       "community": 27,
       "norm_label": "generatefallbacksov()"
-    },
-    {
-      "label": "simulateSingleRufusQuery()",
-      "file_type": "code",
-      "source_file": "api/services/rufusSimulator.ts",
-      "source_location": "L259",
-      "id": "services_rufussimulator_simulatesinglerufusquery",
-      "community": 27,
-      "norm_label": "simulatesinglerufusquery()"
     },
     {
       "label": "scraper.ts",
@@ -6601,15 +6538,6 @@
       "norm_label": "db"
     },
     {
-      "label": ".createTask()",
-      "file_type": "code",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L210",
-      "community": 0,
-      "norm_label": ".createtask()",
-      "id": "agents_orchestrator_optimizationorchestrator_createtask"
-    },
-    {
       "label": "AgentRole",
       "file_type": "code",
       "source_file": "api/agents/types.ts",
@@ -6755,149 +6683,6 @@
     }
   ],
   "links": [
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/__tests__/orchestrator.test.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "tests_orchestrator_test",
-      "target": "agents_orchestrator",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/__tests__/orchestrator.test.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "tests_orchestrator_test",
-      "target": "agents_orchestrator_optimizationorchestrator",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/__tests__/orchestrator.test.ts",
-      "source_location": "L3",
-      "weight": 1.0,
-      "source": "tests_orchestrator_test",
-      "target": "agents_registry",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/__tests__/orchestrator.test.ts",
-      "source_location": "L3",
-      "weight": 1.0,
-      "source": "tests_orchestrator_test",
-      "target": "agents_registry_defaultagentregistry",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/__tests__/orchestrator.test.ts",
-      "source_location": "L4",
-      "weight": 1.0,
-      "source": "tests_orchestrator_test",
-      "target": "agents_reviewer",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/__tests__/orchestrator.test.ts",
-      "source_location": "L4",
-      "weight": 1.0,
-      "source": "tests_orchestrator_test",
-      "target": "agents_reviewer_revieweragent",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/__tests__/orchestrator.test.ts",
-      "source_location": "L5",
-      "weight": 1.0,
-      "source": "tests_orchestrator_test",
-      "target": "agents_types",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/__tests__/orchestrator.test.ts",
-      "source_location": "L5",
-      "weight": 1.0,
-      "source": "tests_orchestrator_test",
-      "target": "agents_types_agent",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/__tests__/orchestrator.test.ts",
-      "source_location": "L5",
-      "weight": 1.0,
-      "source": "tests_orchestrator_test",
-      "target": "agents_types_agentrole",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/__tests__/orchestrator.test.ts",
-      "source_location": "L5",
-      "weight": 1.0,
-      "source": "tests_orchestrator_test",
-      "target": "agents_types_pipelinestate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/__tests__/orchestrator.test.ts",
-      "source_location": "L5",
-      "weight": 1.0,
-      "source": "tests_orchestrator_test",
-      "target": "pipeline_types_agent",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/__tests__/orchestrator.test.ts",
-      "source_location": "L5",
-      "weight": 1.0,
-      "source": "tests_orchestrator_test",
-      "target": "pipeline_types_agentrole",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/__tests__/orchestrator.test.ts",
-      "source_location": "L5",
-      "weight": 1.0,
-      "source": "tests_orchestrator_test",
-      "target": "pipeline_types_pipelinestate",
-      "confidence_score": 1.0
-    },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
@@ -9787,16 +9572,6 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L36",
-      "weight": 1.0,
-      "source": "agents_orchestrator",
-      "target": "agents_orchestrator_stage_deps",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/orchestrator.ts",
       "source_location": "L32",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -10122,51 +9897,11 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L104",
-      "weight": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator",
-      "target": "agents_orchestrator_optimizationorchestrator_executepipeline",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/orchestrator.ts",
       "source_location": "L267",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "agents_orchestrator_optimizationorchestrator",
       "target": "agents_orchestrator_optimizationorchestrator_executewithretry"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L282",
-      "weight": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator",
-      "target": "agents_orchestrator_optimizationorchestrator_getorcreatetask",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L277",
-      "weight": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator",
-      "target": "agents_orchestrator_optimizationorchestrator_gettaskoutput",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L77",
-      "weight": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator",
-      "target": "agents_orchestrator_optimizationorchestrator_resumepipeline",
-      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -10281,17 +10016,6 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L74",
-      "weight": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator_runpipeline",
-      "target": "agents_orchestrator_optimizationorchestrator_executepipeline",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/orchestrator.ts",
       "source_location": "L124",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -10354,114 +10078,70 @@
       "target": "pipeline_types_rawlistingdata"
     },
     {
-      "relation": "calls",
-      "context": "call",
+      "relation": "references",
+      "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L101",
+      "source_location": "L222",
       "weight": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator_resumepipeline",
-      "target": "agents_orchestrator_optimizationorchestrator_executepipeline",
-      "confidence_score": 1.0
+      "confidence_score": 1.0,
+      "source": "agents_orchestrator_optimizationorchestrator_createtask",
+      "target": "agents_types_agentrole"
     },
     {
       "relation": "references",
       "context": "generic_arg",
       "confidence": "EXTRACTED",
       "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L77",
+      "source_location": "L222",
       "weight": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator_resumepipeline",
-      "target": "pipeline_types_pipelinestate",
-      "confidence_score": 1.0
+      "confidence_score": 1.0,
+      "source": "agents_orchestrator_optimizationorchestrator_createtask",
+      "target": "agents_types_agenttask"
     },
     {
-      "relation": "calls",
-      "context": "call",
+      "relation": "references",
+      "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L243",
+      "source_location": "L222",
       "weight": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator_executepipeline",
-      "target": "agents_orchestrator_optimizationorchestrator_gettaskoutput",
-      "confidence_score": 1.0
+      "confidence_score": 1.0,
+      "source": "agents_orchestrator_optimizationorchestrator_createtask",
+      "target": "agents_types_pipelinestate"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "api/agents/orchestrator.ts",
+      "source_location": "L210",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "agents_orchestrator_optimizationorchestrator_createtask",
+      "target": "pipeline_types_agentrole"
     },
     {
       "relation": "references",
       "context": "generic_arg",
       "confidence": "EXTRACTED",
       "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L104",
+      "source_location": "L210",
       "weight": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator_executepipeline",
-      "target": "pipeline_types_pipelinestate",
-      "confidence_score": 1.0
+      "confidence_score": 1.0,
+      "source": "agents_orchestrator_optimizationorchestrator_createtask",
+      "target": "pipeline_types_agenttask"
     },
     {
       "relation": "references",
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L104",
+      "source_location": "L210",
       "weight": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator_executepipeline",
-      "target": "pipeline_types_rawlistingdata",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L277",
-      "weight": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator_gettaskoutput",
-      "target": "pipeline_types_agentrole",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L277",
-      "weight": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator_gettaskoutput",
-      "target": "pipeline_types_pipelinestate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L282",
-      "weight": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator_getorcreatetask",
-      "target": "pipeline_types_agentrole",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "generic_arg",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L282",
-      "weight": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator_getorcreatetask",
-      "target": "pipeline_types_agenttask",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L282",
-      "weight": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator_getorcreatetask",
-      "target": "pipeline_types_pipelinestate",
-      "confidence_score": 1.0
+      "confidence_score": 1.0,
+      "source": "agents_orchestrator_optimizationorchestrator_createtask",
+      "target": "pipeline_types_pipelinestate"
     },
     {
       "relation": "references",
@@ -13313,9 +12993,9 @@
       "source_file": "api/pipeline/__tests__/engine.test.ts",
       "source_location": "L3",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "tests_engine_test",
-      "target": "repositories_pipelinerepository"
+      "target": "repositories_pipelinerepository",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -14520,28 +14200,6 @@
       "confidence_score": 1.0,
       "source": "api_index",
       "target": "vercel"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "api/infra/__tests__/jobRepository.test.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "tests_jobrepository_test",
-      "target": "infra_jobrepository",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "api/infra/__tests__/jobRepository.test.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "tests_jobrepository_test",
-      "target": "infra_jobrepository_sqlitejobrepository",
-      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -15867,9 +15525,9 @@
       "source_file": "api/pipeline/__tests__/engine.test.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "tests_engine_test",
-      "target": "pipeline_engine"
+      "target": "pipeline_engine",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -15878,9 +15536,9 @@
       "source_file": "api/pipeline/__tests__/engine.test.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "tests_engine_test",
-      "target": "pipeline_engine_pipelineengine"
+      "target": "pipeline_engine_pipelineengine",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -15889,9 +15547,9 @@
       "source_file": "api/pipeline/__tests__/engine.test.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "tests_engine_test",
-      "target": "pipeline_executors"
+      "target": "pipeline_executors",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -15900,9 +15558,9 @@
       "source_file": "api/pipeline/__tests__/engine.test.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "tests_engine_test",
-      "target": "pipeline_executors_stageexecutors"
+      "target": "pipeline_executors_stageexecutors",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -16700,17 +16358,6 @@
       "target": "pipeline_types_stagename"
     },
     {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L210",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator_createtask",
-      "target": "pipeline_types_agentrole"
-    },
-    {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -16874,28 +16521,6 @@
       "confidence_score": 1.0,
       "source": "services_competitor",
       "target": "pipeline_types_competitorbenchmark"
-    },
-    {
-      "relation": "references",
-      "context": "generic_arg",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L210",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator_createtask",
-      "target": "pipeline_types_agenttask"
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L210",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator_createtask",
-      "target": "pipeline_types_pipelinestate"
     },
     {
       "relation": "imports",
@@ -19584,16 +19209,6 @@
       "confidence_score": 1.0,
       "source": "services_rufussimulator",
       "target": "services_rufussimulator_simulaterufussov"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "api/services/rufusSimulator.ts",
-      "source_location": "L259",
-      "weight": 1.0,
-      "source": "services_rufussimulator",
-      "target": "services_rufussimulator_simulatesinglerufusquery",
-      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -23159,39 +22774,6 @@
       "target": "vercel_api_index_ts_includefiles"
     },
     {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L222",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator_createtask",
-      "target": "agents_types_agentrole"
-    },
-    {
-      "relation": "references",
-      "context": "generic_arg",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L222",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator_createtask",
-      "target": "agents_types_agenttask"
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "api/agents/orchestrator.ts",
-      "source_location": "L222",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "agents_orchestrator_optimizationorchestrator_createtask",
-      "target": "agents_types_pipelinestate"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -23204,5 +22786,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "fdd726ec6ab173f1e4e36fbdab2855f044700038"
+  "built_at_commit": "141e4eccfaa8118f66d8ffe6be4ad35c0b16741b"
 }

@@ -1,6 +1,5 @@
 import { EventEmitter } from "events";
 import type {
-  Agent,
   AgentRole,
   AgentTask,
   AnalysisResult,
@@ -11,13 +10,7 @@ import type {
   RawListingData,
   ReviewResult,
 } from "./types.js";
-import { ApifyFetcherAgent } from "./agents/apifyFetcher.js";
-import { CompetitorAnalystAgent } from "./agents/competitorAnalyst.js";
-import { ContentOptimizerAgent } from "./agents/contentOptimizer.js";
-import { EmbeddingGeneratorAgent } from "./agents/embeddingGenerator.js";
-import { ListingFetcherAgent } from "./agents/listingFetcher.js";
-import { PreprocessorAgent } from "./agents/preprocessor.js";
-import { SemanticAnalyzerAgent } from "./agents/semanticAnalyzer.js";
+import { DefaultAgentRegistry, type AgentRegistry } from "./registry.js";
 import { ReviewerAgent } from "./reviewer.js";
 
 const STAGES: AgentRole[] = [
@@ -40,22 +33,28 @@ const STAGE_NAMES: Record<AgentRole, string> = {
   reviewer: "Reviewer",
 };
 
+const STAGE_DEPS: Record<AgentRole, AgentRole[]> = {
+  apify_fetcher: [],
+  listing_fetcher: [],
+  preprocessor: ["apify_fetcher"],
+  embedding_generator: ["preprocessor"],
+  semantic_analyzer: ["embedding_generator"],
+  content_optimizer: ["semantic_analyzer"],
+  competitor_analyst: ["apify_fetcher"],
+  reviewer: [],
+};
+
 export class OptimizationOrchestrator extends EventEmitter {
-  private agents: Map<AgentRole, Agent>;
+  private registry: AgentRegistry;
   private reviewer: ReviewerAgent;
 
-  constructor() {
+  constructor(
+    registry: AgentRegistry = new DefaultAgentRegistry(),
+    reviewer: ReviewerAgent = new ReviewerAgent()
+  ) {
     super();
-    this.agents = new Map<AgentRole, Agent>([
-      ["apify_fetcher", new ApifyFetcherAgent()],
-      ["listing_fetcher", new ListingFetcherAgent()],
-      ["preprocessor", new PreprocessorAgent()],
-      ["embedding_generator", new EmbeddingGeneratorAgent()],
-      ["semantic_analyzer", new SemanticAnalyzerAgent()],
-      ["content_optimizer", new ContentOptimizerAgent()],
-      ["competitor_analyst", new CompetitorAnalystAgent()],
-    ]);
-    this.reviewer = new ReviewerAgent();
+    this.registry = registry;
+    this.reviewer = reviewer;
   }
 
   async runPipeline(
@@ -72,32 +71,78 @@ export class OptimizationOrchestrator extends EventEmitter {
     };
 
     this.emit("pipeline:start", { asin, marketplace });
+    return this.executePipeline(state, overrides);
+  }
 
+  async resumePipeline(
+    state: PipelineState
+  ): Promise<PipelineState> {
+    this.emit("pipeline:start", { asin: state.asin, marketplace: state.marketplace });
+
+    // Reset failed or skipped tasks
+    for (const task of state.tasks) {
+      if (task.status === "failed") {
+        task.status = "pending";
+        task.attempt = 0;
+        task.error = undefined;
+        task.output = null;
+      }
+    }
+
+    // Filter reviews to keep only completed tasks
+    state.reviews = state.reviews.filter((r) => {
+      const task = state.tasks.find((t) => t.id === r.taskId);
+      return task && task.status === "completed";
+    });
+
+    state.error = undefined;
+    state.finalReport = undefined;
+
+    return this.executePipeline(state);
+  }
+
+  private async executePipeline(
+    state: PipelineState,
+    overrides?: { listingData?: RawListingData }
+  ): Promise<PipelineState> {
     try {
-      let rawListing: RawListingData | undefined;
-      let cleaned: CleanedText | undefined;
-      let embedding: number[] | undefined;
-      let analysis: AnalysisResult | undefined;
-      let optimized: OptimizedContent | undefined;
+      const stagePromises: Record<AgentRole, Promise<unknown>> = {} as any;
+      const executedStages = new Set<AgentRole>();
 
-      for (let i = 0; i < STAGES.length; i++) {
-        const role = STAGES[i];
-        state.currentStage = i;
+      const executeStage = async (role: AgentRole): Promise<unknown> => {
+        const deps = STAGE_DEPS[role];
+        if (deps.length > 0) {
+          try {
+            await Promise.all(deps.map((dep) => stagePromises[dep]));
+          } catch (depErr) {
+            const task = await this.getOrCreateTask(state, role);
+            task.status = "failed";
+            task.error = "Skipped: Dependency failed";
+            throw new Error(`Stage ${STAGE_NAMES[role]} skipped because dependency failed.`, { cause: depErr });
+          }
+        }
 
-        const task = await this.createTask(state, role);
-        state.tasks.push(task);
+        const hasExecutedDeps = deps.some((dep) => executedStages.has(dep));
+        const task = await this.getOrCreateTask(state, role);
 
-        this.emit("stage:start", { stage: i, role, name: STAGE_NAMES[role] });
+        // Skip completed stages
+        if (!hasExecutedDeps && task.status === "completed" && task.output !== null) {
+          return task.output;
+        }
 
-        // Handle listingData override for apify_fetcher
+        const stageIndex = STAGES.indexOf(role);
+        state.currentStage = stageIndex >= 0 ? stageIndex : state.currentStage;
+
+        this.emit("stage:start", { stage: stageIndex, role, name: STAGE_NAMES[role] });
+
+        // Handle override for apify_fetcher
         if (overrides?.listingData && role === "apify_fetcher") {
-          rawListing = overrides.listingData;
           task.status = "completed";
-          task.output = rawListing;
+          task.output = overrides.listingData;
           task.completedAt = new Date();
 
           this.emit("stage:complete", {
-            stage: i,
+            stage: stageIndex,
             role,
             name: STAGE_NAMES[role],
             status: task.status,
@@ -108,7 +153,7 @@ export class OptimizationOrchestrator extends EventEmitter {
           state.reviews.push(review);
 
           this.emit("review:complete", {
-            stage: i,
+            stage: stageIndex,
             role,
             name: STAGE_NAMES[role],
             approved: review.approved,
@@ -117,8 +162,14 @@ export class OptimizationOrchestrator extends EventEmitter {
             suggestions: review.suggestions,
           });
 
-          continue;
+          executedStages.add(role);
+          return task.output;
         }
+
+        const rawListing = this.getTaskOutput<RawListingData>(state, "apify_fetcher") || this.getTaskOutput<RawListingData>(state, "listing_fetcher");
+        const cleaned = this.getTaskOutput<CleanedText>(state, "preprocessor");
+        const embedding = this.getTaskOutput<number[]>(state, "embedding_generator");
+        const analysis = this.getTaskOutput<AnalysisResult>(state, "semantic_analyzer");
 
         const input = this.buildInput(role, state, rawListing, cleaned, embedding, analysis);
         const result = await this.executeWithRetry(task, input);
@@ -129,7 +180,7 @@ export class OptimizationOrchestrator extends EventEmitter {
         task.completedAt = new Date();
 
         this.emit("stage:complete", {
-          stage: i,
+          stage: stageIndex,
           role,
           name: STAGE_NAMES[role],
           status: task.status,
@@ -137,39 +188,14 @@ export class OptimizationOrchestrator extends EventEmitter {
         });
 
         if (task.status === "failed") {
-          state.error = `Stage ${STAGE_NAMES[role]} failed after ${task.attempt} attempts: ${task.error}`;
-          this.emit("pipeline:error", state.error);
-          return state;
+          throw new Error(`Stage ${STAGE_NAMES[role]} failed after ${task.attempt} attempts: ${task.error}`);
         }
 
-        // Store output for next stages
-        switch (role) {
-          case "apify_fetcher":
-            rawListing = task.output as RawListingData;
-            break;
-          case "listing_fetcher":
-            rawListing = task.output as RawListingData;
-            break;
-          case "preprocessor":
-            cleaned = task.output as CleanedText;
-            break;
-          case "embedding_generator":
-            embedding = task.output as number[];
-            break;
-          case "semantic_analyzer":
-            analysis = task.output as AnalysisResult;
-            break;
-          case "content_optimizer":
-            optimized = task.output as OptimizedContent;
-            break;
-        }
-
-        // Review stage
         const review = await this.reviewStage(task);
         state.reviews.push(review);
 
         this.emit("review:complete", {
-          stage: i,
+          stage: stageIndex,
           role,
           name: STAGE_NAMES[role],
           approved: review.approved,
@@ -178,25 +204,54 @@ export class OptimizationOrchestrator extends EventEmitter {
           suggestions: review.suggestions,
         });
 
+        executedStages.add(role);
+
         if (!review.approved && review.issues.length > 0) {
-          // Non-blocking warning: continue but log
           this.emit("review:warning", {
-            stage: i,
+            stage: stageIndex,
             role,
             issues: review.issues,
           });
         }
+
+        return task.output;
+      };
+
+      // Create execution promises in topological order
+      for (const role of STAGES) {
+        stagePromises[role] = executeStage(role);
+      }
+
+      // Wait for all to settle
+      const results = await Promise.allSettled(STAGES.map((role) => stagePromises[role]));
+
+      // Check for failures
+      const failures = results.filter((r) => r.status === "rejected");
+      if (failures.length > 0) {
+        const errorMsgs = failures.map((f) =>
+          (f as PromiseRejectedResult).reason instanceof Error
+            ? ((f as PromiseRejectedResult).reason as Error).message
+            : String((f as PromiseRejectedResult).reason)
+        );
+        const combinedError = `One or more stages failed: ${errorMsgs.join("; ")}`;
+        state.error = combinedError;
+        this.emit("pipeline:error", combinedError);
+        return state;
       }
 
       // Assemble final report
+      const rawListing = this.getTaskOutput<RawListingData>(state, "apify_fetcher") || this.getTaskOutput<RawListingData>(state, "listing_fetcher");
+      const analysis = this.getTaskOutput<AnalysisResult>(state, "semantic_analyzer");
+      const optimized = this.getTaskOutput<OptimizedContent>(state, "content_optimizer");
+
       if (rawListing && analysis && optimized) {
         const competitors = state.tasks.find((t) => t.role === "competitor_analyst")?.output as
           | CompetitorBenchmark[]
           | undefined;
 
         state.finalReport = {
-          asin,
-          marketplace,
+          asin: state.asin,
+          marketplace: state.marketplace,
           originalRufusScore: analysis.rufusScore,
           optimizedRufusScore: Math.min(100, analysis.rufusScore + 15 + Math.floor(Math.random() * 10)),
           semanticGaps: analysis.semanticGaps,
@@ -219,21 +274,31 @@ export class OptimizationOrchestrator extends EventEmitter {
     }
   }
 
-  private async createTask(
+  private getTaskOutput<T>(state: PipelineState, role: AgentRole): T | undefined {
+    const task = state.tasks.find((t) => t.role === role);
+    return task && task.status === "completed" ? (task.output as T) : undefined;
+  }
+
+  private async getOrCreateTask(
     state: PipelineState,
     role: AgentRole
   ): Promise<AgentTask> {
-    return {
-      id: `${state.asin}-${role}-${Date.now()}`,
-      asin: state.asin,
-      marketplace: state.marketplace,
-      role,
-      status: "pending",
-      input: null,
-      output: null,
-      attempt: 0,
-      maxAttempts: 3,
-    };
+    let task = state.tasks.find((t) => t.role === role);
+    if (!task) {
+      task = {
+        id: `${state.asin}-${role}-${Date.now()}`,
+        asin: state.asin,
+        marketplace: state.marketplace,
+        role,
+        status: "pending",
+        input: null,
+        output: null,
+        attempt: 0,
+        maxAttempts: 3,
+      };
+      state.tasks.push(task);
+    }
+    return task;
   }
 
   private buildInput(
@@ -268,7 +333,7 @@ export class OptimizationOrchestrator extends EventEmitter {
     task: AgentTask,
     input: unknown
   ): Promise<{ output: unknown; status: AgentTask["status"]; error?: string }> {
-    const agent = this.agents.get(task.role);
+    const agent = this.registry.get(task.role);
     if (!agent) {
       return { output: null, status: "failed", error: `No agent found for role: ${task.role}` };
     }
