@@ -26,13 +26,13 @@ export default function StageAEOPDFAudit({
   const agencyName = brandData?.companyName || "Optimus Rufus";
   const agencyWebsite = brandData?.website || "www.optimusrufus.com";
 
-  // Radar Chart calculations
+  // Radar Chart calculations (simplified labels for business owners)
   const vertices = [
-    { name: "Safety & Form", angle: -Math.PI / 2 },
-    { name: "Usage Timing", angle: -Math.PI / 2 + (72 * Math.PI) / 180 },
+    { name: "Safety & Warnings", angle: -Math.PI / 2 },
+    { name: "When to Use", angle: -Math.PI / 2 + (72 * Math.PI) / 180 },
     { name: "Purity & Sourcing", angle: -Math.PI / 2 + (144 * Math.PI) / 180 },
-    { name: "Attribution Traffic", angle: -Math.PI / 2 + (216 * Math.PI) / 180 },
-    { name: "COSMO Seeding", angle: -Math.PI / 2 + (288 * Math.PI) / 180 },
+    { name: "External Traffic", angle: -Math.PI / 2 + (216 * Math.PI) / 180 },
+    { name: "Buyer Questions", angle: -Math.PI / 2 + (288 * Math.PI) / 180 },
   ];
 
   const scores = [
@@ -88,13 +88,13 @@ export default function StageAEOPDFAudit({
         <div className="border-[3px] border-brand-dark p-6 bg-brand-bg shadow-brutal flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <span className="font-mono text-xs uppercase tracking-widest text-brand-gold font-black bg-brand-dark text-white px-2 py-0.5">
-              STANDALONE AUDIT REPORT
+              YOUR GAMEPLAN
             </span>
             <h2 className="display-heading text-2xl md:text-3xl text-brand-dark mt-2">
-              White-Labeled AEO Audit Report
+              Your Custom Answer Engine (AEO) Blueprint
             </h2>
             <p className="text-sm font-mono font-bold text-brand-dark/60 mt-1">
-              Prepared for: {prospect.listing.brand} (ASIN: {prospect.listing.asin})
+              For: {prospect.listing.brand} | ASIN: {prospect.listing.asin}
             </p>
           </div>
           <div className="text-left md:text-right font-mono text-xs font-black space-y-1">
@@ -110,10 +110,10 @@ export default function StageAEOPDFAudit({
           <div className="border-[3px] border-brand-dark p-6 bg-white shadow-brutal space-y-4">
             <div className="flex items-center gap-2 text-brand-blue font-black font-display text-lg uppercase border-b-2 border-brand-dark pb-2">
               <Compass className="h-5 w-5" />
-              <span>Vector Semantic Gap</span>
+              <span>Where You are Losing to Competitors</span>
             </div>
             <p className="text-xs text-brand-dark/70 font-medium leading-relaxed">
-              Comparison between your listing's semantic density and the high-relevance target required to secure conversational recommendations.
+              This shows the gap between what details you have on your listing page right now versus what Amazon's AI requires to start recommending you. If the red area doesn't cover the blue dashed line, your competitor wins the recommendation.
             </p>
 
             <div className="flex justify-center bg-brand-bg border border-brand-dark py-4 relative">
@@ -194,7 +194,7 @@ export default function StageAEOPDFAudit({
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-3.5 h-3 bg-brand-blue/20 inline-block border border-brand-blue border-dashed" />
-                <span>AEO Target Score</span>
+                <span>Target Score Needed to Win</span>
               </div>
             </div>
           </div>
@@ -203,35 +203,35 @@ export default function StageAEOPDFAudit({
           <div className="border-[3px] border-brand-dark p-6 bg-white shadow-brutal space-y-4">
             <div className="flex items-center gap-2 text-brand-blue font-black font-display text-lg uppercase border-b-2 border-brand-dark pb-2">
               <Layers className="h-5 w-5" />
-              <span>Rufus Funnel (Layer 1–4)</span>
+              <span>The 4 Filters of Amazon's AI Engine</span>
             </div>
             <p className="text-xs text-brand-dark/70 font-medium leading-relaxed">
-              How search queries filter down through Amazon's conversational recommendation stack.
+              Before Amazon's AI recommends your product to a customer, it runs your listing through 4 strict filters. Fail any of these, and your competitors get the recommendation.
             </p>
 
             <div className="space-y-3">
               {[
                 {
-                  layer: "Layer 4: Personalization Match",
-                  desc: "Contextual relevancy based on customer profile match.",
+                  layer: "Filter 4: Customer Profile Match",
+                  desc: "Does your product match the buyer's personal lifestyle or dietary needs?",
                   score: prospect.scores.overallScore,
                   color: "bg-green-500",
                 },
                 {
-                  layer: "Layer 3: RAG Validation Layer",
-                  desc: "Corpus trust alignment with reviews and Q&As.",
+                  layer: "Filter 3: Review & Q&A Trust Check",
+                  desc: "Do your customer reviews and Q&As verify your listing's claims?",
                   score: prospect.scores.rufusScore,
                   color: "bg-brand-gold",
                 },
                 {
-                  layer: "Layer 2: COSMO Graph Validation",
-                  desc: "Functional node linking between intent and listing.",
+                  layer: "Filter 2: Buyer Intent Match",
+                  desc: "Is your product linked directly to the specific reason the customer is searching?",
                   score: prospect.scores.cosmoScore,
                   color: "bg-brand-blue",
                 },
                 {
-                  layer: "Layer 1: Indexing & Eligibility",
-                  desc: "Semantic text ingestion and category alignment.",
+                  layer: "Filter 1: Basic AI Reading Check",
+                  desc: "Can Amazon's AI read, scan, and understand the text on your listing page?",
                   score: prospect.scores.semanticScore,
                   color: "bg-purple-500",
                 },
@@ -257,16 +257,16 @@ export default function StageAEOPDFAudit({
           <div className="border-[3px] border-brand-dark p-6 bg-white shadow-brutal space-y-4 md:col-span-2">
             <div className="flex items-center gap-2 text-brand-blue font-black font-display text-lg uppercase border-b-2 border-brand-dark pb-2">
               <CheckSquare className="h-5 w-5" />
-              <span>15-Point Q&A Seeding Roadmap</span>
+              <span>Your 15-Point Q&A Seeding Gameplan</span>
             </div>
             <p className="text-xs text-brand-dark/70 font-medium leading-relaxed">
-              Targeted customer questions to seed in the listing's Q&A section, ensuring Rufus can resolve buyer doubts and avoid competitor recommendation hedging.
+              By seeding these exact questions in your listing's Q&A section, we feed Amazon's AI the precise data it needs to start recommending you instead of competitor brands.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-[10px]">
               <div>
                 <p className="font-black text-brand-gold uppercase tracking-wider mb-2 border-b border-brand-dark/20 pb-1">
-                  Phase 1: Form Mismatches
+                  Phase 1: Product Specs & Sizing
                 </p>
                 <div className="space-y-2">
                   {qaChecklist.slice(0, 5).map((item, i) => (
@@ -287,7 +287,7 @@ export default function StageAEOPDFAudit({
 
               <div>
                 <p className="font-black text-brand-blue uppercase tracking-wider mb-2 border-b border-brand-dark/20 pb-1">
-                  Phase 2: Intent Activation
+                  Phase 2: Answering Buyer Goals
                 </p>
                 <div className="space-y-2">
                   {qaChecklist.slice(5, 10).map((item, i) => (
@@ -308,7 +308,7 @@ export default function StageAEOPDFAudit({
 
               <div>
                 <p className="font-black text-purple-600 uppercase tracking-wider mb-2 border-b border-brand-dark/20 pb-1">
-                  Phase 3: Trust Defense
+                  Phase 3: Overcoming Doubts
                 </p>
                 <div className="space-y-2">
                   {qaChecklist.slice(10, 15).map((item, i) => (
@@ -333,19 +333,19 @@ export default function StageAEOPDFAudit({
           <div className="border-[3px] border-brand-dark p-6 bg-white shadow-brutal space-y-4 md:col-span-2">
             <div className="flex items-center gap-2 text-brand-blue font-black font-display text-lg uppercase border-b-2 border-brand-dark pb-2">
               <Send className="h-5 w-5" />
-              <span>Amazon Attribution Traffic Plan</span>
+              <span>Attracting High-Intent External Traffic</span>
             </div>
             <p className="text-xs text-brand-dark/70 font-medium leading-relaxed">
-              Inject high-intent external traffic into your optimized listing using Amazon Attribution links. External traffic velocity acts as a powerful multiplier for COSMO co-purchase nodes.
+              Amazon rewards listings that bring in buyers from off-Amazon. By using Amazon Attribution links, we prove to Amazon's algorithm that your listing is in high demand, boosting your AI recommendation score.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-mono text-[10px] leading-relaxed">
               <div className="border-2 border-brand-dark bg-brand-bg p-4 space-y-3">
                 <p className="font-black text-brand-dark uppercase text-[11px] border-b border-brand-dark/20 pb-1">
-                  Google Search Ad Recommendations
+                  Google Ad Blueprint
                 </p>
                 <div className="space-y-1.5">
-                  <p className="font-bold text-brand-dark/60 uppercase text-[9px]">Target Query Node:</p>
+                  <p className="font-bold text-brand-dark/60 uppercase text-[9px]">Keywords We Target:</p>
                   <p className="font-black text-brand-dark bg-white px-2 py-1 border border-brand-dark">
                     "pure organic {prospect.listing.category.toLowerCase()} daily supplement"
                   </p>
@@ -361,17 +361,17 @@ export default function StageAEOPDFAudit({
 
               <div className="border-2 border-brand-dark bg-brand-bg p-4 space-y-3">
                 <p className="font-black text-brand-dark uppercase text-[11px] border-b border-brand-dark/20 pb-1">
-                  TikTok Creative Hook Recommendations
+                  Social Media Hook Blueprint
                 </p>
                 <div className="space-y-1.5">
-                  <p className="font-bold text-brand-dark/60 uppercase text-[9px]">Visual Hook Script:</p>
+                  <p className="font-bold text-brand-dark/60 uppercase text-[9px]">What to Say in the Video:</p>
                   <div className="bg-white p-2 border border-brand-dark font-sans font-medium text-xs text-brand-dark">
                     <span className="font-bold block border-b border-brand-dark/10 pb-0.5 mb-1 text-purple-600">
-                      "Why Amazon Rufus kept recommending my competitors..."
+                      "Why Amazon's new AI keeps recommending my competitors..."
                     </span>
                     Show screen recording of Rufus shopping chat. Explain that hidden certifications and listing gaps meant Rufus didn't know the product was organic. Showcase the newly updated packaging.
                   </div>
-                  <p className="font-bold text-brand-dark/60 uppercase text-[9px] mt-2">Attribution Tracking Link Format:</p>
+                  <p className="font-bold text-brand-dark/60 uppercase text-[9px] mt-2">Your Custom Attribution Link:</p>
                   <p className="font-black text-brand-gold bg-brand-dark px-2 py-1 text-[9px] select-all truncate">
                     https://www.amazon.com/dp/{prospect.listing.asin}?tag=agency-conquest-aeo-20&m1=attribution-conquesting
                   </p>
