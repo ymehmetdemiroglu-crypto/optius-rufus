@@ -16,8 +16,9 @@ import StageProofWall from './StageProofWall';
 import StageBookCall from './StageBookCall';
 import FloatingCTA from './FloatingCTA';
 import BrandStyleInjector from './BrandStyleInjector';
+import { STAGES } from '../../lib/stages';
 
-const TOTAL_STAGES = 12;
+const TOTAL_STAGES = STAGES.length;
 
 interface LandingPageComposerProps {
   prospect: ProspectData;

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Network, MessageSquare, BarChart3 } from 'lucide-react';
 import type { ProspectScoreBreakdown, CosmoNodeData, ReviewSentimentProfile } from '../../types/prospect';
+import { getScoreLevel, getScoreColor } from '../../lib/score';
 
 interface StageAutopsyProps {
   scores: ProspectScoreBreakdown;
@@ -20,20 +21,6 @@ interface AnimatedScoreProps {
   delay: number;
   animate: boolean;
   isPrint?: boolean;
-}
-
-function getScoreLevel(score: number): 'critical' | 'warning' | 'good' {
-  if (score < 40) return 'critical';
-  if (score < 65) return 'warning';
-  return 'good';
-}
-
-function getScoreColor(level: 'critical' | 'warning' | 'good'): string {
-  switch (level) {
-    case 'critical': return 'text-brutal-red';
-    case 'warning': return 'text-brand-gold';
-    case 'good': return 'text-brand-blue';
-  }
 }
 
 function AnimatedScore({ label, score, description, delay, animate, isPrint }: AnimatedScoreProps) {

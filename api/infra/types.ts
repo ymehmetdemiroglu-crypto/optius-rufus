@@ -33,7 +33,7 @@ export interface JobOpts {
   priority?: number;
 }
 
-export interface JobQueue {
+export interface IJobQueue {
   add(name: string, data: unknown, opts?: JobOpts): Promise<Job>;
   getJob(id: string): Promise<Job | null>;
   updateProgress(id: string, progress: number): Promise<void>;

@@ -43,7 +43,7 @@ export async function callLlm(
 ): Promise<LlmResponse> {
   // 1. Budget check (only if prospectId is provided)
   if (options.prospectId !== undefined && options.estimatedCostCents !== undefined) {
-    tokenBudgetService.checkBudget(options.prospectId, options.estimatedCostCents);
+    await tokenBudgetService.checkBudget(options.prospectId, options.estimatedCostCents);
   }
 
   // 2. Circuit breaker
@@ -115,7 +115,7 @@ export async function callLlm(
 
     // Track usage (only if prospectId is provided)
     if (options.prospectId !== undefined) {
-      tokenBudgetService.trackUsage(
+      await tokenBudgetService.trackUsage(
         options.prospectId,
         options.jobId,
         options.service,
@@ -230,7 +230,7 @@ export async function callEmbedding(
     const costCents = Math.ceil((totalTokens / 1000) * 0.002);
 
     if (options.prospectId !== undefined) {
-      tokenBudgetService.trackUsage(
+      await tokenBudgetService.trackUsage(
         options.prospectId,
         options.jobId,
         options.service,

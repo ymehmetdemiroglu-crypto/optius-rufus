@@ -1,22 +1,10 @@
+import { STAGE_LABELS } from '../../lib/stages';
+
 interface ProgressBarProps {
   currentStage: number;
   totalStages: number;
   visible: boolean;
 }
-
-const STAGE_LABELS = [
-  'Scan',
-  'Autopsy',
-  'Revenue',
-  'Rufus Sim',
-  'Preview',
-  'Free QAs',
-  'PPC Planner',
-  'Bundling',
-  'Roadmap',
-  'Proof',
-  'Book',
-];
 
 export default function ProgressBar({ currentStage, totalStages, visible }: ProgressBarProps) {
   if (!visible) return null;

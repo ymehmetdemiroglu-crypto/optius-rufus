@@ -4,7 +4,7 @@ import { db } from "../db/drizzle.js";
 import * as schema from "../db/schema.js";
 import type { Job, JobOpts } from "./types.js";
 
-export interface JobRepository {
+export interface IJobRepository {
   add(
     id: string,
     queue: string,
@@ -25,7 +25,7 @@ export interface JobRepository {
   markFailed(id: string, now: number, failedReason: string, stacktrace: string[]): Promise<void>;
 }
 
-export class PgJobRepository implements JobRepository {
+export class JobRepository implements IJobRepository {
   private db: NodePgDatabase<typeof schema>;
 
   constructor(dbInstance?: NodePgDatabase<typeof schema>) {

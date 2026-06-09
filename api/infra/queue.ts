@@ -1,15 +1,15 @@
-import { PgJobRepository, type JobRepository } from "./jobRepository.js";
-import type { Job, JobOpts, JobQueue } from "./types.js";
+import { JobRepository, type IJobRepository } from "./jobRepository.js";
+import type { Job, JobOpts, IJobQueue } from "./types.js";
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 }
 
-export class SQLiteJobQueue implements JobQueue {
+export class JobQueue implements IJobQueue {
   private queueName: string;
-  private repo: JobRepository;
+  private repo: IJobRepository;
 
-  constructor(queueName: string, repo: JobRepository = new PgJobRepository()) {
+  constructor(queueName: string, repo: IJobRepository = new JobRepository()) {
     this.queueName = queueName;
     this.repo = repo;
   }
@@ -83,5 +83,5 @@ export class SQLiteJobQueue implements JobQueue {
 }
 
 // Global queue instances
-export const pipelineQueue = new SQLiteJobQueue("pipeline");
-export const webhookQueue = new SQLiteJobQueue("webhook");
+export const pipelineQueue = new JobQueue("pipeline");
+export const webhookQueue = new JobQueue("webhook");

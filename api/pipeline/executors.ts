@@ -1,14 +1,16 @@
-import { scrapeAmazonListing } from "../services/scraper.js";
+import { scrapeAmazonListing } from "../domains/listing/scraper.js";
 import { generateEmbedding } from "../services/embedding.js";
-import { analyzeSemanticGaps } from "../services/analysis.js";
-import { generateOptimizedContent } from "../services/optimization.js";
+import { analyzeSemanticGaps } from "../domains/analysis/engine.js";
+import { generateOptimizedContent } from "../domains/optimization/content.js";
 import { fetchCompetitors } from "../services/competitor.js";
-import { generateAllStageCopy } from "../services/copywriter.js";
+import { generateAllStageCopy } from "../domains/optimization/copywriter.js";
 import { logger } from "../infra/logger.js";
 import { eventBus } from "../infra/eventBus.js";
-import * as listingService from "../services/domain/listingService.js";
-import * as prospectService from "../services/domain/prospectService.js";
+import * as listingService from "../domains/listing/service.js";
+import * as prospectService from "../domains/prospect/service.js";
 import { executeWithRetry } from "./executeWithRetry.js";
+import { safeJsonParse } from "../lib/json.js";
+import { mapListingRecordToRawListingData, mapScrapedDataToRawListingData } from "../lib/mapping.js";
 import type {
   StageExecutor,
   StageContext,
@@ -19,15 +21,6 @@ import type {
   OptimizedContent,
   CompetitorBenchmark,
 } from "./types.js";
-
-function safeJsonParse<T>(str: string | null | undefined, fallback: T): T {
-  if (!str) return fallback;
-  try {
-    return JSON.parse(str) as T;
-  } catch {
-    return fallback;
-  }
-}
 
 function getMockListingData(asin?: string): RawListingData {
   return {
@@ -52,63 +45,7 @@ function getMockListingData(asin?: string): RawListingData {
   };
 }
 
-function mapListingRecordToRawListingData(row: {
-  asin: string;
-  title?: string | null;
-  bullets?: string | null;
-  description?: string | null;
-  brand?: string | null;
-  category?: string | null;
-  price?: number | null;
-  rating?: number | null;
-  reviewCount?: number | null;
-  images?: string | null;
-  rawScrapeData?: string | null;
-}): RawListingData {
-  return {
-    asin: row.asin,
-    title: row.title || "",
-    bullets: safeJsonParse(row.bullets, []),
-    description: row.description || "",
-    brand: row.brand || "",
-    category: row.category || "",
-    subcategory: row.category || "",
-    images: safeJsonParse(row.images, []),
-    price: row.price ?? 0,
-    rating: row.rating ?? 0,
-    reviewCount: row.reviewCount ?? 0,
-    attributes: safeJsonParse(row.rawScrapeData, {}),
-  };
-}
 
-function mapScrapedDataToRawListingData(data: {
-  asin: string;
-  title: string;
-  bullets: string[];
-  description: string;
-  brand: string;
-  category: string;
-  price: number;
-  rating: number;
-  reviewCount: number;
-  images: string[];
-  rawScrapeData?: string;
-}): RawListingData {
-  return {
-    asin: data.asin,
-    title: data.title,
-    bullets: data.bullets,
-    description: data.description,
-    brand: data.brand,
-    category: data.category,
-    subcategory: data.category,
-    images: data.images,
-    price: data.price,
-    rating: data.rating,
-    reviewCount: data.reviewCount,
-    attributes: data.rawScrapeData ? JSON.parse(data.rawScrapeData) : {},
-  };
-}
 
 export const stageExecutors: StageExecutor[] = [
   {

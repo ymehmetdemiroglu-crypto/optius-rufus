@@ -1,14 +1,14 @@
 import { router } from "./trpc.js";
-import { agentsRouter } from "./routers/agents.js";
-import { prospectsRouter } from "./routers/prospects.js";
-import { scraperRouter } from "./routers/scraper.js";
-import { analysisRouter } from "./routers/analysis.js";
-import { apolloRouter } from "./routers/apollo.js";
-import { bookingRouter } from "./routers/booking.js";
-import { brandingRouter } from "./routers/branding.js";
-import { rufusTrackerRouter } from "./routers/rufusTracker.js";
-import { catalogGraphRouter } from "./routers/catalogGraphRouter.js";
-import { ppcRouter } from "./routers/ppcRouter.js";
+import { agentsRouter } from "./domains/optimization/router.js";
+import { prospectsRouter } from "./domains/prospect/router.js";
+import { scraperRouter } from "./domains/listing/router.js";
+import { analysisRouter } from "./domains/analysis/router.js";
+import { apolloRouter } from "./domains/apollo/router.js";
+import { bookingRouter } from "./domains/booking/router.js";
+import { brandingRouter } from "./domains/branding/router.js";
+import { rufusTrackerRouter } from "./domains/rufus/router.js";
+import { catalogGraphRouter } from "./domains/catalog/router.js";
+import { ppcRouter } from "./domains/ppc/router.js";
 
 export const appRouter = router({
   agents: agentsRouter,
@@ -24,4 +24,3 @@ export const appRouter = router({
 });
 
 export type AppRouter = typeof appRouter;
-

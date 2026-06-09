@@ -6,6 +6,7 @@ import { mapBackendToProspectData } from '../lib/prospectMapper';
 import type { ProspectData } from '../types/prospect';
 import { MOCK_PROSPECT_DATA } from '../lib/mockProspectData';
 import { useActivityTracker } from '../hooks/useActivityTracker';
+import { STAGE_NAMES, STAGE_IDS } from '../lib/stages';
 import SkeletonLoader from '../components/landing/SkeletonLoader';
 import LandingPageComposer from '../components/landing/LandingPageComposer';
 import ReportNotFound from '../components/landing/ReportNotFound';
@@ -60,25 +61,8 @@ export default function ProspectLanding(): JSX.Element {
   useEffect(() => {
     if (!scanComplete) return;
 
-    const stageNames = [
-      'hero', 'autopsy', 'bleed', 'simulator', 'transform',
-      'free-qas', 'ppc-planner', 'bundling', 'aeo-audit', 'roadmap', 'proof', 'book',
-    ];
-
-    const stageIds = [
-      'stage-hero',
-      'stage-autopsy',
-      'stage-bleed',
-      'stage-simulator',
-      'stage-transform',
-      'stage-free-qas',
-      'stage-ppc-planner',
-      'stage-bundling',
-      'stage-aeo-audit',
-      'stage-roadmap',
-      'stage-proof',
-      'stage-book',
-    ];
+    const stageNames = STAGE_NAMES;
+    const stageIds = STAGE_IDS;
 
     const handleScroll = () => {
       const scrollHeight = document.documentElement.scrollHeight;

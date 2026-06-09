@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeftRight, Play, CheckCircle } from 'lucide-react';
 import type { TransformSnippet } from '../../types/prospect';
+import { getScoreLevel, getScoreColor } from '../../lib/score';
 
 interface StageTransformPreviewProps {
   headline: string;
@@ -8,20 +9,6 @@ interface StageTransformPreviewProps {
   after: TransformSnippet[];
   visible: boolean;
   contentScore: number;
-}
-
-function getScoreLevel(score: number): 'critical' | 'warning' | 'good' {
-  if (score < 40) return 'critical';
-  if (score < 65) return 'warning';
-  return 'good';
-}
-
-function getScoreColor(level: 'critical' | 'warning' | 'good'): string {
-  switch (level) {
-    case 'critical': return 'text-brutal-red';
-    case 'warning': return 'text-brand-gold';
-    case 'good': return 'text-brand-blue';
-  }
 }
 
 export default function StageTransformPreview({

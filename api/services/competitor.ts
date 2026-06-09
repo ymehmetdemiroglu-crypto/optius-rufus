@@ -1,7 +1,7 @@
 import type { CompetitorBenchmark, RawListingData } from "../pipeline/types.js";
-import { scrapeAmazonListing } from "./scraper.js";
+import { scrapeAmazonListing } from "../domains/listing/scraper.js";
 import { generateEmbedding } from "./embedding.js";
-import { analyzeSemanticGaps } from "./analysis.js";
+import { analyzeSemanticGaps } from "../domains/analysis/engine.js";
 
 const RAINFOREST_API_KEY = process.env.RAINFOREST_API_KEY;
 

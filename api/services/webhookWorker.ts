@@ -2,7 +2,7 @@ import { webhookQueue } from "../infra/queue.js";
 import { eventBus } from "../infra/eventBus.js";
 import { triggerWebhook } from "./webhook.js";
 import { logger } from "../infra/logger.js";
-import * as prospectRepo from "../db/repositories/prospectRepository.js";
+import * as prospectRepo from "../domains/prospect/repository.js";
 
 // Enqueue webhook jobs when prospect activity occurs
 eventBus.on<{ prospectId: number; eventType: string; eventData: unknown; interestScore: number }>(

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { PgJobRepository } from "../jobRepository.js";
+import { JobRepository } from "../jobRepository.js";
 
-describe("PgJobRepository - Requeue Backoff Fix", () => {
+describe("JobRepository - Requeue Backoff Fix", () => {
   let mockDb: any;
-  let repository: PgJobRepository;
+  let repository: JobRepository;
 
   beforeEach(() => {
     mockDb = {
@@ -23,7 +23,7 @@ describe("PgJobRepository - Requeue Backoff Fix", () => {
         })),
       })),
     };
-    repository = new PgJobRepository(mockDb);
+    repository = new JobRepository(mockDb);
   });
 
   it("should update timestamp to now and set delay to backoff on requeue", async () => {
@@ -40,7 +40,7 @@ describe("PgJobRepository - Requeue Backoff Fix", () => {
     // Verify update was called on jobs table
     expect(mockDb.update).toHaveBeenCalled();
     expect(setMock).toHaveBeenCalled();
-    const setArgs = setMock.mock.calls[0][0];
+    const setArgs = (setMock.mock.calls[0] as any[])[0] as any;
 
     // Timestamp should be recent (within 1000ms of now)
     expect(setArgs.timestamp).toBeGreaterThan(Date.now() - 1000);

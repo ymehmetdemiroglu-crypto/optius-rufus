@@ -1,4 +1,6 @@
-import { db } from "../db/client.js";
+import { db } from "../db/drizzle.js";
+import * as schema from "../db/schema.js";
+import { eq, and, gte, sum } from "drizzle-orm";
 import { eventBus } from "../infra/eventBus.js";
 import { logger } from "../infra/logger.js";
 
@@ -26,20 +28,24 @@ export class TokenBudgetService {
   /**
    * Record token usage for a service call.
    */
-  trackUsage(
+  async trackUsage(
     prospectId: number,
     jobId: number | undefined,
     service: string,
     promptTokens: number,
     completionTokens: number,
     costCents: number
-  ): void {
+  ): Promise<void> {
     const totalTokens = promptTokens + completionTokens;
-    db.prepare(
-      `INSERT INTO usage_events
-       (prospectId, jobId, service, promptTokens, completionTokens, totalTokens, costCents)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`
-    ).run(prospectId, jobId ?? null, service, promptTokens, completionTokens, totalTokens, costCents);
+    await db.insert(schema.usageEvents).values({
+      prospectId,
+      jobId: jobId ?? null,
+      service,
+      promptTokens,
+      completionTokens,
+      totalTokens,
+      costCents,
+    });
 
     logger.info(`Token usage tracked`, {
       prospectId,
@@ -63,11 +69,14 @@ export class TokenBudgetService {
   /**
    * Get remaining budget for a prospect in cents.
    */
-  getRemainingBudget(prospectId: number): number {
-    const prospect = db.prepare("SELECT packageType FROM prospects WHERE id = ?").get(prospectId) as
-      | { packageType: string }
-      | undefined;
+  async getRemainingBudget(prospectId: number): Promise<number> {
+    const rows = await db
+      .select({ packageType: schema.prospects.packageType })
+      .from(schema.prospects)
+      .where(eq(schema.prospects.id, prospectId))
+      .limit(1);
 
+    const prospect = rows[0];
     if (!prospect) return 0;
 
     const tierCap = TIER_BUDGETS_CENTS[prospect.packageType] ?? TIER_BUDGETS_CENTS.package_2;
@@ -77,22 +86,25 @@ export class TokenBudgetService {
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
 
-    const row = db
-      .prepare(
-        `SELECT COALESCE(SUM(costCents), 0) as spent
-         FROM usage_events
-         WHERE prospectId = ? AND createdAt >= ?`
-      )
-      .get(prospectId, startOfMonth.toISOString()) as { spent: number };
+    const usageRows = await db
+      .select({ spent: sum(schema.usageEvents.costCents) })
+      .from(schema.usageEvents)
+      .where(
+        and(
+          eq(schema.usageEvents.prospectId, prospectId),
+          gte(schema.usageEvents.createdAt, startOfMonth)
+        )
+      );
 
-    return Math.max(0, tierCap - row.spent);
+    const spent = Number(usageRows[0]?.spent ?? 0);
+    return Math.max(0, tierCap - spent);
   }
 
   /**
    * Check if a prospective cost is within budget. Throws if exceeded.
    */
-  checkBudget(prospectId: number, estimatedCostCents: number): void {
-    const remaining = this.getRemainingBudget(prospectId);
+  async checkBudget(prospectId: number, estimatedCostCents: number): Promise<void> {
+    const remaining = await this.getRemainingBudget(prospectId);
     if (estimatedCostCents > remaining) {
       const err = new TokenBudgetExceededError(
         `Token budget exceeded for prospect ${prospectId}. Remaining: ${remaining}c, requested: ${estimatedCostCents}c`,

@@ -11,8 +11,6 @@ import { generatePdf } from "./infra/pdf.js";
 import { pipelineSseHandler } from "./sse/pipeline.js";
 import { queueWorker } from "./pipeline/worker.js";
 import { webhookWorker } from "./services/webhookWorker.js";
-import { db } from "./db/client.js";
-
 export const app = new Hono();
 
 // A simple serveStatic replacement using Node fs for portable and error-free execution
@@ -61,14 +59,9 @@ app.use("*", cors({
   },
 }));
 
-// Health check with DB connectivity
+// Health check
 app.get("/health", (c) => {
-  try {
-    db.prepare("SELECT 1").get();
-    return c.json({ status: "ok", version: process.env.APP_VERSION || "1.0.0", db: "connected" });
-  } catch {
-    return c.json({ status: "degraded", version: process.env.APP_VERSION || "1.0.0", db: "disconnected" }, 503);
-  }
+  return c.json({ status: "ok", version: process.env.APP_VERSION || "1.0.0" });
 });
 
 // SSE pipeline progress streaming
