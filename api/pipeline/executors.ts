@@ -20,7 +20,7 @@ import type {
   AnalysisResult,
   OptimizedContent,
   CompetitorBenchmark,
-} from "./types.js";
+} from "./pipeline.types.js";
 
 function getMockListingData(asin?: string): RawListingData {
   return {

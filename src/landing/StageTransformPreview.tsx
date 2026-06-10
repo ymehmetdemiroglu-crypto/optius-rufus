@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeftRight, Play, CheckCircle } from 'lucide-react';
-import type { TransformSnippet } from '../../types/prospect';
-import { getScoreLevel, getScoreColor } from '../../lib/score';
+import type { TransformSnippet } from '../../dtos/prospect.dto';
+import { getScoreLevel, getScoreColor } from '../shared/lib/score';
 
 interface StageTransformPreviewProps {
   headline: string;

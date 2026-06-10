@@ -1,7 +1,7 @@
 import { z } from "zod";
 import * as prospectRepo from "../prospect/repository.js";
 import { createContact, enrollInSequence, getSequences } from "./service.js";
-import { router, publicProcedure } from "../../trpc.js";
+import { router, publicProcedure } from "../../trpc/context.js";
 
 export const apolloRouter = router({
   createContact: publicProcedure

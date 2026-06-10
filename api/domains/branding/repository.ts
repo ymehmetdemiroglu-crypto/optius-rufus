@@ -1,7 +1,7 @@
 import { eq, desc } from "drizzle-orm";
 import { db as pgDb } from "../../db/drizzle.js";
 import * as schema from "../../db/schema.js";
-import type { BrandSettingsRecord, InsertBrandSettingsInput } from "../../db/types.js";
+import type { BrandSettingsRecord, InsertBrandSettingsInput } from "../../db/schema.types.js";
 
 export async function getSettings(): Promise<BrandSettingsRecord | undefined> {
   try {

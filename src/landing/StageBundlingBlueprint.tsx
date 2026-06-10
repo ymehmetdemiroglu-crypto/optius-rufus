@@ -1,5 +1,5 @@
 import { Box, Layers, Plus } from 'lucide-react';
-import type { BundlingItem } from '../../types/prospect';
+import type { BundlingItem } from '../../dtos/prospect.dto';
 
 interface StageBundlingBlueprintProps {
   cosmoBundling: BundlingItem[];

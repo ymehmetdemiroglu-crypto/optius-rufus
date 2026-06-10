@@ -4,7 +4,7 @@ import * as schema from "../../db/schema.js";
 import type {
   ListingAnalysisRecord,
   InsertAnalysisInput,
-} from "../../db/types.js";
+} from "../../db/schema.types.js";
 import type { StageCopy } from "../optimization/copywriter.js";
 
 export async function create(

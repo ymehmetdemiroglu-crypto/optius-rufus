@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import { RefreshCw } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '../shared/lib/utils';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger';

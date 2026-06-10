@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { router, publicProcedure } from "../../trpc.js";
+import { router, publicProcedure } from "../../trpc/context.js";
 import { buildCatalogGraph } from "./service.js";
 import { generateEmbedding } from "../../services/embedding.js";
 import { fetchCompetitors } from "../../services/competitor.js";
-import * as catalogRepo from "../../db/repositories/catalogRepository.js";
+import * as catalogRepo from '../catalog/repository.js';
 import * as listingRepo from "../listing/repository.js";
 
 export const catalogGraphRouter = router({

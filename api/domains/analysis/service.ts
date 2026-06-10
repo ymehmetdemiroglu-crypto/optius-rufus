@@ -4,8 +4,8 @@ import type {
   RawListingData,
   AnalysisResult,
   SemanticGap,
-} from "../../pipeline/types.js";
-import type { PipelineJob } from "../../pipeline/types.js";
+} from "../../pipeline/pipeline.types.js";
+import type { PipelineJob } from "../../pipeline/pipeline.types.js";
 import type { StageCopy } from "../optimization/copywriter.js";
 import * as listingRepo from "../listing/repository.js";
 import * as prospectRepo from "../prospect/repository.js";
@@ -14,10 +14,10 @@ import type {
   ProspectRecord,
   ListingAnalysisRecord,
   InsertAnalysisInput,
-} from "../../db/types.js";
+} from "../../db/schema.types.js";
 import { mapListingRecordToRawListingData } from "../../lib/mapping.js";
 import { safeJsonParse } from "../../lib/json.js";
-import type { ListingRecord } from "../../db/types.js";
+import type { ListingRecord } from "../../db/schema.types.js";
 
 
 

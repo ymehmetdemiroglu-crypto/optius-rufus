@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { router, publicProcedure } from "../../trpc.js";
+import { router, publicProcedure } from "../../trpc/context.js";
 import { generatePpcPlan, convertPlanToCsv } from "./service.js";
 import * as listingRepo from "../listing/repository.js";
 

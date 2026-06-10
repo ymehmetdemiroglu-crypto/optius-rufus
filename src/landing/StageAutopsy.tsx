@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Network, MessageSquare, BarChart3 } from 'lucide-react';
-import type { ProspectScoreBreakdown, CosmoNodeData, ReviewSentimentProfile } from '../../types/prospect';
-import { getScoreLevel, getScoreColor } from '../../lib/score';
+import type { ProspectScoreBreakdown, CosmoNodeData, ReviewSentimentProfile } from '../../dtos/prospect.dto';
+import { getScoreLevel, getScoreColor } from '../shared/lib/score';
 
 interface StageAutopsyProps {
   scores: ProspectScoreBreakdown;

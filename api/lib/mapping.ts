@@ -1,5 +1,5 @@
 import { safeJsonParse } from "./json.js";
-import type { RawListingData } from "../pipeline/types.js";
+import type { RawListingData } from "../pipeline/pipeline.types.js";
 
 export interface ListingRecordLike {
   asin: string;

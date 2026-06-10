@@ -2,7 +2,7 @@ import { z } from "zod";
 import { scrapeAmazonListing } from "./scraper.js";
 import * as listingService from "./service.js";
 import * as prospectService from "../prospect/service.js";
-import { router, publicProcedure } from "../../trpc.js";
+import { router, publicProcedure } from "../../trpc/context.js";
 
 export const scraperRouter = router({
   trigger: publicProcedure

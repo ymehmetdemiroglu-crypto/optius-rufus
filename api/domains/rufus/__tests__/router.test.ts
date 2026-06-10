@@ -28,7 +28,7 @@ vi.mock("../service", () => {
   };
 });
 
-vi.mock("../../../db/repositories/rufusRepository", () => {
+vi.mock("../../rufus/repository.js", () => {
   return {
     createQuery: vi.fn(),
     createQueryRun: vi.fn(),
@@ -39,13 +39,13 @@ vi.mock("../../../db/repositories/rufusRepository", () => {
 import * as listingRepo from "../../listing/repository.js";
 import { fetchCompetitors } from "../../../services/competitor.js";
 import { simulateRufusSOV } from "../service.js";
-import * as rufusRepo from "../../../db/repositories/rufusRepository.js";
+import * as rufusRepo from '../../rufus/repository.js';
 
 describe("rufusTrackerRouter", () => {
   let caller: any;
 
   beforeAll(async () => {
-    const { appRouter } = await import("../../../router.js");
+    const { appRouter } = await import("../../../trpc/router.js");
     caller = appRouter.createCaller({ req: new Request("http://localhost/api/trpc") } as any);
   });
 

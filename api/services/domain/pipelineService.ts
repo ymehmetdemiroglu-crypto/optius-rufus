@@ -1,5 +1,5 @@
 import { pipelineEngine } from "../../pipeline/engine.js";
-import type { PipelineJob, StageName } from "../../pipeline/types.js";
+import type { PipelineJob, StageName } from "../../pipeline/pipeline.types.js";
 
 export async function createJob(
   prospectId: number,

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { router, publicProcedure } from "../../trpc.js";
+import { router, publicProcedure } from "../../trpc/context.js";
 import * as prospectService from "./service.js";
 
 export const prospectsRouter = router({

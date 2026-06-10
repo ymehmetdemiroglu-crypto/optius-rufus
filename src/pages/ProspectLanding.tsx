@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import type { JSX } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { trpc } from '../providers/trpc';
-import { mapBackendToProspectData } from '../lib/prospectMapper';
-import type { ProspectData } from '../types/prospect';
-import { MOCK_PROSPECT_DATA } from '../lib/mockProspectData';
-import { useActivityTracker } from '../hooks/useActivityTracker';
-import { STAGE_NAMES, STAGE_IDS } from '../lib/stages';
-import SkeletonLoader from '../components/landing/SkeletonLoader';
-import LandingPageComposer from '../components/landing/LandingPageComposer';
-import ReportNotFound from '../components/landing/ReportNotFound';
+import { trpc } from '../shared/providers/trpc';
+import { mapBackendToProspectData } from '../shared/lib/prospectMapper';
+import type { ProspectData } from '../dtos/prospect.dto';
+import { MOCK_PROSPECT_DATA } from '../shared/lib/mockProspectData';
+import { useActivityTracker } from '../shared/hooks/useActivityTracker';
+import { STAGE_NAMES, STAGE_IDS } from '../shared/lib/stages';
+import SkeletonLoader from '../landing/SkeletonLoader';
+import LandingPageComposer from '../landing/LandingPageComposer';
+import ReportNotFound from '../landing/ReportNotFound';
 
 export default function ProspectLanding(): JSX.Element {
   const { slug: urlSlug } = useParams<{ slug: string }>();

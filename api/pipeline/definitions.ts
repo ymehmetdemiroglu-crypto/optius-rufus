@@ -1,4 +1,4 @@
-import type { StageDefinition } from "./types.js";
+import type { StageDefinition } from "./pipeline.types.js";
 
 export const STAGE_ORDER: StageDefinition[] = [
   { name: "fetch", dependencies: [] },

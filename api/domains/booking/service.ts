@@ -1,5 +1,5 @@
-import * as bookingRepo from "../../db/repositories/bookingRepository.js";
-import type { BookingRecord, InsertBookingInput } from "../../db/types.js";
+import * as bookingRepo from '../booking/repository.js';
+import type { BookingRecord, InsertBookingInput } from "../../db/schema.types.js";
 
 export interface CreateBookingInput {
   prospectId: number;

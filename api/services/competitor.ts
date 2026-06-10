@@ -1,4 +1,4 @@
-import type { CompetitorBenchmark, RawListingData } from "../pipeline/types.js";
+import type { CompetitorBenchmark, RawListingData } from "../pipeline/pipeline.types.js";
 import { scrapeAmazonListing } from "../domains/listing/scraper.js";
 import { generateEmbedding } from "./embedding.js";
 import { analyzeSemanticGaps } from "../domains/analysis/engine.js";

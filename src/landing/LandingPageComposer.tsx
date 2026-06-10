@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { JSX } from 'react';
-import type { ProspectData } from '../../types/prospect';
+import type { ProspectData } from '../../dtos/prospect.dto';
 import ProgressBar from './ProgressBar';
 import StageHero from './StageHero';
 import StageAutopsy from './StageAutopsy';
@@ -16,7 +16,7 @@ import StageProofWall from './StageProofWall';
 import StageBookCall from './StageBookCall';
 import FloatingCTA from './FloatingCTA';
 import BrandStyleInjector from './BrandStyleInjector';
-import { STAGES } from '../../lib/stages';
+import { STAGES } from '../shared/lib/stages';
 
 const TOTAL_STAGES = STAGES.length;
 

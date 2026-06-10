@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import StageScanAnimation from './StageScanAnimation';
-import type { ProspectListing } from '../../types/prospect';
+import type { ProspectListing } from '../../dtos/prospect.dto';
 
 interface StageHeroProps {
   listing: ProspectListing;

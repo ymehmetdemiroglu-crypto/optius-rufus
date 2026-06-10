@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { trpc } from '../../providers/trpc';
+import { trpc } from '../shared/providers/trpc';
 import { Cpu, Layers, Download, ExternalLink, RefreshCw } from 'lucide-react';
 import PipelineStatusPanel from './PipelineStatusPanel';
 import COSMOCanvas from './COSMOCanvas';

@@ -1,5 +1,5 @@
 import { Cpu, CheckCircle, RefreshCw, AlertTriangle } from 'lucide-react';
-import { usePipeline } from '../../hooks/usePipeline';
+import { usePipeline } from '../shared/hooks/usePipeline';
 import Badge from '../ui/Badge';
 
 interface PipelineStatusPanelProps {

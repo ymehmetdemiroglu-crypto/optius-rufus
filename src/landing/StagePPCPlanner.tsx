@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Download, Target, FileSpreadsheet } from 'lucide-react';
-import type { PPCKeywordItem } from '../../types/prospect';
+import type { PPCKeywordItem } from '../../dtos/prospect.dto';
 
 interface StagePPCPlannerProps {
   ppcKeywords: PPCKeywordItem[];

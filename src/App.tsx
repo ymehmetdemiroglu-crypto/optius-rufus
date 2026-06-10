@@ -1,7 +1,7 @@
 import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { TRPCProvider } from './providers/trpc';
-import { ErrorBoundary } from './components/ErrorBoundary';
+import { TRPCProvider } from './shared/providers/trpc';
+import { ErrorBoundary } from './shared/ErrorBoundary';
 
 const ProspectLanding = lazy(() => import('./pages/ProspectLanding'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));

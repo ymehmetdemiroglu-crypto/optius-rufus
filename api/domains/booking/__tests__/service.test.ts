@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as bookingService from "../service.js";
-import * as bookingRepo from "../../../db/repositories/bookingRepository.js";
+import * as bookingRepo from '../../booking/repository.js';
 
 // Mock the booking repository
-vi.mock("../../../db/repositories/bookingRepository.js", () => {
+vi.mock("../../booking/repository.js", () => {
   return {
     create: vi.fn(),
     getByProspectId: vi.fn(),

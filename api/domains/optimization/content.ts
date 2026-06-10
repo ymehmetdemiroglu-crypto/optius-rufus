@@ -1,5 +1,5 @@
 import { callLlm } from "../../services/llmGateway.js";
-import type { OptimizedContent, SemanticGap, RawListingData } from "../../pipeline/types.js";
+import type { OptimizedContent, SemanticGap, RawListingData } from "../../pipeline/pipeline.types.js";
 
 /**
  * Generate optimized title, bullets, description, and Q&A using an LLM.

@@ -1,8 +1,8 @@
-import * as pipelineRepo from "../db/repositories/pipelineRepository.js";
+import * as pipelineRepo from "../domains/pipeline/repository.js";
 import { eventBus } from "../infra/eventBus.js";
 import { logger } from "../infra/logger.js";
 import { pipelineQueue } from "../infra/queue.js";
-import type { PipelineJob, StageName, StageOutput, StageContext, PipelineStageState } from "./types.js";
+import type { PipelineJob, StageName, StageOutput, StageContext, PipelineStageState } from "./pipeline.types.js";
 import { STAGE_ORDER } from "./definitions.js";
 import { stageExecutors } from "./executors.js";
 

@@ -1,5 +1,5 @@
 import { JobRepository, type IJobRepository } from "./jobRepository.js";
-import type { Job, JobOpts, IJobQueue } from "./types.js";
+import type { Job, JobOpts, IJobQueue } from "./infra.types.js";
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;

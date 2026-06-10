@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { MessageCircle, Bot, AlertCircle, ChevronRight, ArrowRightLeft } from 'lucide-react';
-import type { SimulatorScenario, CompetitorComparison } from '../../types/prospect';
+import type { SimulatorScenario, CompetitorComparison } from '../../dtos/prospect.dto';
 
 interface StageRufusSimulatorProps {
   intro: string;

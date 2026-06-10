@@ -1,6 +1,6 @@
 import { logger } from "../infra/logger.js";
 import { eventBus } from "../infra/eventBus.js";
-import type { StageContext } from "./types.js";
+import type { StageContext } from "./pipeline.types.js";
 
 export async function executeWithRetry<T>(
   execute: () => Promise<T>,

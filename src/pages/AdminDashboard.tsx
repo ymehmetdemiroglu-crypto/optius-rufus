@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { trpc } from '../providers/trpc';
+import { trpc } from '../shared/providers/trpc';
 import { FolderOpen, Palette } from 'lucide-react';
-import AuditLaunchBox from '../components/admin/AuditLaunchBox';
-import ClientDirectory from '../components/admin/ClientDirectory';
-import ProspectDetailPanel from '../components/admin/ProspectDetailPanel';
-import BrandingPanel from '../components/admin/BrandingPanel';
+import AuditLaunchBox from '../admin/AuditLaunchBox';
+import ClientDirectory from '../admin/ClientDirectory';
+import ProspectDetailPanel from '../admin/ProspectDetailPanel';
+import BrandingPanel from '../admin/BrandingPanel';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<"clients" | "branding">("clients");

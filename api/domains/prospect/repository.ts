@@ -1,8 +1,8 @@
 import { eq, desc, count } from "drizzle-orm";
 import { db as pgDb } from "../../db/drizzle.js";
 import * as schema from "../../db/schema.js";
-import type { ProspectRecord, InsertProspectInput } from "../../db/types.js";
-import { create as createActivity } from "../../db/repositories/activityRepository.js";
+import type { ProspectRecord, InsertProspectInput } from "../../db/schema.types.js";
+import { create as createActivity } from '../prospect/activityRepository.js';
 
 export async function create(input: InsertProspectInput): Promise<ProspectRecord> {
   try {

@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import type { DomainEvent, EventBus } from "./types.js";
+import type { DomainEvent, EventBus } from "./infra.types.js";
 
 class MemoryEventBus implements EventBus {
   private emitter = new EventEmitter();

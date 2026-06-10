@@ -1,7 +1,7 @@
 import * as prospectRepo from "./repository.js";
 import * as listingRepo from "../listing/repository.js";
 import * as analysisRepo from "../analysis/repository.js";
-import * as bookingRepo from "../../db/repositories/bookingRepository.js";
+import * as bookingRepo from '../booking/repository.js';
 import { eventBus } from "../../infra/eventBus.js";
 import type {
   ProspectRecord,
@@ -9,7 +9,7 @@ import type {
   ListingAnalysisRecord,
   BookingRecord,
   InsertProspectInput,
-} from "../../db/types.js";
+} from "../../db/schema.types.js";
 
 export interface CreateProspectInput {
   email: string;

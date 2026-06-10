@@ -2,7 +2,7 @@ import { eq, and, or, asc, lte, sql } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { db } from "../db/drizzle.js";
 import * as schema from "../db/schema.js";
-import type { Job, JobOpts } from "./types.js";
+import type { Job, JobOpts } from "./infra.types.js";
 
 export interface IJobRepository {
   add(

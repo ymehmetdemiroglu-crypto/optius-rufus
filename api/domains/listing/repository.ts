@@ -1,7 +1,7 @@
 import { eq, desc } from "drizzle-orm";
 import { db as pgDb } from "../../db/drizzle.js";
 import * as schema from "../../db/schema.js";
-import type { ListingRecord, InsertListingInput } from "../../db/types.js";
+import type { ListingRecord, InsertListingInput } from "../../db/schema.types.js";
 
 export async function create(input: InsertListingInput): Promise<ListingRecord> {
   try {

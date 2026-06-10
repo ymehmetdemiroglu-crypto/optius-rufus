@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { PipelineEngine } from "../engine.js";
-import * as pipelineRepo from "../../db/repositories/pipelineRepository.js";
+import * as pipelineRepo from '../../domains/pipeline/repository.js';
 import { stageExecutors } from "../executors.js";
 
 // Mock the pipeline repository
-vi.mock("../../db/repositories/pipelineRepository.js", () => {
+vi.mock("../../domains/pipeline/repository.js", () => {
   return {
     createJob: vi.fn(),
     getJob: vi.fn(),
@@ -53,7 +53,7 @@ describe("PipelineEngine - Concurrent DAG Execution", () => {
     };
 
     // All stages start as pending
-    const mockStages: Record<string, import("../../pipeline/types.js").PipelineStageState> = {
+    const mockStages: Record<string, import("../../pipeline/pipeline.types.js").PipelineStageState> = {
       fetch: { status: "pending" },
       preprocess: { status: "pending" },
       embedding: { status: "pending" },
@@ -150,7 +150,7 @@ describe("PipelineEngine - Concurrent DAG Execution", () => {
       updatedAt: new Date().toISOString(),
     };
 
-    const mockStages: Record<string, import("../../pipeline/types.js").PipelineStageState> = {
+    const mockStages: Record<string, import("../../pipeline/pipeline.types.js").PipelineStageState> = {
       fetch: { status: "pending" },
       preprocess: { status: "pending" },
       embedding: { status: "pending" },
@@ -250,7 +250,7 @@ describe("PipelineEngine - Concurrent DAG Execution", () => {
     };
 
     // First run results: all completed
-    const mockStages: Record<string, import("../../pipeline/types.js").PipelineStageState> = {
+    const mockStages: Record<string, import("../../pipeline/pipeline.types.js").PipelineStageState> = {
       fetch: { status: "completed", output: { asin: "B00003" } },
       // preprocess is pending (the user clicked retry on it, clearing its status to pending!)
       preprocess: { status: "pending" },

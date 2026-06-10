@@ -7,7 +7,7 @@ import type {
   PPCKeywordItem,
   BundlingItem,
   CosmoNodeData,
-} from '../types/prospect';
+} from '../dtos/prospect.dto';
 
 export function getDefaultSimulatorScenarios(): SimulatorScenario[] {
   return [

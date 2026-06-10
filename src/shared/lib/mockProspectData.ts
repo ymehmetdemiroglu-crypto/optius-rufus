@@ -1,4 +1,4 @@
-import type { ProspectData } from '../types/prospect';
+import type { ProspectData } from '../dtos/prospect.dto';
 
 export const MOCK_PROSPECT_DATA: ProspectData = {
   id: 5,

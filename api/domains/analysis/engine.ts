@@ -1,4 +1,4 @@
-import type { SemanticGap, AnalysisResult, CleanedText } from "../../pipeline/types.js";
+import type { SemanticGap, AnalysisResult, CleanedText } from "../../pipeline/pipeline.types.js";
 import { generateEmbedding } from "../../services/embedding.js";
 import { cosineSimilarity } from "../../lib/math.js";
 

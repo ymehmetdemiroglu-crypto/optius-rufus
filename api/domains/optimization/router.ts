@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { router, publicProcedure } from "../../trpc.js";
+import { router, publicProcedure } from "../../trpc/context.js";
 import { pipelineEngine } from "../../pipeline/engine.js";
 import { queueWorker } from "../../pipeline/worker.js";
 import { logger } from "../../infra/logger.js";
-import * as pipelineRepo from "../../db/repositories/pipelineRepository.js";
+import * as pipelineRepo from '../pipeline/repository.js';
 
 // On Vercel, process jobs immediately after enqueueing since there's no background worker
 const isVercel = !!process.env.VERCEL;

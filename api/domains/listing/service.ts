@@ -1,5 +1,5 @@
 import * as listingRepo from "./repository.js";
-import type { ListingRecord, InsertListingInput } from "../../db/types.js";
+import type { ListingRecord, InsertListingInput } from "../../db/schema.types.js";
 
 export interface CreateListingInput {
   prospectId: number;

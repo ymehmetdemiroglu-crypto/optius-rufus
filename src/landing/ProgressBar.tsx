@@ -1,4 +1,4 @@
-import { STAGE_LABELS } from '../../lib/stages';
+import { STAGE_LABELS } from '../shared/lib/stages';
 
 interface ProgressBarProps {
   currentStage: number;

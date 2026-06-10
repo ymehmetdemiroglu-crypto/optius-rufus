@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { router, publicProcedure } from "../../trpc.js";
+import { router, publicProcedure } from "../../trpc/context.js";
 import { simulateRufusSOV } from "./service.js";
 import { fetchCompetitors } from "../../services/competitor.js";
-import * as rufusRepo from "../../db/repositories/rufusRepository.js";
+import * as rufusRepo from '../rufus/repository.js';
 import * as listingRepo from "../listing/repository.js";
 
 export const rufusTrackerRouter = router({

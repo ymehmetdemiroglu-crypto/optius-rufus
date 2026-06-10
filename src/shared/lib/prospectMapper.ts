@@ -5,7 +5,7 @@ import type {
   ProspectScoreBreakdown,
   ProspectListing,
   StageCopyData,
-} from '../types/prospect';
+} from '../dtos/prospect.dto';
 import { safeJsonParse } from './utils';
 import {
   getDefaultSimulatorScenarios,

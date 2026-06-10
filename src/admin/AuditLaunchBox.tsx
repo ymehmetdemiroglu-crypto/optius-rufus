@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Search, RefreshCw } from 'lucide-react';
-import { trpc } from '../../providers/trpc';
+import { trpc } from '../shared/providers/trpc';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
 

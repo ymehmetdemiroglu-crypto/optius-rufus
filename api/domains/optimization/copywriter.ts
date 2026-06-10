@@ -1,5 +1,5 @@
 import { callLlm } from "../../services/llmGateway.js";
-import type { RawListingData, SemanticGap } from "../../pipeline/types.js";
+import type { RawListingData, SemanticGap } from "../../pipeline/pipeline.types.js";
 
 interface AnalysisInput {
   rufusScore: number;
