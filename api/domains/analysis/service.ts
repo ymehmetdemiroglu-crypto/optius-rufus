@@ -1,4 +1,5 @@
 import { pipelineEngine } from "../../pipeline/engine.js";
+import { logger } from "../../infra/logger.js";
 import { generateAllStageCopy } from "../optimization/copywriter.js";
 import type {
   RawListingData,
@@ -92,7 +93,8 @@ async function resolveStageCopy(
   analysisResult: AnalysisResult | undefined,
   rawListing: RawListingData,
   prospectName: string,
-  optimized: ({ stageCopy?: unknown } & Record<string, unknown>) | undefined
+  optimized: ({ stageCopy?: unknown } & Record<string, unknown>) | undefined,
+  expectedRevenue?: string
 ): Promise<StageCopy> {
   const existing = optimized?.stageCopy as StageCopy | undefined;
   if (existing) return existing;
@@ -105,7 +107,8 @@ async function resolveStageCopy(
       semanticGaps: gaps,
     },
     rawListing,
-    prospectName
+    prospectName,
+    expectedRevenue
   );
 }
 
@@ -256,7 +259,8 @@ export async function runAnalysis(
     analysisResult,
     rawListing,
     prospectName,
-    optimized
+    optimized,
+    prospect.expectedRevenue || undefined
   );
   const analysis = await persistAnalysis(
     listing,
@@ -365,7 +369,8 @@ export async function regenerateCopy(
         semanticGaps: gaps,
       },
       rawListing,
-      prospectName
+      prospectName,
+      prospect?.expectedRevenue || undefined
     );
   } catch (err) {
     throw new Error(`Failed to regenerate copy for analysis ${analysisId}`, {
@@ -411,3 +416,62 @@ export async function regenerateCopy(
   }
   return updated;
 }
+
+export async function scrapeAndAudit(
+  prospectId: number,
+  asin: string,
+  marketplace = "US"
+): Promise<void> {
+  logger.info(`Starting background scrape and audit for prospect ${prospectId}, ASIN ${asin}`);
+  try {
+    await prospectRepo.updateStatus(prospectId, "analyzing");
+
+    // 1. Scrape listing
+    const item = await scrapeAmazonListing(asin, marketplace);
+    let rawScrapeData: Record<string, unknown> = {};
+    if (item.rawScrapeData) {
+      try {
+        rawScrapeData = JSON.parse(item.rawScrapeData);
+      } catch {
+        rawScrapeData = {};
+      }
+    }
+
+    // 2. Create listing
+    const listing = await listingService.createListing({
+      prospectId,
+      asin: item.asin,
+      marketplace,
+      url: `https://www.amazon.com/dp/${item.asin}`,
+      title: item.title,
+      bullets: item.bullets,
+      description: item.description,
+      brand: item.brand,
+      category: item.category,
+      price: item.price,
+      rating: item.rating,
+      reviewCount: item.reviewCount,
+      images: item.images,
+      aPlusText: item.aPlusText,
+      rawScrapeData,
+    });
+
+    await prospectRepo.updateStatus(prospectId, "scraped");
+
+    // 3. Run analysis
+    await runAnalysis(listing.id);
+    logger.info(`Background scrape and audit completed for prospect ${prospectId}, ASIN ${asin}`);
+
+    // 4. Send email notification
+    await sendAuditReadyEmail(prospectId);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    logger.error(`Failed background scrape and audit for prospect ${prospectId}: ${message}`);
+    await prospectRepo.updateStatus(prospectId, "failed");
+    throw err;
+  }
+}
+
+import { scrapeAmazonListing } from "../listing/scraper.js";
+import * as listingService from "../listing/service.js";
+import { sendAuditReadyEmail } from "../../services/email.js";

@@ -10,6 +10,8 @@ import { STAGE_NAMES, STAGE_IDS } from '../shared/lib/stages';
 import SkeletonLoader from '../landing/SkeletonLoader';
 import LandingPageComposer from '../landing/LandingPageComposer';
 import ReportNotFound from '../landing/ReportNotFound';
+import LiveAuditProgress from '../landing/LiveAuditProgress';
+import { usePipeline } from '../shared/hooks/usePipeline';
 
 export default function ProspectLanding(): JSX.Element {
   const { slug: urlSlug } = useParams<{ slug: string }>();
@@ -23,7 +25,7 @@ export default function ProspectLanding(): JSX.Element {
 
   const isMock = slug === 'mock-prospect';
 
-  const { data, isLoading } = trpc.prospects.getBySlug.useQuery(
+  const { data, isLoading, refetch } = trpc.prospects.getBySlug.useQuery(
     { slug: slug || '' },
     { enabled: !!slug && !isMock }
   );
@@ -33,6 +35,24 @@ export default function ProspectLanding(): JSX.Element {
   const incrementViews = trpc.prospects.incrementViews.useMutation();
 
   const prospectId = isMock ? 5 : (data?.prospect?.id as number ?? 0);
+  const isAuditPending = !isMock && data?.prospect && data.prospect.status !== 'analyzed';
+
+  // Live pipeline update hook via Server-Sent Events (SSE)
+  const { job, isConnected, error } = usePipeline({
+    prospectId: isAuditPending ? prospectId : null,
+    enableSse: true,
+  });
+
+  // Automatically refresh data when pipeline completes
+  useEffect(() => {
+    if (isAuditPending && job?.status === 'completed') {
+      const timer = setTimeout(() => {
+        refetch();
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [isAuditPending, job?.status, refetch]);
+
   const tracker = useActivityTracker(prospectId);
   const trackerRef = useRef(tracker);
   useEffect(() => {
@@ -118,6 +138,19 @@ export default function ProspectLanding(): JSX.Element {
 
   if (!data && !isMock) {
     return <ReportNotFound />;
+  }
+
+  if (isAuditPending) {
+    return (
+      <LiveAuditProgress
+        job={job}
+        isConnected={isConnected}
+        error={error}
+        prospectName={data.prospect.firstName ? `${data.prospect.firstName} ${data.prospect.lastName || ''}`.trim() : data.prospect.email}
+        companyName={data.prospect.company || undefined}
+        asin={data.prospect.asin || data.listing?.asin || undefined}
+      />
+    );
   }
 
   const prospect: ProspectData = isMock ? MOCK_PROSPECT_DATA : mapBackendToProspectData(data);

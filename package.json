@@ -12,7 +12,17 @@
     "build": "vite build && tsc -p tsconfig.server.json",
     "check": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "docs:lint": "markdownlint 'docs/**/*.md' && markdown-link-check docs/**/*.md",
+    "docs:frontmatter": "tsx scripts/lint/frontmatter-validator.ts",
+    "docs:stale": "tsx scripts/lint/staleness-check.ts",
+    "docs:codegen": "tsx scripts/codegen/package-scripts.ts --write && tsx scripts/codegen/env-table.ts --write && tsx scripts/codegen/domain-catalog.ts --write",
+    "docs:codegen:check": "tsx scripts/codegen/package-scripts.ts --check && tsx scripts/codegen/env-table.ts --check && tsx scripts/codegen/domain-catalog.ts --check",
+    "codegen:scripts": "tsx scripts/codegen/package-scripts.ts --write",
+    "codegen:env": "tsx scripts/codegen/env-table.ts --write",
+    "codegen:domains": "tsx scripts/codegen/domain-catalog.ts --write",
+    "docs:drift": "tsx scripts/lint/api-drift-check.ts",
+    "docs:check": "pnpm docs:lint && pnpm docs:frontmatter && pnpm docs:codegen:check && pnpm docs:stale"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.28.0",
@@ -48,6 +58,8 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
     "jsdom": "^29.1.1",
+    "markdown-link-check": "^3.11.2",
+    "markdownlint-cli": "^0.42.0",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.1",
     "tsx": "^4.7.1",

@@ -167,3 +167,42 @@ export async function recordActivity(
     );
   }
 }
+
+export async function getByEmail(email: string): Promise<ProspectRecord | undefined> {
+  try {
+    const result = await pgDb
+      .select()
+      .from(schema.prospects)
+      .where(eq(schema.prospects.email, email))
+      .limit(1);
+    return result[0] as unknown as ProspectRecord | undefined;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    throw new Error(`Failed to fetch prospect by email "${email}": ${message}`, { cause: err });
+  }
+}
+
+export async function updateReplyDetails(
+  id: number,
+  data: { repliedAt: Date; apolloReplyData: unknown; asin?: string; expectedRevenue?: string }
+): Promise<void> {
+  try {
+    const setObj: Partial<typeof schema.prospects.$inferInsert> = {
+      repliedAt: data.repliedAt,
+      apolloReplyData: data.apolloReplyData,
+    };
+    if (data.asin !== undefined) {
+      setObj.asin = data.asin;
+    }
+    if (data.expectedRevenue !== undefined) {
+      setObj.expectedRevenue = data.expectedRevenue;
+    }
+    await pgDb
+      .update(schema.prospects)
+      .set(setObj)
+      .where(eq(schema.prospects.id, id));
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    throw new Error(`Failed to update reply details for prospect ${id}: ${message}`, { cause: err });
+  }
+}

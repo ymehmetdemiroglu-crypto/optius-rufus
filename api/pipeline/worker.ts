@@ -32,6 +32,10 @@ export class QueueWorker {
       if (job.name === "run-pipeline") {
         const data = job.data as { jobId: number; correlationId: string; retryStage?: string };
         await pipelineEngine.runJob(data.jobId, data.correlationId);
+      } else if (job.name === "scrape-and-audit") {
+        const data = job.data as { prospectId: number; asin: string; marketplace?: string };
+        const { scrapeAndAudit } = await import("../domains/analysis/service.js");
+        await scrapeAndAudit(data.prospectId, data.asin, data.marketplace || "US");
       } else {
         throw new Error(`Unknown job name: ${job.name}`);
       }

@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { trpc } from '../shared/providers/trpc';
-import { FolderOpen, Palette } from 'lucide-react';
+import { FolderOpen, Palette, Terminal, Users } from 'lucide-react';
 import AuditLaunchBox from '../admin/AuditLaunchBox';
 import ClientDirectory from '../admin/ClientDirectory';
 import ProspectDetailPanel from '../admin/ProspectDetailPanel';
 import BrandingPanel from '../admin/BrandingPanel';
+import WebhookSimulator from '../admin/WebhookSimulator';
+import PeopleSearch from '../admin/PeopleSearch';
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<"clients" | "branding">("clients");
+  const [activeTab, setActiveTab] = useState<"clients" | "branding" | "simulator" | "prospecting">("clients");
   const [selectedProspectId, setSelectedProspectId] = useState<number | null>(null);
 
   // tRPC Queries & Mutations
@@ -41,12 +43,24 @@ export default function AdminDashboard() {
             <FolderOpen size={14} /> Brand Directory
           </button>
           <button 
+            onClick={() => setActiveTab("prospecting")}
+            className={`px-4 py-2 font-mono text-xs uppercase tracking-wider transition-all flex items-center gap-2 ${activeTab === "prospecting" ? "bg-brand-gold text-brand-dark font-bold" : "text-white/70 hover:text-white"}`}
+          >
+            <Users size={14} /> Apollo Prospecting
+          </button>
+          <button 
             onClick={() => {
               setActiveTab("branding");
             }}
             className={`px-4 py-2 font-mono text-xs uppercase tracking-wider transition-all flex items-center gap-2 ${activeTab === "branding" ? "bg-brand-gold text-brand-dark font-bold" : "text-white/70 hover:text-white"}`}
           >
             <Palette size={14} /> White-Label Settings
+          </button>
+          <button 
+            onClick={() => setActiveTab("simulator")}
+            className={`px-4 py-2 font-mono text-xs uppercase tracking-wider transition-all flex items-center gap-2 ${activeTab === "simulator" ? "bg-brand-gold text-brand-dark font-bold" : "text-white/70 hover:text-white"}`}
+          >
+            <Terminal size={14} /> Webhook Simulator
           </button>
         </div>
       </header>
@@ -78,12 +92,20 @@ export default function AdminDashboard() {
               )}
             </div>
           </>
-        ) : (
+        ) : activeTab === "prospecting" ? (
+          /* Apollo Prospecting Panel */
+          <div className="col-span-12">
+            <PeopleSearch onProspectImported={refetchProspects} />
+          </div>
+        ) : activeTab === "branding" ? (
           /* Branding Configuration Panel */
           <BrandingPanel
             brandData={brandData}
             onSave={(data) => updateBranding.mutate(data)}
           />
+        ) : (
+          /* Webhook Simulation Panel */
+          <WebhookSimulator />
         )}
       </main>
     </div>

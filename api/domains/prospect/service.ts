@@ -20,6 +20,7 @@ export interface CreateProspectInput {
   marketplace?: string;
   packageType?: string;
   pricePoint?: number;
+  expectedRevenue?: string;
 }
 
 export interface ListProspectsOptions {
@@ -32,6 +33,51 @@ function generateSlug(): string {
   return Math.random().toString(36).substring(2, 10);
 }
 
+export function classifyProspectRevenue(expectedRevenue?: string): "Class_A" | "Class_B" | "Class_C" {
+  if (!expectedRevenue) return "Class_C";
+  
+  const lower = expectedRevenue.toLowerCase();
+  
+  // 1. Check for text indicators
+  if (lower.includes("enterprise") || lower.includes("class_a") || lower.includes("class a")) {
+    return "Class_A";
+  }
+  if (lower.includes("growth") || lower.includes("class_b") || lower.includes("class b")) {
+    return "Class_B";
+  }
+  if (lower.includes("starter") || lower.includes("class_c") || lower.includes("class c")) {
+    return "Class_C";
+  }
+  
+  // 2. Parse number
+  let num = parseFloat(expectedRevenue.replace(/[^0-9.]/g, ""));
+  if (isNaN(num)) {
+    return "Class_C";
+  }
+  
+  const isThousand = lower.includes("thousand") || /\d+\s*k\b/.test(lower);
+  const isMillion = lower.includes("million") || /\d+\s*m\b/.test(lower);
+  const isMonthly = lower.includes("month") || lower.includes("/mo") || lower.includes("monthly");
+  
+  // If string indicates thousands (e.g. 150k)
+  if (isThousand) {
+    num = num * 1000;
+  }
+  // If string indicates millions (e.g. 1.2M or 1.2 million)
+  else if (isMillion) {
+    num = num * 1000000;
+  }
+  
+  // If string indicates monthly revenue (e.g. $10k/mo or $10,000/monthly)
+  if (isMonthly) {
+    num = num * 12;
+  }
+  
+  if (num >= 1000000) return "Class_A";
+  if (num >= 100000) return "Class_B";
+  return "Class_C";
+}
+
 export async function createProspect(
   input: CreateProspectInput
 ): Promise<ProspectRecord> {
@@ -42,16 +88,153 @@ export async function createProspect(
     firstName: input.firstName,
     lastName: input.lastName,
     company: input.company,
+    asin: input.asin,
+    expectedRevenue: input.expectedRevenue,
     status: "new",
     landingPageViews: 0,
     packageType: input.packageType || "package_2",
     pricePoint: input.pricePoint ?? 1500,
   };
   try {
-    return await prospectRepo.create(insertInput);
+    const prospect = await prospectRepo.create(insertInput);
+
+    // Auto-enroll the prospect in the matching Apollo sequence based on expected revenue
+    try {
+      const { createContact, enrollInSequence } = await import("../apollo/service.js");
+      const contact = await createContact({
+        email: prospect.email,
+        firstName: prospect.firstName || undefined,
+        lastName: prospect.lastName || undefined,
+        company: prospect.company || undefined,
+      });
+
+      const tier = classifyProspectRevenue(prospect.expectedRevenue || undefined);
+      const sequenceMap = {
+        Class_A: "seq-enterprise",
+        Class_B: "seq-growth",
+        Class_C: "seq-starter",
+      };
+      const sequenceId = sequenceMap[tier];
+
+      await enrollInSequence(contact.id, sequenceId);
+
+      await prospectRepo.updateApolloFields(prospect.id, {
+        apolloContactId: contact.id,
+        apolloSequenceId: sequenceId,
+        status: "emailed",
+      });
+    } catch (apolloErr) {
+      console.error("Failed to auto-enroll prospect in Apollo campaign:", apolloErr);
+    }
+
+    return (await prospectRepo.getById(prospect.id)) || prospect;
   } catch (err) {
     throw new Error("Failed to create prospect", { cause: err });
   }
+}
+
+export async function handleApolloReply(payload: any): Promise<{
+  success: boolean;
+  prospectId: number;
+  slug: string;
+  auditTriggered: boolean;
+  asin?: string;
+}> {
+  const email = payload.contact?.email || payload.email_message?.sender_email || payload.email;
+  if (!email) {
+    throw new Error("No email found in Apollo webhook payload");
+  }
+
+  const firstName = payload.contact?.first_name || payload.first_name || "";
+  const lastName = payload.contact?.last_name || payload.last_name || "";
+  const company = payload.contact?.organization_name || payload.company || "";
+  const expectedRevenue = payload.expectedRevenue || payload.contact?.custom_fields?.expected_revenue || "";
+
+  // Extract ASIN
+  let asin = payload.contact?.custom_fields?.asin || 
+             payload.contact?.custom_fields?.ASIN || 
+             payload.asin;
+             
+  const bodyText = payload.email_message?.body_text || payload.body_text || "";
+  if (!asin && bodyText) {
+    const asinMatch = bodyText.match(/\b(B[A-Z0-9]{9})\b/i);
+    if (asinMatch) {
+      asin = asinMatch[1].toUpperCase();
+    }
+  }
+
+  // Find or Create Prospect
+  let prospect = await prospectRepo.getByEmail(email);
+  let isNew = false;
+  
+  if (!prospect) {
+    isNew = true;
+    prospect = await createProspect({
+      email,
+      firstName,
+      lastName,
+      company,
+      expectedRevenue,
+    });
+  } else {
+    // Update expected revenue if provided in webhook and not already set
+    if (expectedRevenue && prospect.expectedRevenue !== expectedRevenue) {
+      await prospectRepo.updateReplyDetails(prospect.id, {
+        repliedAt: new Date(),
+        apolloReplyData: payload.email_message || payload,
+        asin: asin || prospect.asin || undefined,
+        expectedRevenue,
+      });
+    }
+  }
+
+  // Update status to 'replied'
+  await prospectRepo.updateStatus(prospect.id, "replied");
+  await prospectRepo.updateReplyDetails(prospect.id, {
+    repliedAt: new Date(),
+    apolloReplyData: payload.email_message || payload,
+    asin: asin || prospect.asin || undefined,
+  });
+
+  // Record activity
+  await recordActivity(prospect.id, "email_replied", {
+    subject: payload.email_message?.subject || "Apollo Email Reply",
+    snippet: bodyText.slice(0, 500) || "User replied to Apollo outreach",
+    isNewProspect: isNew,
+  }, 20);
+
+  // Trigger Scrape & Audit if ASIN is present
+  const finalAsin = asin || prospect.asin;
+  let auditTriggered = false;
+
+  if (finalAsin) {
+    const existingListing = await listingRepo.getLatestByProspectId(prospect.id);
+    let existingAnalysis = null;
+    if (existingListing) {
+      existingAnalysis = await analysisRepo.getLatestByListingId(existingListing.id);
+    }
+
+    if (!existingAnalysis) {
+      const { pipelineQueue } = await import("../../infra/queue.js");
+      await pipelineQueue.add("scrape-and-audit", {
+        prospectId: prospect.id,
+        asin: finalAsin,
+        marketplace: "US"
+      });
+      auditTriggered = true;
+      await prospectRepo.updateStatus(prospect.id, "analyzing");
+    }
+  }
+
+  const updatedProspect = await prospectRepo.getById(prospect.id);
+
+  return {
+    success: true,
+    prospectId: prospect.id,
+    slug: updatedProspect?.slug || prospect.slug,
+    auditTriggered,
+    asin: finalAsin,
+  };
 }
 
 export async function getProspectBySlug(

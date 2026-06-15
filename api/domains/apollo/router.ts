@@ -1,6 +1,6 @@
 import { z } from "zod";
 import * as prospectRepo from "../prospect/repository.js";
-import { createContact, enrollInSequence, getSequences } from "./service.js";
+import { createContact, enrollInSequence, getSequences, searchPeople, enrichAndImportProspect } from "./service.js";
 import { router, publicProcedure } from "../../trpc/context.js";
 
 export const apolloRouter = router({
@@ -64,5 +64,35 @@ export const apolloRouter = router({
     .input(z.object({}))
     .query(async () => {
       return getSequences();
+    }),
+
+  searchPeople: publicProcedure
+    .input(
+      z.object({
+        person_titles: z.array(z.string()).optional(),
+        include_similar_titles: z.boolean().optional(),
+        q_keywords: z.string().optional(),
+        person_locations: z.array(z.string()).optional(),
+        person_seniorities: z.array(z.string()).optional(),
+        organization_locations: z.array(z.string()).optional(),
+        q_organization_domains_list: z.array(z.string()).optional(),
+        page: z.number().int().optional(),
+        per_page: z.number().int().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      return searchPeople(input);
+    }),
+
+  enrichAndImport: publicProcedure
+    .input(
+      z.object({
+        personId: z.string(),
+        asin: z.string().optional(),
+        marketplace: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return enrichAndImportProspect(input.personId, input.asin, input.marketplace);
     }),
 });

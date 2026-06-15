@@ -1,0 +1,1973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OPTIMUS RUFUS | AI Audit & Optimization Report</title>
+  
+  <!-- Premium Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ── DESIGN SYSTEM & TOKENS ── */
+    :root {
+      --brand-bg: #f5f0e8;
+      --brand-dark: #1a1a1a;
+      --brand-gold: #ff9900;
+      --brand-red: #ff1a1a;
+      --brand-blue: #0055ff;
+      --terminal-green: #00ff88;
+      --terminal-bg: #0d1117;
+      --chat-buyer: #e8f0fe;
+      --chat-rufus: #fff4e6;
+      --font-sans: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-display: 'Space Grotesk', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      scrollbar-width: thin;
+      scrollbar-color: var(--brand-dark) transparent;
+    }
+
+    body {
+      background-color: var(--brand-bg);
+      color: var(--brand-dark);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    ::selection {
+      background-color: var(--brand-gold);
+      color: var(--brand-dark);
+    }
+
+    /* ── TYPOGRAPHY ── */
+    h1, h2, h3, h4 {
+      font-family: var(--font-display);
+      text-transform: uppercase;
+      font-weight: 900;
+      line-height: 1.1;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .section-subtitle {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: rgba(26, 26, 26, 0.6);
+      margin-bottom: 2rem;
+      display: block;
+    }
+
+    /* ── BRUTALIST UI UTILITIES ── */
+    .brutalist-card {
+      background: #ffffff;
+      border: 3px solid var(--brand-dark);
+      padding: 1.5rem;
+      box-shadow: 6px 6px 0px var(--brand-dark);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .brutalist-card:hover {
+      transform: translate(-3px, -3px);
+      box-shadow: 9px 9px 0px var(--brand-dark);
+    }
+
+    .brutalist-btn {
+      background-color: var(--brand-gold);
+      color: var(--brand-dark);
+      border: 3px solid var(--brand-dark);
+      padding: 1rem 2rem;
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      box-shadow: 6px 6px 0px var(--brand-dark);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.15s ease-out;
+      text-decoration: none;
+    }
+
+    .brutalist-btn:hover {
+      transform: translate(2px, 2px);
+      box-shadow: 4px 4px 0px var(--brand-dark);
+    }
+
+    .brutalist-btn:active {
+      transform: translate(6px, 6px);
+      box-shadow: 0px 0px 0px var(--brand-dark);
+    }
+
+    .brutalist-btn-red {
+      background-color: var(--brand-red);
+      color: #ffffff;
+    }
+
+    .brutalist-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: var(--brand-red);
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      padding: 0.5rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      box-shadow: 3px 3px 0px rgba(255, 255, 255, 0.2);
+    }
+
+    /* ── SCROLL PROGRESS BAR ── */
+    .progress-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: rgba(26, 26, 26, 0.1);
+      z-index: 1000;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--brand-gold);
+      transition: width 0.1s;
+    }
+
+    /* ── STAGE 0: HERO (DARK MODE) ── */
+    .hero-section {
+      background-color: var(--brand-dark);
+      color: #ffffff;
+      min-h: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-grid-bg {
+      position: absolute;
+      inset: 0;
+      opacity: 0.04;
+      background-image: 
+        linear-gradient(#fff 1px, transparent 1px),
+        linear-gradient(90deg, #fff 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      max-width: 900px;
+      margin: 0 auto;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    @media (min-width: 768px) {
+      .hero-title {
+        font-size: 5rem;
+      }
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 700px;
+      line-height: 1.6;
+    }
+
+    /* ── ASIN PREVIEW WIDGET ── */
+    .asin-widget {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 1.25rem;
+      max-width: 550px;
+      backdrop-filter: blur(5px);
+    }
+
+    @media (min-width: 480px) {
+      .asin-widget {
+        flex-direction: row;
+        align-items: center;
+      }
+    }
+
+    .asin-img {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      background: white;
+    }
+
+    .asin-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .asin-meta {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .asin-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 350px;
+    }
+
+    .asin-stats {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* ── SCANNER ENGINE WIDGET ── */
+    .scanner-terminal {
+      background: var(--terminal-bg);
+      border: 3px solid var(--brand-dark);
+      border-color: rgba(255,255,255,0.15);
+      padding: 1.5rem;
+      font-family: var(--font-mono);
+      color: var(--terminal-green);
+      font-size: 0.85rem;
+      box-shadow: 6px 6px 0px rgba(255,255,255,0.1);
+      display: none;
+      flex-direction: column;
+      gap: 0.5rem;
+      text-shadow: 0 0 5px rgba(0, 255, 136, 0.45);
+    }
+
+    .terminal-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 2px solid rgba(0, 255, 136, 0.2);
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+
+    .terminal-cursor {
+      display: inline-block;
+      width: 8px;
+      height: 15px;
+      background: var(--terminal-green);
+      animation: cursor-blink 1s step-end infinite;
+    }
+
+    @keyframes cursor-blink {
+      50% { opacity: 0; }
+    }
+
+    /* ── CONTENT CONTAINER (VISIBLE AFTER SCAN) ── */
+    .report-wrapper {
+      display: none; /* Injected by JS when scan completes */
+    }
+
+    /* ── AUTOPSY STAGE ── */
+    .autopsy-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    @media (min-width: 992px) {
+      .autopsy-grid {
+        grid-template-columns: 350px 1fr;
+      }
+    }
+
+    /* SCORECARD */
+    .scorecard {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .score-circle-container {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      margin: 0 auto;
+    }
+
+    .score-circle-svg {
+      transform: rotate(-90deg);
+    }
+
+    .score-circle-bg {
+      fill: none;
+      stroke: #e6e0d5;
+      stroke-width: 12;
+    }
+
+    .score-circle-fill {
+      fill: none;
+      stroke: var(--brand-red);
+      stroke-width: 12;
+      stroke-dasharray: 502;
+      stroke-dashoffset: 502; /* 502 * (1 - 45/100) = 276.1 */
+      stroke-linecap: square;
+      transition: stroke-dashoffset 2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .score-text-wrapper {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .score-big-num {
+      font-family: var(--font-display);
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: var(--brand-dark);
+      line-height: 1;
+    }
+
+    .score-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(26,26,26,0.5);
+    }
+
+    .gauge-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .gauge-meta {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .gauge-bar {
+      height: 18px;
+      background-color: rgba(26, 26, 26, 0.05);
+      border: 2px solid var(--brand-dark);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gauge-fill {
+      height: 100%;
+      border-right: 2px solid var(--brand-dark);
+      background-color: var(--brand-gold);
+      width: 0%;
+      transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .gauge-fill.critical { background-color: var(--brand-red); }
+    .gauge-fill.warning { background-color: var(--brand-gold); }
+    .gauge-fill.good { background-color: var(--brand-blue); }
+
+    /* CRITICAL ISSUE CARDS */
+    .wounds-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (min-width: 600px) {
+      .wounds-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .wound-card {
+      border: 3px solid var(--brand-dark);
+      background: white;
+      padding: 1.25rem;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .wound-severity {
+      position: absolute;
+      top: -12px;
+      right: 12px;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 0.25rem 0.5rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      border: 2px solid var(--brand-dark);
+    }
+
+    .wound-severity.critical {
+      background-color: var(--brand-red);
+      color: white;
+    }
+
+    .wound-severity.warning {
+      background-color: var(--brand-gold);
+      color: var(--brand-dark);
+    }
+
+    .wound-title {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      margin-top: 0.5rem;
+    }
+
+    .wound-desc {
+      font-size: 0.85rem;
+      color: rgba(26,26,26,0.8);
+      flex: 1;
+    }
+
+    .wound-impact {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--brand-red);
+      border-top: 1px dashed rgba(26,26,26,0.15);
+      padding-top: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* ── GENERAL SECTION CONTAINERS ── */
+    .report-section {
+      border-bottom: 3px solid var(--brand-dark);
+      padding: 5rem 2rem;
+    }
+
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* ── STAGE 1: BLEED CALCULATOR ── */
+    .calculator-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .calculator-layout {
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+      }
+    }
+
+    .calculator-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .slider-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .brutal-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 12px;
+      background: rgba(26, 26, 26, 0.08);
+      border: 2px solid var(--brand-dark);
+      outline: none;
+      margin: 10px 0;
+    }
+
+    .brutal-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      background: var(--brand-gold);
+      border: 2px solid var(--brand-dark);
+      cursor: pointer;
+      box-shadow: 2px 2px 0px var(--brand-dark);
+      transition: transform 0.1s;
+    }
+
+    .brutal-slider::-webkit-slider-thumb:hover {
+      background: #ffaa22;
+      transform: scale(1.1);
+    }
+
+    .bleed-output-card {
+      background: var(--brand-red);
+      color: #ffffff;
+      border: 3px solid var(--brand-dark);
+      padding: 2rem;
+      box-shadow: 8px 8px 0px var(--brand-dark);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .bleed-output-header {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.8;
+    }
+
+    .bleed-output-value {
+      font-family: var(--font-display);
+      font-size: 3.5rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    /* ── STAGE 2: RUFUS CHAT SIMULATOR ── */
+    .simulator-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+
+    @media (min-width: 992px) {
+      .simulator-grid {
+        grid-template-columns: 1fr 420px;
+        align-items: flex-start;
+      }
+    }
+
+    .questions-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .q-btn {
+      text-align: left;
+      background: white;
+      border: 3px solid var(--brand-dark);
+      padding: 1.25rem;
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 4px 4px 0px var(--brand-dark);
+      transition: all 0.1s ease-out;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .q-btn.active {
+      background-color: var(--brand-gold);
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px var(--brand-dark);
+    }
+
+    /* CHAT DEVICE MOCK */
+    .phone-frame {
+      background: #ffffff;
+      border: 4px solid var(--brand-dark);
+      box-shadow: 10px 10px 0px var(--brand-dark);
+      max-width: 380px;
+      margin: 0 auto;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 480px;
+    }
+
+    .phone-header {
+      background: var(--brand-dark);
+      color: #ffffff;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .rufus-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--brand-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--brand-dark);
+    }
+
+    .phone-title-row {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .phone-title {
+      font-size: 0.8rem;
+      font-weight: 900;
+      font-family: var(--font-display);
+    }
+
+    .phone-status {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--terminal-green);
+    }
+
+    .phone-screen {
+      flex: 1;
+      background: #fafafa;
+      padding: 1rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .bubble {
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--brand-dark);
+      max-width: 85%;
+      position: relative;
+    }
+
+    .bubble-buyer {
+      background-color: var(--chat-buyer);
+      align-self: flex-end;
+    }
+
+    .bubble-rufus {
+      background-color: var(--chat-rufus);
+      align-self: flex-start;
+      display: none; /* Managed by JS animation */
+    }
+
+    .bubble-warning {
+      background-color: #fff0f0;
+      border-color: var(--brand-red);
+      align-self: flex-start;
+      display: none;
+      font-size: 0.75rem;
+      color: var(--brand-red);
+      font-weight: 600;
+    }
+
+    /* ── STAGE 3: BEFORE/AFTER TRANSFORM PREVIEW ── */
+    .transform-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tab-btn {
+      background: white;
+      border: 3px solid var(--brand-dark);
+      padding: 0.5rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 3px 3px 0px var(--brand-dark);
+    }
+
+    .tab-btn.active {
+      background: var(--brand-dark);
+      color: white;
+      box-shadow: none;
+      transform: translate(3px, 3px);
+    }
+
+    .transform-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .transform-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .transform-card {
+      border: 3px solid var(--brand-dark);
+      padding: 1.5rem;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: relative;
+    }
+
+    .transform-card.before {
+      background-color: #fdfdfd;
+      box-shadow: 4px 4px 0px var(--brand-dark);
+    }
+
+    .transform-card.after {
+      background-color: #f0faf4;
+      border-color: var(--brand-dark);
+      box-shadow: 8px 8px 0px var(--brand-dark);
+    }
+
+    .transform-label-badge {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.25rem 0.5rem;
+      border: 2px solid var(--brand-dark);
+      display: inline-block;
+      align-self: flex-start;
+    }
+
+    .transform-label-badge.red {
+      background-color: #ffcccc;
+    }
+
+    .transform-label-badge.green {
+      background-color: #ccffdd;
+    }
+
+    .transform-content-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+    }
+
+    .transform-copy-text {
+      font-size: 0.9rem;
+      color: rgba(26,26,26,0.8);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+    }
+
+    .diff-del {
+      background: #ffcccc;
+      text-decoration: line-through;
+      padding: 0.1rem 0.25rem;
+    }
+
+    .diff-ins {
+      background: #ccffdd;
+      font-weight: 700;
+      padding: 0.1rem 0.25rem;
+    }
+
+    /* ── STAGE 4: FREE Q&A COPIER ── */
+    .qa-bank {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .qa-card {
+      border: 3px solid var(--brand-dark);
+      background: white;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 4px 4px 0px var(--brand-dark);
+    }
+
+    @media (min-width: 768px) {
+      .qa-card {
+        flex-direction: row;
+      }
+    }
+
+    .qa-question-box {
+      background: var(--brand-dark);
+      color: white;
+      padding: 1.5rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .qa-tag {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+      color: var(--brand-gold);
+    }
+
+    .qa-question-text {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+    }
+
+    .qa-answer-box {
+      padding: 1.5rem;
+      flex: 1.5;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 1.5rem;
+      background: #ffffff;
+    }
+
+    .qa-answer-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: rgba(26,26,26,0.85);
+    }
+
+    .qa-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px dashed rgba(26,26,26,0.15);
+      padding-top: 1rem;
+    }
+
+    .qa-action-btn {
+      background: transparent;
+      border: 2px solid var(--brand-dark);
+      padding: 0.4rem 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.1s ease-out;
+    }
+
+    .qa-action-btn:hover {
+      background: var(--brand-dark);
+      color: white;
+    }
+
+    /* ── STAGE 5: PPC PLANNER & COSMO BUNDLING ── */
+    .planner-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    @media (min-width: 992px) {
+      .planner-grid {
+        grid-template-columns: 1.5fr 1fr;
+      }
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .brutal-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 3px solid var(--brand-dark);
+    }
+
+    .brutal-table th, .brutal-table td {
+      border: 2px solid var(--brand-dark);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+
+    .brutal-table th {
+      background: var(--brand-dark);
+      color: white;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .brutal-table td {
+      font-size: 0.9rem;
+      background: white;
+    }
+
+    .brutal-table tr:nth-child(even) td {
+      background: var(--brand-bg);
+    }
+
+    .kw-tag {
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+
+    .volume-cell {
+      font-family: var(--font-mono);
+    }
+
+    .difficulty-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      border: 1px solid var(--brand-dark);
+    }
+
+    .difficulty-badge.low {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .difficulty-badge.medium {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .bundle-card {
+      border: 3px solid var(--brand-dark);
+      background: white;
+      padding: 1.25rem;
+      box-shadow: 4px 4px 0px var(--brand-dark);
+      margin-bottom: 1.25rem;
+    }
+
+    .bundle-title {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .bundle-title::before {
+      content: '✦';
+      color: var(--brand-gold);
+    }
+
+    .bundle-list {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 0.75rem;
+      font-size: 0.85rem;
+      font-family: var(--font-mono);
+    }
+
+    .bundle-list li {
+      padding: 0.2rem 0;
+      border-bottom: 1px dashed rgba(26,26,26,0.1);
+    }
+
+    .bundle-rationale {
+      font-size: 0.8rem;
+      color: rgba(26,26,26,0.75);
+    }
+
+    /* ── STAGE 6: ROADMAP & PROOF ── */
+    .roadmap-timeline {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    @media (min-width: 768px) {
+      .roadmap-timeline {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+
+    .roadmap-step {
+      background: white;
+      border: 3px solid var(--brand-dark);
+      padding: 1.5rem;
+      position: relative;
+      box-shadow: 4px 4px 0px var(--brand-dark);
+    }
+
+    .roadmap-step-num {
+      position: absolute;
+      top: -15px;
+      left: 15px;
+      background: var(--brand-gold);
+      border: 2px solid var(--brand-dark);
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.2rem;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .roadmap-step-title {
+      margin-top: 1rem;
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .roadmap-step-desc {
+      font-size: 0.85rem;
+      color: rgba(26,26,26,0.8);
+    }
+
+    /* ── STAGE 7: BOOKING & GUARANTEE ── */
+    .booking-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      margin-top: 2rem;
+    }
+
+    @media (min-width: 992px) {
+      .booking-layout {
+        grid-template-columns: 1fr 450px;
+      }
+    }
+
+    .guarantee-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .guarantee-badge-large {
+      border: 4px dashed var(--brand-red);
+      background-color: #fff0f0;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 6px 6px 0px var(--brand-dark);
+    }
+
+    .guarantee-title {
+      color: var(--brand-red);
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .guarantee-body {
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .booking-widget {
+      background: white;
+      border: 3px solid var(--brand-dark);
+      padding: 2rem;
+      box-shadow: 8px 8px 0px var(--brand-dark);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .input-field {
+      width: 100%;
+      border: 3px solid var(--brand-dark);
+      padding: 0.75rem 1rem;
+      font-family: var(--font-sans);
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .input-field:focus {
+      border-color: var(--brand-blue);
+      box-shadow: 3px 3px 0px var(--brand-blue);
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      background-color: var(--brand-dark);
+      color: rgba(255,255,255,0.4);
+      padding: 3rem 2rem;
+      text-align: center;
+      border-top: 3px solid var(--brand-dark);
+    }
+
+    .footer-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+    }
+
+    /* ── FLOATING CTA BANNER ── */
+    .floating-cta {
+      position: fixed;
+      bottom: -100px;
+      left: 0;
+      width: 100%;
+      background: var(--brand-dark);
+      color: white;
+      padding: 1rem 2rem;
+      border-top: 3px solid var(--brand-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 900;
+      transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0px -5px 15px rgba(0,0,0,0.15);
+    }
+
+    .floating-cta.active {
+      bottom: 0;
+    }
+
+    .floating-cta-text {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      display: none;
+    }
+
+    @media (min-width: 600px) {
+      .floating-cta-text {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Scroll Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar" id="scrollIndicator"></div>
+  </div>
+
+  <!-- STAGE 0: HERO SECTION (DARK MODE) -->
+  <section class="hero-section" id="hero">
+    <div class="hero-grid-bg"></div>
+    <div class="hero-content">
+      
+      <!-- Report Alert Badge -->
+      <div>
+        <div class="brutalist-badge">
+          ⚠️ DIAGNOSTIC REPORT FOR ACME GREENS
+        </div>
+      </div>
+
+      <!-- Action-Oriented Headline -->
+      <h1 class="hero-title" id="heroHeadline">
+        Alex, Your Acme Greens Listing is Invisible to 73% of Buyers
+      </h1>
+
+      <p class="hero-subtitle" id="heroSubheadline">
+        We ran ASIN <strong>B08GREEN88</strong> through our 7-agent AI engine — scanning Amazon Rufus compatibility, COSMO purchase intent mapping, and semantic keyword coverage. What we discovered should concern you.
+      </p>
+
+      <!-- ASIN Preview Widget -->
+      <div class="asin-widget">
+        <img class="asin-img" src="https://images.unsplash.com/photo-1540420773420-3366772f4999" alt="Product Image">
+        <div class="asin-info">
+          <div class="asin-meta">ASIN: B08GREEN88 • CATEGORY: Supergreens Powder</div>
+          <div class="asin-title">Acme Premium Organic Supergreens Powder — 30 Servings | Gut Health & Natural Energy</div>
+          <div class="asin-stats">$34.95 • ★4.1 (245 reviews)</div>
+        </div>
+      </div>
+
+      <!-- Interactive Autopsy Button / Terminal -->
+      <div style="margin-top: 1rem;">
+        <button class="brutalist-btn" id="runAutopsyBtn">
+          <span>RUN FREE AUTOPSY ON B08GREEN88</span>
+          <span style="font-size: 1.25rem;">→</span>
+        </button>
+        
+        <!-- Live Terminal Scanner -->
+        <div class="scanner-terminal" id="terminalScanner">
+          <div class="terminal-header">
+            <span>RUFUS_SCANNER_v2.09</span>
+            <span>SYSTEM STATE: ACTIVE</span>
+          </div>
+          <div id="terminalOutput"></div>
+          <div><span class="terminal-cursor"></span></div>
+        </div>
+
+        <p class="asin-meta" id="scanPromptText" style="margin-top: 0.75rem; color: rgba(255,255,255,0.4);">
+          Takes 4 seconds • No signup required • 100% free
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- REPORT WRAPPER (HIDDEN UNTIL SCAN COMPLETE) -->
+  <div class="report-wrapper" id="reportWrapper">
+
+    <!-- STAGE 1: AUTOPSY REPORT -->
+    <section class="report-section" id="autopsy">
+      <div class="section-inner">
+        <span class="section-subtitle">STAGE_01 // LISTING AUTOPSY</span>
+        <h2 class="section-title" id="autopsyHeadline">Alex, Your Listing Has 3 Untreated Wounds</h2>
+        <p style="font-size: 1.1rem; max-width: 800px; margin-bottom: 3rem; color: rgba(26,26,26,0.8);" id="autopsyBody">
+          Your Rufus compatibility score is 48/100 — that means Amazon's AI can only answer 48% of buyer questions using your listing. The category leader in Supergreens Powder scores 87. Your biggest gaps are highlighted below.
+        </p>
+
+        <div class="autopsy-grid">
+          
+          <!-- Core Scorecard Gauge -->
+          <div class="scorecard brutalist-card">
+            <h3 style="font-size: 1.2rem; text-align: center;">RUFUS AUDIT SCORE</h3>
+            
+            <div class="score-circle-container">
+              <svg class="score-circle-svg" width="180" height="180">
+                <circle class="score-circle-bg" cx="90" cy="90" r="80"></circle>
+                <circle class="score-circle-fill" id="scoreCircle" cx="90" cy="90" r="80"></circle>
+              </svg>
+              <div class="score-text-wrapper">
+                <div class="score-big-num" id="overallScoreText">0</div>
+                <div class="score-label">OUT OF 100</div>
+              </div>
+            </div>
+
+            <!-- Score breakdown bars -->
+            <div class="gauge-card" style="margin-top: 1rem;">
+              <div class="gauge-meta">
+                <span>COSMO Intent Mapping</span>
+                <span id="cosmoVal">0%</span>
+              </div>
+              <div class="gauge-bar"><div class="gauge-fill critical" id="cosmoBar"></div></div>
+            </div>
+
+            <div class="gauge-card">
+              <div class="gauge-meta">
+                <span>Semantic Coverage</span>
+                <span id="semanticVal">0%</span>
+              </div>
+              <div class="gauge-bar"><div class="gauge-fill critical" id="semanticBar"></div></div>
+            </div>
+
+            <div class="gauge-card">
+              <div class="gauge-meta">
+                <span>Category Average</span>
+                <span>54%</span>
+              </div>
+              <div class="gauge-bar"><div class="gauge-fill warning" style="width: 54%;"></div></div>
+            </div>
+          </div>
+
+          <!-- Gaps / Wounds Grid -->
+          <div class="wounds-grid">
+            <div class="wound-card">
+              <span class="wound-severity critical">Critical</span>
+              <h4 class="wound-title">Daily Safety Warning</h4>
+              <p class="wound-desc">Lacks explicit statements on daily dosage limits, potential side effects, and safety warning callouts in bullets or description.</p>
+              <div class="wound-impact">
+                <span>RUFUS COMPATIBILITY GAP:</span>
+                <span>62%</span>
+              </div>
+            </div>
+
+            <div class="wound-card">
+              <span class="wound-severity warning">Warning</span>
+              <h4 class="wound-title">Usage Instructions</h4>
+              <p class="wound-desc">Fails to detail optimal consumption timing, liquid temperature pairings, and routine integration schedules.</p>
+              <div class="wound-impact">
+                <span>RUFUS COMPATIBILITY GAP:</span>
+                <span>55%</span>
+              </div>
+            </div>
+
+            <div class="wound-card">
+              <span class="wound-severity critical">Critical</span>
+              <h4 class="wound-title">Packaging & Bags</h4>
+              <p class="wound-desc">8% of customer reviews mention a faulty bag seal. Rufus actively flags packaging risk to conversational buyers looking for options.</p>
+              <div class="wound-impact">
+                <span>BUYER CONFIDENCE GAP:</span>
+                <span>40%</span>
+              </div>
+            </div>
+
+            <div class="wound-card">
+              <span class="wound-severity warning">Warning</span>
+              <h4 class="wound-title">Probiotic CFUs</h4>
+              <p class="wound-desc">Listing references "gut health" but fails to specify the exact probiotic strains or colony-forming units (CFUs).</p>
+              <div class="wound-impact">
+                <span>COSMO INTENT GAP:</span>
+                <span>35%</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE 2: BLEED CALCULATOR -->
+    <section class="report-section" id="bleed">
+      <div class="section-inner">
+        <span class="section-subtitle">STAGE_02 // CONVERSION LEAKAGE</span>
+        <h2 class="section-title" id="bleedHeadline">Every Day You Wait, You're Writing a Check to Your Competitors</h2>
+        <p style="font-size: 1.1rem; max-width: 800px; margin-bottom: 3rem; color: rgba(26,26,26,0.8);" id="bleedBody">
+          Because Rufus redirects buyers seeking detailed safety and usage answers, you lose traffic on the threshold of conversion. Estimate your bleeding revenue below.
+        </p>
+
+        <div class="calculator-layout">
+          
+          <!-- Controls -->
+          <div class="calculator-controls brutalist-card">
+            
+            <div class="slider-group">
+              <div class="slider-label-row">
+                <span>ESTIMATED MONTHLY TRAFFIC (VISITS)</span>
+                <span id="trafficLabel">4,900</span>
+              </div>
+              <input type="range" class="brutal-slider" id="trafficSlider" min="1000" max="20000" step="500" value="4900">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-label-row">
+                <span>PRODUCT PRICE ($)</span>
+                <span id="priceLabel">$34.95</span>
+              </div>
+              <input type="range" class="brutal-slider" id="priceSlider" min="10" max="150" step="1" value="35">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-label-row">
+                <span>CONVERSION RATE GAP (%)</span>
+                <span id="gapLabel">3.5%</span>
+              </div>
+              <input type="range" class="brutal-slider" id="gapSlider" min="0.5" max="8" step="0.1" value="3.5">
+            </div>
+
+          </div>
+
+          <!-- Live Output -->
+          <div class="bleed-output-card">
+            <span class="bleed-output-header">Estimated Monthly Revenue Bleeding</span>
+            <div class="bleed-output-value" id="bleedResult">$5,985</div>
+            <p style="font-size: 0.9rem; opacity: 0.9;">
+              This calculation represents the conservative direct loss of conversion to competitors (like AG1) because the AI engine cannot confidently validate buyer requirements from your listing.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE 3: CHAT SIMULATOR -->
+    <section class="report-section" id="simulator">
+      <div class="section-inner">
+        <span class="section-subtitle">STAGE_03 // RUFUS SIMULATION</span>
+        <h2 class="section-title">See Rufus Recommend Competitors Instead</h2>
+        <p style="font-size: 1.1rem; max-width: 800px; margin-bottom: 3rem; color: rgba(26,26,26,0.8);" id="simulatorIntro">
+          This is happening right now. Every time a buyer asks Amazon's AI a question your listing cannot answer, Rufus warns them and recommends a competitor instead. Select a question below to see the simulation:
+        </p>
+
+        <div class="simulator-grid">
+          
+          <!-- Questions Selector -->
+          <div class="questions-selector">
+            <button class="q-btn active" onclick="simulateChat(0, this)">
+              <span>1. "Is this supergreens powder safe to take daily?"</span>
+              <span>➜</span>
+            </button>
+            <button class="q-btn" onclick="simulateChat(1, this)">
+              <span>2. "When is the best time of day to consume this?"</span>
+              <span>➜</span>
+            </button>
+            <button class="q-btn" onclick="simulateChat(2, this)">
+              <span>3. "Does this contain real wheatgrass, and is it gluten-free?"</span>
+              <span>➜</span>
+            </button>
+          </div>
+
+          <!-- Interactive Phone Mock -->
+          <div class="phone-frame">
+            <div class="phone-header">
+              <div class="rufus-avatar">R</div>
+              <div class="phone-title-row">
+                <span class="phone-title">Amazon Rufus Simulator</span>
+                <span class="phone-status">● Live Simulation</span>
+              </div>
+            </div>
+            <div class="phone-screen" id="chatScreen">
+              <!-- Chat Bubble: Buyer Question -->
+              <div class="bubble bubble-buyer" id="buyerBubble">
+                Is this supergreens powder safe to take daily?
+              </div>
+              
+              <!-- Chat Bubble: Rufus Response -->
+              <div class="bubble bubble-rufus" id="rufusBubble" style="display: block;">
+                Based on available product information, I cannot determine daily usage safety for this product. Here are products with detailed safety information...
+              </div>
+
+              <!-- Chat Bubble: Competitor Recommendation -->
+              <div class="bubble bubble-warning" id="competitorWarning" style="display: block;">
+                ⚠️ competitor detour: Rufus recommends <strong>Athletic Greens AG1</strong> because their listing explicitly verifies third-party tested daily safety.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE 4: BEFORE / AFTER CONTENT PREVIEW -->
+    <section class="report-section" id="transform">
+      <div class="section-inner">
+        <span class="section-subtitle">STAGE_04 // AI OPTIMIZATION PREVIEW</span>
+        <h2 class="section-title" id="transformHeadline">Here's What a Rufus-Optimized Listing Looks Like</h2>
+        <p style="font-size: 1.1rem; max-width: 800px; margin-bottom: 2rem; color: rgba(26,26,26,0.8);">
+          We rewrite your copy to feed structured semantically rich answers directly to Rufus's indexers, converting skeptical shoppers instantly.
+        </p>
+
+        <!-- Section Tabs -->
+        <div class="transform-tabs">
+          <button class="tab-btn active" onclick="switchTransformTab(0, this)">Title</button>
+          <button class="tab-btn" onclick="switchTransformTab(1, this)">Bullet 1</button>
+          <button class="tab-btn" onclick="switchTransformTab(2, this)">Bullet 2</button>
+        </div>
+
+        <div class="transform-grid">
+          
+          <!-- Before Card -->
+          <div class="transform-card before">
+            <span class="transform-label-badge red">Before (Unoptimized)</span>
+            <h4 class="transform-content-title" id="transformBeforeTitle">Title</h4>
+            <p class="transform-copy-text" id="transformBeforeCopy">
+              Acme Premium Organic Supergreens Powder — 30 Servings | Gut Health & Natural Energy
+            </p>
+          </div>
+
+          <!-- After Card -->
+          <div class="transform-card after">
+            <span class="transform-label-badge green">After (Rufus Optimized)</span>
+            <h4 class="transform-content-title" id="transformAfterTitle">Title</h4>
+            <p class="transform-copy-text" id="transformAfterCopy">
+              Acme Premium Organic Supergreens Powder — <span class="diff-ins">Clinically-Formulated for Daily Use</span> | <span class="diff-ins">Safe With Medications</span> | <span class="diff-ins">Gluten-Free Wheatgrass</span>
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE 5: FREE Q&A COPY SECTION -->
+    <section class="report-section" id="free-qas">
+      <div class="section-inner">
+        <span class="section-subtitle">STAGE_05 // HIGH-INTENT QA INSTANTS</span>
+        <h2 class="section-title">Ready-to-Deploy Q&A Injection Cards</h2>
+        <p style="font-size: 1.1rem; max-width: 800px; margin-bottom: 3rem; color: rgba(26,26,26,0.8);">
+          Paste these precise Q&As into your listing's customer questions section. When Rufus indexes these answers, it bridges the compliance gaps immediately.
+        </p>
+
+        <div class="qa-bank">
+          
+          <!-- Q&A 1 -->
+          <div class="qa-card">
+            <div class="qa-question-box">
+              <span class="qa-tag">Intent: Safety & Dosage</span>
+              <p class="qa-question-text">"Is Acme Supergreens powder safe to take daily?"</p>
+            </div>
+            <div class="qa-answer-box">
+              <p class="qa-answer-text" id="qaText1">"Yes, it is formulated with organic, clean plants and is entirely safe for daily consumption. Standard dosage is 1 scoop mixed with water or smoothies daily."</p>
+              <div class="qa-footer">
+                <span style="font-size: 0.8rem; font-family: var(--font-mono); color: var(--brand-red); font-weight: 700;">Fixes: safety_information Gap</span>
+                <button class="qa-action-btn" onclick="copyQA(1, this)">
+                  <span>Copy Answer</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Q&A 2 -->
+          <div class="qa-card">
+            <div class="qa-question-box">
+              <span class="qa-tag">Intent: Timing & Optimization</span>
+              <p class="qa-question-text">"How do I take this for best results?"</p>
+            </div>
+            <div class="qa-answer-box">
+              <p class="qa-answer-text" id="qaText2">"For maximum nutrient absorption and natural morning energy, mix 1 scoop into 8-12 oz of cold water on an empty stomach every morning."</p>
+              <div class="qa-footer">
+                <span style="font-size: 0.8rem; font-family: var(--font-mono); color: var(--brand-red); font-weight: 700;">Fixes: usage_instructions Gap</span>
+                <button class="qa-action-btn" onclick="copyQA(2, this)">
+                  <span>Copy Answer</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE 6: PPC & BUNDLING -->
+    <section class="report-section" id="ppc-bundling">
+      <div class="section-inner">
+        <span class="section-subtitle">STAGE_06 // ENGINE EXTRAS</span>
+        
+        <div class="planner-grid">
+          
+          <!-- PPC Keywords -->
+          <div>
+            <h2 class="section-title">Rufus Keyword Blueprint</h2>
+            <p style="font-size: 0.95rem; margin-bottom: 2rem; color: rgba(26,26,26,0.85);">
+              These organic keywords contain clear intent gaps. Targeting them with search ads guarantees high relevance:
+            </p>
+            
+            <div class="table-container">
+              <table class="brutal-table">
+                <thead>
+                  <tr>
+                    <th>Keyword Target</th>
+                    <th>Intent Group</th>
+                    <th>Search Vol.</th>
+                    <th>Est. Bid</th>
+                    <th>Difficulty</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="kw-tag">"organic supergreens powder for bloating"</span></td>
+                    <td>Bloating Relief</td>
+                    <td class="volume-cell">1,850</td>
+                    <td class="volume-cell">$1.15</td>
+                    <td><span class="difficulty-badge low">Low</span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="kw-tag">"certified gluten free greens drink powder"</span></td>
+                    <td>Gluten-Free Purity</td>
+                    <td class="volume-cell">620</td>
+                    <td class="volume-cell">$0.85</td>
+                    <td><span class="difficulty-badge low">Low</span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="kw-tag">"daily organic greens powder supplement"</span></td>
+                    <td>Daily Vitality</td>
+                    <td class="volume-cell">5,100</td>
+                    <td class="volume-cell">$2.30</td>
+                    <td><span class="difficulty-badge medium">Medium</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- COSMO Bundles -->
+          <div>
+            <h2 class="section-title">COSMO Bundling Strategy</h2>
+            <p style="font-size: 0.95rem; margin-bottom: 2rem; color: rgba(26,26,26,0.85);">
+              Amazon's COSMO semantic graph bundles products based on common intent trees. Launch these virtual bundles:
+            </p>
+
+            <div class="bundle-card">
+              <h4 class="bundle-title">The Morning Gut-Health Stack</h4>
+              <ul class="bundle-list">
+                <li>Acme Premium Organic Supergreens Powder</li>
+                <li>Acme Organic Apple Cider Vinegar Capsules</li>
+              </ul>
+              <p class="bundle-rationale">
+                COSMO purchase histories reveal a high correlation for morning digestive health boosters. Bundling ACV capsule signals establishes co-purchase associations.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE 7: ROADMAP & BOOKING -->
+    <section class="report-section" id="roadmap" style="background-color: white;">
+      <div class="section-inner">
+        <span class="section-subtitle">STAGE_07 // OPTIMIZATION ROADMAP</span>
+        <h2 class="section-title" id="roadmapHeadline">3 Steps. 48 Hours. Fully Optimized Listing.</h2>
+        <p style="font-size: 1.1rem; max-width: 800px; margin-bottom: 4rem; color: rgba(26,26,26,0.8);" id="roadmapBody">
+          No software platforms to learn. No developer APIs to connect. We do the rewrite work — you watch your conversion metrics rise.
+        </p>
+
+        <!-- Timeline Grid -->
+        <div class="roadmap-timeline">
+          <div class="roadmap-step">
+            <div class="roadmap-step-num">1</div>
+            <h4 class="roadmap-step-title">Deep Audit Call</h4>
+            <p class="roadmap-step-desc">We cross-examine your competitor audits and customer intent queries to build a targeted copywriting blueprint.</p>
+          </div>
+          
+          <div class="roadmap-step">
+            <div class="roadmap-step-num">2</div>
+            <h4 class="roadmap-step-title">Copywriting Delivery</h4>
+            <p class="roadmap-step-desc">Within 48 hours, we send you the fully-written semantic title, bullets, and backend keywords optimized for Rufus indexing.</p>
+          </div>
+
+          <div class="roadmap-step">
+            <div class="roadmap-step-num">3</div>
+            <h4 class="roadmap-step-title">Indexing Lock-in</h4>
+            <p class="roadmap-step-desc">We assist you in uploading details, trigger indexing ping routines, and monitor your Rufus recommendations for 30 days.</p>
+          </div>
+        </div>
+
+        <!-- Booking & Guarantee Section -->
+        <div class="booking-layout" id="stage-book">
+          
+          <!-- Large Guarantee -->
+          <div class="guarantee-container">
+            <div class="guarantee-badge-large">
+              <h3 class="guarantee-title">THE OPTIMUS $100 GUARANTEE</h3>
+              <p class="guarantee-body" id="ctaGuarantee">
+                If we can't find at least $5,000/year in hidden leakage during our call, we will send you $100 via PayPal immediately for wasting your time. No strings attached.
+              </p>
+            </div>
+            
+            <div class="brutalist-card">
+              <h4 style="font-size: 1.1rem; margin-bottom: 0.5rem;">⚡ Slots are extremely limited</h4>
+              <p style="font-size: 0.85rem; color: rgba(26,26,26,0.75);">
+                Due to the manual research required for every optimization run, we only onboard 8 new listings per week. 3 slots remaining.
+              </p>
+            </div>
+          </div>
+
+          <!-- Scheduling Form -->
+          <div class="booking-widget">
+            <h3 style="font-size: 1.5rem; text-align: center;" id="ctaHeadline">Book Your Free 15-Minute Audit, Alex</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              <div>
+                <label style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; display: block; margin-bottom: 0.25rem;">YOUR NAME</label>
+                <input type="text" class="input-field" value="Alex Hormozi">
+              </div>
+
+              <div>
+                <label style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; display: block; margin-bottom: 0.25rem;">BUSINESS EMAIL</label>
+                <input type="email" class="input-field" value="founder@acmegreens.com">
+              </div>
+
+              <button class="brutalist-btn brutalist-btn-red" style="width: 100%; justify-content: center; margin-top: 1rem;" onclick="alert('Booking calendar loaded! (Cal.com integration placeholder)')">
+                <span>RESERVE AUDIT SLOT NOW</span>
+                <span>➜</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-label">OPTIMUS RUFUS — AI-NATIVE AMAZON LISTING OPTIMIZATION</div>
+    </footer>
+
+  </div>
+
+  <!-- FLOATING CTA BANNER -->
+  <div class="floating-cta" id="floatingCTA">
+    <span class="floating-cta-text">ACME GREENS DIAGNOSTIC REPORT // 3 CRITICAL GAPS FOUND</span>
+    <a href="#stage-book" class="brutalist-btn" style="padding: 0.5rem 1.25rem; font-size: 0.85rem; box-shadow: 3px 3px 0px white; border-color: white; background: var(--brand-gold);">
+      <span>BOOK AUDIT CALL</span>
+    </a>
+  </div>
+
+
+  <!-- ── SCRIPTS (INTERACTIVE BEHAVIOR) ── -->
+  <script>
+    // 1. SCROLL PROGRESS INDICATOR
+    window.onscroll = function() {
+      let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      let scrolled = (winScroll / height) * 100;
+      document.getElementById("scrollIndicator").style.width = scrolled + "%";
+      
+      // Floating CTA visibility
+      let floatingCTA = document.getElementById("floatingCTA");
+      if (winScroll > 400 && winScroll < (height - 300)) {
+        floatingCTA.classList.add("active");
+      } else {
+        floatingCTA.classList.remove("active");
+      }
+    };
+
+    // 2. TERMINAL SCAN ANIMATION
+    const runAutopsyBtn = document.getElementById("runAutopsyBtn");
+    const terminalScanner = document.getElementById("terminalScanner");
+    const terminalOutput = document.getElementById("terminalOutput");
+    const reportWrapper = document.getElementById("reportWrapper");
+    const scanPromptText = document.getElementById("scanPromptText");
+
+    const scanLines = [
+      "Initializing connection to Amazon Sp-API...",
+      "Extracting listing data for ASIN: B08GREEN88...",
+      "Payload parsed. Title length: 94 chars. Bullets: 3 entries.",
+      "Feeding listing to Agent-1 (Rufus Indexer Analyzer)...",
+      "Analyzing semantic vectors for dimension: safety_information...",
+      "⚠️ MISSING safety warnings, toxic bounds, daily caps.",
+      "Feeding listing to Agent-2 (COSMO Intent Graph Mapper)...",
+      "⚠️ Missing co-purchase target linkages for gut/ACV.",
+      "Simulating 1,000 synthetic buyer conversations on Rufus...",
+      "Failure rate detected: 73.4% of conversational queries diverted.",
+      "Diagnostic report compiled! Writing output payload..."
+    ];
+
+    runAutopsyBtn.addEventListener("click", () => {
+      runAutopsyBtn.style.display = "none";
+      scanPromptText.style.display = "none";
+      terminalScanner.style.display = "flex";
+      
+      let lineIndex = 0;
+      
+      function printNextLine() {
+        if (lineIndex < scanLines.length) {
+          const div = document.createElement("div");
+          div.style.margin = "4px 0";
+          div.innerText = "> " + scanLines[lineIndex];
+          
+          // Color warning lines red
+          if (scanLines[lineIndex].includes("⚠️")) {
+            div.style.color = "var(--brand-red)";
+          }
+          
+          terminalOutput.appendChild(div);
+          lineIndex++;
+          
+          // Scroll terminal down
+          terminalScanner.scrollTop = terminalScanner.scrollHeight;
+          
+          setTimeout(printNextLine, 350 + Math.random() * 250);
+        } else {
+          // Scan Complete! Hide hero scanner, show report
+          setTimeout(() => {
+            terminalScanner.style.display = "none";
+            reportWrapper.style.display = "block";
+            
+            // Trigger gauge bar animations and scores
+            animateScores();
+            
+            // Smooth scroll to Autopsy section
+            document.getElementById("autopsy").scrollIntoView({ behavior: "smooth" });
+          }, 800);
+        }
+      }
+      
+      printNextLine();
+    });
+
+    // 3. SCORECARD CIRCLE & BREAKDOWN ANIMATIONS
+    function animateScores() {
+      // Circle stroke dash offset
+      const circleFill = document.getElementById("scoreCircle");
+      // 502 is full circle. Score is 45. Target offset is 502 * (1 - 45/100) = 276.1
+      circleFill.style.strokeDashoffset = "276.1";
+
+      // Number count up
+      let currentVal = 0;
+      const valInterval = setInterval(() => {
+        if (currentVal < 45) {
+          currentVal++;
+          document.getElementById("overallScoreText").innerText = currentVal;
+        } else {
+          clearInterval(valInterval);
+        }
+      }, 35);
+
+      // Gauge Bars
+      setTimeout(() => {
+        document.getElementById("cosmoBar").style.width = "42%";
+        document.getElementById("cosmoVal").innerText = "42%";
+        
+        document.getElementById("semanticBar").style.width = "43%";
+        document.getElementById("semanticVal").innerText = "43%";
+      }, 200);
+    }
+
+    // 4. BLEED CALCULATOR LOGIC
+    const trafficSlider = document.getElementById("trafficSlider");
+    const priceSlider = document.getElementById("priceSlider");
+    const gapSlider = document.getElementById("gapSlider");
+
+    const trafficLabel = document.getElementById("trafficLabel");
+    const priceLabel = document.getElementById("priceLabel");
+    const gapLabel = document.getElementById("gapLabel");
+    const bleedResult = document.getElementById("bleedResult");
+
+    function calculateBleed() {
+      const traffic = parseInt(trafficSlider.value);
+      const price = parseFloat(priceSlider.value);
+      const gap = parseFloat(gapSlider.value) / 100;
+
+      // Update Labels
+      trafficLabel.innerText = traffic.toLocaleString();
+      priceLabel.innerText = "$" + price.toFixed(2);
+      gapLabel.innerText = (gap * 100).toFixed(1) + "%";
+
+      // Calculate Revenue Bleed
+      const lostRevenue = Math.round(traffic * gap * price);
+      bleedResult.innerText = "$" + lostRevenue.toLocaleString();
+    }
+
+    trafficSlider.addEventListener("input", calculateBleed);
+    priceSlider.addEventListener("input", calculateBleed);
+    gapSlider.addEventListener("input", calculateBleed);
+
+    // 5. RUFUS CHAT SIMULATOR
+    const chatScenarios = [
+      {
+        question: "Is this supergreens powder safe to take daily?",
+        answer: "Based on available product information, I cannot determine daily usage safety for this product. Here are products with detailed safety information:",
+        warning: "⚠️ competitor detour: Rufus recommends Athletic Greens AG1 because their listing explicitly verifies third-party tested daily safety."
+      },
+      {
+        question: "When is the best time of day to consume this?",
+        answer: "This listing doesn't specify optimal timing. However, Athletic Greens AG1 recommends taking 1 scoop in cold water in the morning.",
+        warning: "⚠️ competitor detour: Rufus pulls AG1's detailed routine instructions because Acme Greens fails to state daily consumption timing."
+      },
+      {
+        question: "Does this contain real wheatgrass, and is it gluten-free?",
+        answer: "I don't have enough certified purity data. Here are alternatives with certified gluten-free wheatgrass:",
+        warning: "⚠️ competitor detour: Rufus suggests Organifi Green Juice which holds USDA Organic and Gluten-Free certifications prominently in their index."
+      }
+    ];
+
+    function simulateChat(index, btnElement) {
+      // Toggle button active class
+      const buttons = document.querySelectorAll(".q-btn");
+      buttons.forEach(b => b.classList.remove("active"));
+      btnElement.classList.add("active");
+
+      const buyerBubble = document.getElementById("buyerBubble");
+      const rufusBubble = document.getElementById("rufusBubble");
+      const competitorWarning = document.getElementById("competitorWarning");
+
+      // Reset
+      buyerBubble.innerText = chatScenarios[index].question;
+      rufusBubble.style.display = "none";
+      competitorWarning.style.display = "none";
+
+      // Trigger typing animation delay
+      setTimeout(() => {
+        rufusBubble.innerText = chatScenarios[index].answer;
+        rufusBubble.style.display = "block";
+        
+        setTimeout(() => {
+          competitorWarning.innerHTML = chatScenarios[index].warning;
+          competitorWarning.style.display = "block";
+        }, 800);
+      }, 500);
+    }
+
+    // 6. BEFORE/AFTER TAB SWITCHER
+    const transforms = {
+      titles: {
+        before: "Acme Premium Organic Supergreens Powder — 30 Servings | Gut Health & Natural Energy",
+        after: "Acme Premium Organic Supergreens Powder — <span class='diff-ins'>Clinically-Formulated for Daily Use</span> | <span class='diff-ins'>Safe With Medications</span> | <span class='diff-ins'>Gluten-Free Wheatgrass</span>"
+      },
+      bullet1: {
+        before: "DAILY NUTRIENT BOOST: Contains organic spirulina, chlorella, wheatgrass, and barley grass for all-day cellular vitality.",
+        after: "✅ <span class='diff-ins'>SAFE FOR DAILY USE</span>: Formulated for daily vitality. Third-party tested. <span class='diff-ins'>Safe alongside common medications</span>. Standard dosage: <span class='diff-ins'>1 scoop daily</span>."
+      },
+      bullet2: {
+        before: "DIGESTION & GUT HEALTH: Enhanced with natural prebiotics and digestive enzymes for optimal nutrient absorption without bloating.",
+        after: "⏰ <span class='diff-ins'>OPTIMAL TIMING</span>: Take <span class='diff-ins'>1 scoop in cold water in the morning on an empty stomach</span> for maximum absorption and clean morning energy."
+      }
+    };
+
+    function switchTransformTab(index, btnElement) {
+      // Toggle button active class
+      const tabs = document.querySelectorAll(".tab-btn");
+      tabs.forEach(t => t.classList.remove("active"));
+      btnElement.classList.add("active");
+
+      const beforeTitle = document.getElementById("transformBeforeTitle");
+      const afterTitle = document.getElementById("transformAfterTitle");
+      const beforeCopy = document.getElementById("transformBeforeCopy");
+      const afterCopy = document.getElementById("transformAfterCopy");
+
+      if (index === 0) {
+        beforeTitle.innerText = "Title";
+        afterTitle.innerText = "Title";
+        beforeCopy.innerHTML = transforms.titles.before;
+        afterCopy.innerHTML = transforms.titles.after;
+      } else if (index === 1) {
+        beforeTitle.innerText = "Bullet 1";
+        afterTitle.innerText = "Bullet 1";
+        beforeCopy.innerHTML = transforms.bullet1.before;
+        afterCopy.innerHTML = transforms.bullet1.after;
+      } else if (index === 2) {
+        beforeTitle.innerText = "Bullet 2";
+        afterTitle.innerText = "Bullet 2";
+        beforeCopy.innerHTML = transforms.bullet2.before;
+        afterCopy.innerHTML = transforms.bullet2.after;
+      }
+    }
+
+    // 7. COPY TO CLIPBOARD FUNCTIONALITY
+    function copyQA(index, button) {
+      const text = document.getElementById("qaText" + index).innerText;
+      
+      navigator.clipboard.writeText(text).then(() => {
+        // Change button style temporarily
+        const originalText = button.innerHTML;
+        button.innerHTML = "✅ Copied!";
+        button.style.backgroundColor = "var(--brand-gold)";
+        button.style.color = "var(--brand-dark)";
+        
+        setTimeout(() => {
+          button.innerHTML = originalText;
+          button.style.backgroundColor = "transparent";
+          button.style.color = "";
+        }, 1500);
+      }).catch(err => {
+        console.error("Could not copy text: ", err);
+      });
+    }
+  </script>
+</body>
+</html>

@@ -24,12 +24,19 @@ export interface ProspectRecord {
   firstName?: string;
   lastName?: string;
   company?: string;
+  asin?: string;
+  expectedRevenue?: string;
   apolloContactId?: string;
   apolloSequenceId?: string;
   status: string;
   landingPageViews: number;
   packageType?: string;
   pricePoint?: number;
+  repliedAt?: string;
+  apolloReplyData?: unknown;
+  jobTitle?: string;
+  linkedinUrl?: string;
+  websiteUrl?: string;
   createdAt: string;
 }
 

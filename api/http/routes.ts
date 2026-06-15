@@ -29,6 +29,18 @@ function serveStatic(options: { root?: string; path?: string }) {
 export function registerHttpRoutes(app: Hono) {
   app.get("/health", (c) => c.json({ status: "ok", version: process.env.APP_VERSION || "1.0.0" }));
   app.get("/api/sse/pipeline/:jobId", (c) => pipelineSseHandler(c));
+  app.post("/api/webhooks/apollo", async (c) => {
+    try {
+      const body = await c.req.json();
+      const { handleApolloReply } = await import("../domains/prospect/service.js");
+      const result = await handleApolloReply(body);
+      return c.json(result);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error("❌ [Hono] Apollo webhook handler failed:", err);
+      return c.json({ success: false, error: message }, 500);
+    }
+  });
   app.get("/api/pdf/:slug", async (c) => {
     const slug = c.req.param("slug");
     try {

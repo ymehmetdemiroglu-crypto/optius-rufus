@@ -53,7 +53,8 @@ export interface TransformSnippet {
 export async function generateAllStageCopy(
   analysis: AnalysisInput,
   listing: RawListingData,
-  prospectName: string
+  prospectName: string,
+  expectedRevenue?: string
 ): Promise<StageCopy> {
   const fallback = buildFallbackCopy(analysis, listing, prospectName);
 
@@ -63,6 +64,44 @@ export async function generateAllStageCopy(
     .join(", ");
 
   const bulletsSummary = (listing.bullets || []).slice(0, 3).join(" | ");
+
+  // Classify expected revenue and adapt copywriting strategy
+  let revenueStrategyPrompt = "";
+  if (expectedRevenue) {
+    const cleanNum = parseFloat(expectedRevenue.replace(/[^0-9.]/g, ""));
+    let tier = "Class_C";
+    if (isNaN(cleanNum)) {
+      const lower = expectedRevenue.toLowerCase();
+      if (lower.includes("1m") || lower.includes("million") || lower.includes("enterprise") || lower.includes("1,000,000")) {
+        tier = "Class_A";
+      } else if (lower.includes("100k") || lower.includes("growth") || lower.includes("100,000")) {
+        tier = "Class_B";
+      }
+    } else {
+      if (cleanNum >= 1000000) tier = "Class_A";
+      else if (cleanNum >= 100000 || cleanNum >= 8000) tier = "Class_B";
+    }
+
+    if (tier === "Class_A") {
+      revenueStrategyPrompt = `\nCOPYWRITING STRATEGY (ENTERPRISE BRAND):
+- Focus on large-scale revenue leakages, systemic organic erosion, and brand equity loss.
+- Emphasize lost market share to competitors who capture conversational search traffic.
+- Highlight that high-volume competitor conquesting is stealing their organic sales.
+- Tone: Highly authoritative, corporate-focused, highlighting systemic leaks.\n`;
+    } else if (tier === "Class_B") {
+      revenueStrategyPrompt = `\nCOPYWRITING STRATEGY (GROWTH BRAND):
+- Focus on scaling organic search and unlocking $5,000–$15,000/month in hidden conversational search sales.
+- Emphasize beating key market competitors for specific product intent attributes.
+- Emphasize conversion optimization to lower acquisition costs and scale.
+- Tone: Action-oriented, ROI-driven, highlighting growth opportunities and market expansion.\n`;
+    } else {
+      revenueStrategyPrompt = `\nCOPYWRITING STRATEGY (STARTER BRAND):
+- Focus on building solid foundations for organic search.
+- Highlight easy organic wins to get listed on Rufus search recommendations.
+- Emphasize establishing initial review traction and listing authority.
+- Tone: Encouraging, tactical, focusing on getting started and initial growth.\n`;
+    }
+  }
 
   const prompt = `You are an elite direct-response conversion copywriter trained in Alex Hormozi's value equation framework. You write copy that makes brand owners FEEL the problem viscerally, understand the massive cost of inaction in dollars, and see the solution as an absolute no-brainer.
 
@@ -78,6 +117,7 @@ PROSPECT DATA:
 - Rufus Score: ${analysis.rufusScore}/100
 - COSMO Score: ${analysis.cosmoScore}/100
 - Top Semantic Gaps: ${topGaps}
+${revenueStrategyPrompt}
 
 Your task is to write personalized landing page copy for ALL 8 stages of the "Listing Autopsy" diagnostic report. The copy must explain that we optimize listings for Amazon's conversational search AI (Rufus & COSMO) by sealing their semantic gaps, seeding high-weight Q&A roadmaps, and setting up Page 2 organic rank conquesting PPC campaigns.
 

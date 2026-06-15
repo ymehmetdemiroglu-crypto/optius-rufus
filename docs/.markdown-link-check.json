@@ -1,0 +1,26 @@
+{
+  "ignorePatterns": [
+    {
+      "pattern": "^<!-- codegen:source="
+    },
+    {
+      "pattern": "^<!-- DO NOT EDIT"
+    }
+  ],
+  "replacementPatterns": [
+    {
+      "pattern": "^/",
+      "replacement": "https://github.com/yhia/optimus-rufus-webapp/blob/main/"
+    }
+  ],
+  "httpHeaders": [
+    {
+      "urls": ["https://github.com", "https://raw.githubusercontent.com"],
+      "headers": { "Accept-Encoding": "gzip, identity" }
+    }
+  ],
+  "timeout": "10s",
+  "retryOn429": true,
+  "retryCount": 2,
+  "aliveStatusCodes": [200, 206, 999]
+}
