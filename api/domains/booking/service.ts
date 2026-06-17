@@ -1,5 +1,47 @@
 import * as bookingRepo from '../booking/repository.js';
+import * as prospectRepo from '../prospect/repository.js';
 import type { BookingRecord, InsertBookingInput } from "../../db/schema.types.js";
+
+async function sendTelegramNotification(booking: BookingRecord) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId || token.includes("your_bot_token") || chatId.includes("your_telegram_chat_id")) {
+    console.warn("Telegram bot token or chat ID not configured. Skipping notification.");
+    return;
+  }
+
+  try {
+    const prospect = await prospectRepo.getById(booking.prospectId);
+    const slug = prospect?.slug || "";
+    const auditUrl = slug ? `https://optimusrufus.com/audit/${slug}` : "N/A";
+
+    const text = `🚨 *New Rufus Audit Booking!* 🚨\n\n` +
+      `👤 *Name:* ${booking.name}\n` +
+      `📧 *Email:* ${booking.email}\n` +
+      `🏢 *Company:* ${booking.company || prospect?.company || "N/A"}\n` +
+      `💰 *Monthly Revenue:* ${booking.revenue || prospect?.expectedRevenue || "N/A"}\n` +
+      `📝 *Notes:* ${booking.notes || "None"}\n` +
+      `🔗 *Audit Page:* ${auditUrl}`;
+
+    const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: text,
+        parse_mode: "Markdown",
+      }),
+    });
+
+    if (!response.ok) {
+      console.error(`Telegram notification failed: ${response.status} - ${await response.text()}`);
+    } else {
+      console.log("✅ Telegram booking notification sent successfully!");
+    }
+  } catch (err: any) {
+    console.error("Error sending Telegram notification:", err.message);
+  }
+}
 
 export interface CreateBookingInput {
   prospectId: number;
@@ -25,7 +67,14 @@ export async function createBooking(
     status: "pending",
   };
   try {
-    return await bookingRepo.create(insertInput);
+    const booking = await bookingRepo.create(insertInput);
+    
+    // Dispatch Telegram message asynchronously
+    sendTelegramNotification(booking).catch(err => {
+      console.error("Failed to dispatch Telegram message:", err);
+    });
+    
+    return booking;
   } catch (err) {
     throw new Error("Failed to create booking", { cause: err });
   }

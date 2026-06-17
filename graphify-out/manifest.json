@@ -80,9 +80,9 @@
     "semantic_hash": "15b78dff5948db1258759aa1278b3d39"
   },
   "api/domains/booking/service.ts": {
-    "mtime": 1781031770.308919,
-    "ast_hash": "e21b6c224ae2397ef82f51a9f668e26c",
-    "semantic_hash": "e21b6c224ae2397ef82f51a9f668e26c"
+    "mtime": 1781700339.2229156,
+    "ast_hash": "5bbafff65417092eb850c7955cb103cf",
+    "semantic_hash": ""
   },
   "api/domains/branding/__tests__/repository.test.ts": {
     "mtime": 1781031641.0039897,
@@ -185,8 +185,8 @@
     "semantic_hash": "064419f26914b4bff670e04fb204cdca"
   },
   "api/domains/prospect/service.ts": {
-    "mtime": 1781453564.2586317,
-    "ast_hash": "5e389b74fad15ac181ad2ebaaa468e4d",
+    "mtime": 1781700331.5607975,
+    "ast_hash": "2821e2ef34e24649ca83a62a7448140b",
     "semantic_hash": ""
   },
   "api/domains/rufus/__tests__/router.test.ts": {
@@ -355,8 +355,8 @@
     "semantic_hash": ""
   },
   "api/services/llmGateway.ts": {
-    "mtime": 1781696877.606119,
-    "ast_hash": "02bd2eddca0aacf5b8d67a382fcf1955",
+    "mtime": 1781701266.0975127,
+    "ast_hash": "1b751eda39e8b75ea09c2426f1013c86",
     "semantic_hash": ""
   },
   "api/services/webhook.ts": {
@@ -500,9 +500,9 @@
     "semantic_hash": "5de267cda4459e3447e956e26980c03d"
   },
   "src/landing/StageBookCall.tsx": {
-    "mtime": 1781071812.7336962,
-    "ast_hash": "5b6832e5a824137219141184325b3c80",
-    "semantic_hash": "5b6832e5a824137219141184325b3c80"
+    "mtime": 1781700351.5485845,
+    "ast_hash": "adce86df99c573c6762e6b0cf8a79e4d",
+    "semantic_hash": ""
   },
   "src/landing/StageBundlingBlueprint.tsx": {
     "mtime": 1781031553.918777,

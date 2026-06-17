@@ -43,7 +43,11 @@ export async function callLlm(
 ): Promise<LlmResponse> {
   // 1. Budget check (only if prospectId is provided)
   if (options.prospectId !== undefined && options.estimatedCostCents !== undefined) {
-    await tokenBudgetService.checkBudget(options.prospectId, options.estimatedCostCents);
+    try {
+      await tokenBudgetService.checkBudget(options.prospectId, options.estimatedCostCents);
+    } catch (err: any) {
+      logger.warn(`Token budget check bypassed: ${err.message}`, { prospectId: options.prospectId });
+    }
   }
 
   // 2. Circuit breaker
@@ -115,14 +119,18 @@ export async function callLlm(
 
     // Track usage (only if prospectId is provided)
     if (options.prospectId !== undefined) {
-      await tokenBudgetService.trackUsage(
-        options.prospectId,
-        options.jobId,
-        options.service,
-        promptTokens,
-        completionTokens,
-        costCents
-      );
+      try {
+        await tokenBudgetService.trackUsage(
+          options.prospectId,
+          options.jobId,
+          options.service,
+          promptTokens,
+          completionTokens,
+          costCents
+        );
+      } catch (err: any) {
+        logger.warn(`Token usage tracking failed: ${err.message}`, { prospectId: options.prospectId });
+      }
     }
 
     logger.info(`LLM request completed`, {
@@ -255,14 +263,18 @@ export async function callEmbedding(
     const costCents = Math.ceil((totalTokens / 1000) * 0.002);
 
     if (options.prospectId !== undefined) {
-      await tokenBudgetService.trackUsage(
-        options.prospectId,
-        options.jobId,
-        options.service,
-        totalTokens,
-        0,
-        costCents
-      );
+      try {
+        await tokenBudgetService.trackUsage(
+          options.prospectId,
+          options.jobId,
+          options.service,
+          totalTokens,
+          0,
+          costCents
+        );
+      } catch (err: any) {
+        logger.warn(`Embedding usage tracking failed: ${err.message}`, { prospectId: options.prospectId });
+      }
     }
 
     logger.info(`Embedding request completed`, {

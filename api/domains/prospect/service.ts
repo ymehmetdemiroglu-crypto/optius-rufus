@@ -110,9 +110,9 @@ export async function createProspect(
 
       const tier = classifyProspectRevenue(prospect.expectedRevenue || undefined);
       const sequenceMap = {
-        Class_A: "seq-enterprise",
-        Class_B: "seq-growth",
-        Class_C: "seq-starter",
+        Class_A: "6a3005fee287cb000c007e03", // Enterprise
+        Class_B: "6a300617700f6b000cee5416", // Growth
+        Class_C: "6a30063082147b001cd1f361", // Starter
       };
       const sequenceId = sequenceMap[tier];
 

@@ -77,7 +77,13 @@ export default function StageBookCall({
   }
 
   const bookMutation = trpc.booking?.create?.useMutation({
-    onSuccess: () => setSubmitted(true),
+    onSuccess: () => {
+      setSubmitted(true);
+      const calendlyUrl = import.meta.env.VITE_CALENDLY_URL || 'https://calendly.com/optimusrufus';
+      setTimeout(() => {
+        window.location.href = calendlyUrl;
+      }, 3000);
+    },
     onError: (err) => console.error('Booking failed:', err),
   });
 
@@ -120,15 +126,22 @@ export default function StageBookCall({
             </div>
             <div className="space-y-2">
               <h3 className="display-heading text-2xl md:text-3xl text-white">
-                Audit Call Confirmed
+                Details Confirmed!
               </h3>
               <p className="text-base text-white/80 font-medium">
-                {form.name}, we've received your request. You'll get a calendar invite within the hour.
+                {form.name}, your information is saved.
+              </p>
+              <p className="text-sm text-brand-gold font-mono uppercase tracking-wider font-bold">
+                Redirecting to select your call time...
               </p>
             </div>
-            <div className="flex items-center justify-center gap-2 text-brand-gold font-mono text-xs uppercase tracking-widest">
-              <Clock className="h-4 w-4" />
-              <span>Check your inbox shortly</span>
+            <div className="flex items-center justify-center gap-2">
+              <a
+                href={import.meta.env.VITE_CALENDLY_URL || 'https://calendly.com/optimusrufus'}
+                className="inline-block bg-brand-gold text-brand-dark px-6 py-2.5 font-bold uppercase tracking-wider text-xs border-[3px] border-brand-dark shadow-brutal-sm hover:bg-white hover:text-brand-dark transition-colors"
+              >
+                Click here if not redirected →
+              </a>
             </div>
           </div>
         ) : (
