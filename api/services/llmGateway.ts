@@ -158,7 +158,32 @@ export async function callEmbedding(
     jobId?: number;
     correlationId?: string;
   }
-): Promise<number[]> {
+): Promise<number[]>;
+
+export async function callEmbedding(
+  texts: string[],
+  options: {
+    service: string;
+    prospectId?: number;
+    jobId?: number;
+    correlationId?: string;
+  }
+): Promise<number[][]>;
+
+export async function callEmbedding(
+  input: string | string[],
+  options: {
+    service: string;
+    prospectId?: number;
+    jobId?: number;
+    correlationId?: string;
+  }
+): Promise<number[] | number[][]> {
+  const isBatch = Array.isArray(input);
+  if (isBatch && input.length === 0) {
+    return [];
+  }
+
   const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
   const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
   const apiKey = OPENROUTER_API_KEY || OPENAI_API_KEY;
@@ -183,6 +208,7 @@ export async function callEmbedding(
       prospectId: options.prospectId,
       jobId: options.jobId,
       correlationId: options.correlationId,
+      batchSize: isBatch ? input.length : 1,
     });
 
     eventBus.emit(
@@ -205,7 +231,7 @@ export async function callEmbedding(
       method: "POST",
       headers,
       body: JSON.stringify({
-        input: text,
+        input,
         model,
         dimensions: 1536,
       }),
@@ -217,13 +243,12 @@ export async function callEmbedding(
     }
 
     const data = (await response.json()) as {
-      data: Array<{ embedding: number[] }>;
+      data: Array<{ embedding: number[]; index: number }>;
       usage?: { total_tokens: number; prompt_tokens: number };
     };
 
-    const embedding = data.data[0]?.embedding;
-    if (!Array.isArray(embedding) || embedding.length !== 1536) {
-      throw new Error(`Unexpected embedding shape: ${embedding?.length}`);
+    if (!data.data || !Array.isArray(data.data) || data.data.length === 0) {
+      throw new Error("API returned empty data for embeddings");
     }
 
     const totalTokens = data.usage?.total_tokens ?? data.usage?.prompt_tokens ?? 0;
@@ -255,6 +280,25 @@ export async function callEmbedding(
       options.correlationId
     );
 
-    return embedding;
+    if (isBatch) {
+      const embeddings: number[][] = new Array(input.length);
+      for (const item of data.data) {
+        if (item && Array.isArray(item.embedding) && item.embedding.length === 1536) {
+          embeddings[item.index] = item.embedding;
+        }
+      }
+      for (let i = 0; i < embeddings.length; i++) {
+        if (!embeddings[i]) {
+          throw new Error(`Missing or malformed embedding for index ${i} in API response`);
+        }
+      }
+      return embeddings;
+    } else {
+      const embedding = data.data[0]?.embedding;
+      if (!Array.isArray(embedding) || embedding.length !== 1536) {
+        throw new Error(`Unexpected embedding shape: ${embedding?.length}`);
+      }
+      return embedding;
+    }
   });
 }

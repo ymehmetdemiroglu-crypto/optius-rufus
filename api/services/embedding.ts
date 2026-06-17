@@ -4,17 +4,30 @@ import { callEmbedding } from "./llmGateway.js";
  * Generate embedding vector via the centralized LLM gateway.
  * Prefers OpenRouter, falls back to OpenAI, then deterministic fallback.
  */
-export async function generateEmbedding(text: string): Promise<number[]> {
-  try {
-    return await callEmbedding(text.slice(0, 8000), { service: "embedding" });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.warn(`[Embedding] API call failed: ${message}. Using deterministic fallback.`);
-    return generateFallbackEmbedding(text);
+export async function generateEmbedding(text: string): Promise<number[]>;
+export async function generateEmbedding(texts: string[]): Promise<number[][]>;
+export async function generateEmbedding(textOrTexts: string | string[]): Promise<number[] | number[][]> {
+  if (Array.isArray(textOrTexts)) {
+    try {
+      const sliced = textOrTexts.map((t) => t.slice(0, 8000));
+      return await callEmbedding(sliced, { service: "embedding" });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.warn(`[Embedding] Batched API call failed: ${message}. Using deterministic fallback for each.`);
+      return textOrTexts.map((t) => generateFallbackEmbedding(t));
+    }
+  } else {
+    try {
+      return await callEmbedding(textOrTexts.slice(0, 8000), { service: "embedding" });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.warn(`[Embedding] API call failed: ${message}. Using deterministic fallback.`);
+      return generateFallbackEmbedding(textOrTexts);
+    }
   }
 }
 
-function generateFallbackEmbedding(text: string): number[] {
+export function generateFallbackEmbedding(text: string): number[] {
   const seed = hashString(text);
   const rng = seededRandom(seed);
   const vector: number[] = [];
