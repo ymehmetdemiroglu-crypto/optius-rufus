@@ -2,8 +2,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as prospectService from "../service.js";
 import * as prospectRepo from "../repository.js";
 import * as listingRepo from "../../listing/repository.js";
-import * as analysisRepo from "../../analysis/repository.js";
-
 // Mock repositories relative to this test file
 vi.mock("../repository.js", () => {
   return {

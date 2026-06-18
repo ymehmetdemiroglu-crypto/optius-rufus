@@ -25,6 +25,7 @@
     "docs:check": "pnpm docs:lint && pnpm docs:frontmatter && pnpm docs:codegen:check && pnpm docs:stale"
   },
   "dependencies": {
+    "@hono/node-server": "^2.0.5",
     "@tanstack/react-query": "^5.28.0",
     "@trpc/client": "^11.0.0-rc.362",
     "@trpc/react-query": "^11.0.0-rc.362",

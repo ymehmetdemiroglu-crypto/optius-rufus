@@ -5,3 +5,8 @@ export function startWorkers() {
   queueWorker.start();
   webhookWorker.start();
 }
+
+export async function stopWorkers() {
+  await queueWorker.stop();
+  await webhookWorker.stop();
+}

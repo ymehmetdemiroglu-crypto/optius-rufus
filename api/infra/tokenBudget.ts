@@ -79,7 +79,7 @@ export class TokenBudgetService {
     const prospect = rows[0];
     if (!prospect) return 0;
 
-    const tierCap = TIER_BUDGETS_CENTS[prospect.packageType] ?? TIER_BUDGETS_CENTS.package_2;
+    const tierCap = TIER_BUDGETS_CENTS[prospect.packageType || "package_2"] ?? TIER_BUDGETS_CENTS.package_2;
 
     // Sum usage for current calendar month
     const startOfMonth = new Date();

@@ -1,15 +1,27 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { logger as honoLogger } from "hono/logger";
+import { bodyLimit } from "hono/body-limit";
+import { secureHeaders } from "hono/secure-headers";
+import { serve } from "@hono/node-server";
 import { registerHttpRoutes } from "./http/routes.js";
 import { registerTrpcHandler } from "./trpc/handler.js";
-import { startWorkers } from "./workers/bootstrap.js";
+import { startWorkers, stopWorkers } from "./workers/bootstrap.js";
+import { runMigrations } from "./db/migrate.js";
+import { logger } from "./infra/logger.js";
 import "./db/schema.js";
 
-export const app = new Hono();
+type AppVariables = {
+  correlationId: string;
+};
+
+export const app = new Hono<{ Variables: AppVariables }>();
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
-  : process.env.NODE_ENV === "production" ? [] : ["*"];
+  : process.env.NODE_ENV === "production"
+    ? []
+    : ["*"];
 
 app.use("*", cors({
   origin: (origin) => {
@@ -20,48 +32,85 @@ app.use("*", cors({
   },
 }));
 
+app.use("*", secureHeaders());
+app.use("*", honoLogger((message: string, ...rest: string[]) => {
+  logger.info(message, { args: rest });
+}));
+app.use(
+  "*",
+  bodyLimit({
+    maxSize: 10 * 1024 * 1024, // 10 MB
+    onError: (c) => {
+      logger.warn("Request body exceeded size limit", { path: c.req.path });
+      return c.json({ error: "Payload too large" }, 413);
+    },
+  })
+);
+
+// Correlation ID middleware
+app.use("*", async (c, next) => {
+  const correlationId = c.req.header("x-correlation-id") ?? crypto.randomUUID();
+  c.set("correlationId", correlationId);
+  c.header("x-correlation-id", correlationId);
+  await next();
+});
+
 registerHttpRoutes(app);
 registerTrpcHandler(app);
 
-const port = parseInt(process.env.PORT || "3000", 10);
-console.log(`🚀 Optimus Rufus server running on http://localhost:${port}`);
-
-import { createServer } from "http";
-
-const httpServer = createServer(async (req, res) => {
-  const url = new URL(req.url || "/", `http://${req.headers.host}`);
-  const request = new Request(url, {
-    method: req.method,
-    headers: new Headers(Object.entries(req.headers).map(([k, v]) => [k, Array.isArray(v) ? v.join(", ") : String(v || "")]) as HeadersInit),
-    body: (req.method !== "GET" && req.method !== "HEAD" ? await getBody(req) : undefined) as BodyInit | undefined,
+// Global error handler
+app.onError((err, c) => {
+  const correlationId = c.get("correlationId");
+  logger.error("Unhandled request error", {
+    path: c.req.path,
+    method: c.req.method,
+    correlationId,
+    error: err.message,
+    stack: err.stack,
   });
-  const response = await app.fetch(request);
-  res.statusCode = response.status;
-  response.headers.forEach((value, key) => res.setHeader(key, value));
-  if (response.body) {
-    const reader = response.body.getReader();
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      res.write(Buffer.from(value));
-    }
-  }
-  res.end();
+  return c.json({ error: "Internal server error", correlationId }, 500);
 });
 
-function getBody(req: import("http").IncomingMessage): Promise<Buffer> {
-  return new Promise((resolve) => {
-    const chunks: Buffer[] = [];
-    req.on("data", (chunk) => chunks.push(chunk));
-    req.on("end", () => resolve(Buffer.concat(chunks)));
+const port = parseInt(process.env.PORT || "3000", 10);
+const host = process.env.HOST || "0.0.0.0";
+
+async function boot() {
+  try {
+    await runMigrations();
+  } catch (err) {
+    logger.error("Failed to run migrations; aborting boot", {
+      error: err instanceof Error ? err.message : String(err),
+    });
+    process.exit(1);
+  }
+
+  const server = serve({
+    fetch: app.fetch,
+    port,
+    hostname: host,
   });
+
+  logger.info(`🚀 Optimus Rufus server running on http://${host}:${port}`);
+  logger.info(`📡 tRPC endpoint: http://${host}:${port}/api/trpc`);
+  logger.info(`📊 SSE endpoint: http://${host}:${port}/api/sse/pipeline/:jobId`);
+
+  startWorkers();
+
+  const shutdown = async (signal: string) => {
+    logger.info(`Received ${signal}; shutting down gracefully...`);
+    server.close(() => {
+      logger.info("HTTP server closed");
+    });
+    await stopWorkers();
+    logger.info("Workers stopped");
+    process.exit(0);
+  };
+
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+  process.on("SIGINT", () => shutdown("SIGINT"));
 }
 
-if (!process.env.VERCEL) {
-  httpServer.listen(port, () => {
-    console.log(`🚀 Server listening on http://localhost:${port}`);
-    console.log(`📡 tRPC endpoint: http://localhost:${port}/api/trpc`);
-    console.log(`📊 SSE endpoint: http://localhost:${port}/api/sse/pipeline/:jobId`);
-    startWorkers();
-  });
-}
+boot().catch((err) => {
+  logger.error("Fatal boot error", { error: String(err), stack: err instanceof Error ? err.stack : undefined });
+  process.exit(1);
+});

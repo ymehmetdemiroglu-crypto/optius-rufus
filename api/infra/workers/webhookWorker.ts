@@ -16,6 +16,7 @@ eventBus.on<{ prospectId: number; eventType: string; eventData: unknown; interes
 export class WebhookWorker {
   private running = false;
   private timer?: NodeJS.Timeout;
+  private activePromise?: Promise<unknown>;
   private readonly pollIntervalMs: number;
 
   constructor(pollIntervalMs = 3000) {
@@ -67,11 +68,14 @@ export class WebhookWorker {
     const loop = async () => {
       while (this.running) {
         try {
-          const processed = await this.processOne();
+          this.activePromise = this.processOne();
+          const processed = await this.activePromise;
+          this.activePromise = undefined;
           if (!processed) {
             await new Promise((resolve) => { this.timer = setTimeout(resolve, this.pollIntervalMs); });
           }
         } catch (err) {
+          this.activePromise = undefined;
           logger.error("Webhook worker loop error", { error: String(err) });
           await new Promise((resolve) => { this.timer = setTimeout(resolve, this.pollIntervalMs); });
         }
@@ -84,11 +88,17 @@ export class WebhookWorker {
     });
   }
 
-  stop(): void {
+  async stop(): Promise<void> {
     this.running = false;
     if (this.timer) {
       clearTimeout(this.timer);
       this.timer = undefined;
+    }
+    if (this.activePromise) {
+      logger.info("Webhook worker waiting for active job to finish...");
+      await this.activePromise.catch((err) => {
+        logger.error("Active webhook job failed during shutdown", { error: String(err) });
+      });
     }
     logger.info("Webhook worker stopped");
   }

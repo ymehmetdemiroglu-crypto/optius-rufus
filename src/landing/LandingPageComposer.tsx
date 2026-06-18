@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useReducer, useEffect } from 'react';
 import type { JSX } from 'react';
 import type { ProspectData } from '../../dtos/prospect.dto';
 import ProgressBar from './ProgressBar';
@@ -45,10 +45,13 @@ export default function LandingPageComposer({
 }: LandingPageComposerProps): JSX.Element {
   const { stageCopy } = prospect;
 
-  const [maxStage, setMaxStage] = useState(currentStage);
+  const [maxStage, dispatchMaxStage] = useReducer(
+    (state: number, action: number) => Math.max(state, action),
+    currentStage
+  );
 
   useEffect(() => {
-    setMaxStage((prev) => Math.max(prev, currentStage));
+    dispatchMaxStage(currentStage);
   }, [currentStage]);
 
   const estimatedTraffic = Math.max(2000, (prospect.listing.reviewCount || 100) * 20);

@@ -143,22 +143,6 @@ function lineCountOf(text: string): number {
   return text.split(/\r?\n/).length;
 }
 
-/**
- * Map the export name back to a procedure name on the parent router by
- * re-reading api/trpc/router.ts. Falls back to the slug if not found.
- */
-function loadMountMap(): Record<string, string> {
-  const rootRouter = resolve(REPO_ROOT, "api/trpc/router.ts");
-  // We try/catch — domain-catalog should work even if the root router moves.
-  try {
-    // Synchronous-ish via dynamic import not needed: use readFileSync semantics
-    // through readFile. We are in async context anyway.
-    return {} as Record<string, string>; // populated below
-  } catch {
-    return {};
-  }
-}
-
 async function buildMountMap(): Promise<Record<string, string>> {
   // Map: procedureNameOnAppRouter → exportedRouterNameFromDomain
   // Example: agentsRouter lives in api/domains/optimization/router.ts and

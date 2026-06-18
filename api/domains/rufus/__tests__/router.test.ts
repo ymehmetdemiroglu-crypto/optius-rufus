@@ -1,4 +1,8 @@
 import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
+import type { AppRouter } from "../../../trpc/router.js";
+import type { ListingRecord, RufusQueryRecord, RufusQueryRunRecord } from "../../../db/schema.types.js";
+import type { CompetitorBenchmark } from "../../../pipeline/pipeline.types.js";
+import type { RufusSOVResult } from "../service.js";
 
 vi.mock("../../db/drizzle.js", () => {
   return {
@@ -42,11 +46,11 @@ import { simulateRufusSOV } from "../service.js";
 import * as rufusRepo from '../../rufus/repository.js';
 
 describe("rufusTrackerRouter", () => {
-  let caller: any;
+  let caller: ReturnType<AppRouter["createCaller"]>;
 
   beforeAll(async () => {
     const { appRouter } = await import("../../../trpc/router.js");
-    caller = appRouter.createCaller({ req: new Request("http://localhost/api/trpc") } as any);
+    caller = appRouter.createCaller({ req: new Request("http://localhost/api/trpc") });
   });
 
   beforeEach(() => {
@@ -84,11 +88,11 @@ describe("rufusTrackerRouter", () => {
         rufusAnsweredRate: 90,
       };
 
-      vi.mocked(listingRepo.getLatestByProspectId).mockResolvedValue(mockListing as any);
-      vi.mocked(fetchCompetitors).mockResolvedValue(mockCompetitors as any);
-      vi.mocked(simulateRufusSOV).mockResolvedValue(mockSimulationResult as any);
-      vi.mocked(rufusRepo.createQuery).mockResolvedValue({ id: 100 } as any);
-      vi.mocked(rufusRepo.createQueryRun).mockResolvedValue({ id: 200 } as any);
+      vi.mocked(listingRepo.getLatestByProspectId).mockResolvedValue(mockListing as unknown as ListingRecord);
+      vi.mocked(fetchCompetitors).mockResolvedValue(mockCompetitors as unknown as CompetitorBenchmark[]);
+      vi.mocked(simulateRufusSOV).mockResolvedValue(mockSimulationResult as unknown as RufusSOVResult);
+      vi.mocked(rufusRepo.createQuery).mockResolvedValue({ id: 100 } as unknown as RufusQueryRecord);
+      vi.mocked(rufusRepo.createQueryRun).mockResolvedValue({ id: 200 } as unknown as RufusQueryRunRecord);
 
       const result = await caller.rufusTracker.runSOVSimulation({
         prospectId: 10,
@@ -141,7 +145,9 @@ describe("rufusTrackerRouter", () => {
         }
       ];
 
-      vi.mocked(rufusRepo.getSOVHistoryForProspect).mockResolvedValue(mockHistoryRows as any);
+      vi.mocked(rufusRepo.getSOVHistoryForProspect).mockResolvedValue(
+        mockHistoryRows as unknown as Awaited<ReturnType<typeof rufusRepo.getSOVHistoryForProspect>>
+      );
 
       const result = await caller.rufusTracker.getSOVHistory({ prospectId: 10 });
 

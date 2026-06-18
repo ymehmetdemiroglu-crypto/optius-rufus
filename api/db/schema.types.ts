@@ -4,15 +4,12 @@ import type {
   listings,
   listingAnalyses,
   bookings,
-  prospectActivities,
   brandSettings,
   rufusQueries,
   rufusQueryRuns,
   catalogLinks,
   pipelineJobs,
   pipelineJobStages,
-  usageEvents,
-  jobs,
 } from "./schema.js";
 
 // ── Record interfaces (mirrors api/db/client.ts for backward compat) ──

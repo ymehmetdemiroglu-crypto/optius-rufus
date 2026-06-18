@@ -269,7 +269,19 @@ export async function searchPeople(filters: SearchPeopleFilters): Promise<Search
 
     return {
       total_entries: filtered.length,
-      people: items.map(({ enriched, ...p }) => p),
+      people: items.map((p) => ({
+        id: p.id,
+        first_name: p.first_name,
+        last_name_obfuscated: p.last_name_obfuscated,
+        title: p.title,
+        last_refreshed_at: p.last_refreshed_at,
+        has_email: p.has_email,
+        has_city: p.has_city,
+        has_state: p.has_state,
+        has_country: p.has_country,
+        has_direct_phone: p.has_direct_phone,
+        organization: p.organization,
+      })),
     };
   }
 
@@ -315,10 +327,10 @@ export async function enrichAndImportProspect(
   asin?: string,
   marketplace?: string
 ): Promise<{ success: boolean; prospectId: number; slug: string }> {
-  let firstName = "";
-  let lastName = "";
-  let email = "";
-  let company = "";
+  let firstName: string;
+  let lastName: string;
+  let email: string;
+  let company: string;
 
   if (!APOLLO_API_KEY) {
     const mock = MOCK_PEOPLE.find(p => p.id === personId);

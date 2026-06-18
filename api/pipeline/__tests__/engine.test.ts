@@ -62,8 +62,8 @@ describe("PipelineEngine - Concurrent DAG Execution", () => {
       competitor: { status: "pending" },
     };
 
-    vi.mocked(pipelineRepo.getJob).mockResolvedValue(mockJobRecord as any);
-    vi.mocked(pipelineRepo.getStagesForJob).mockResolvedValue(mockStages as any);
+    vi.mocked(pipelineRepo.getJob).mockResolvedValue(mockJobRecord as unknown as NonNullable<Awaited<ReturnType<typeof pipelineRepo.getJob>>>);
+    vi.mocked(pipelineRepo.getStagesForJob).mockResolvedValue(mockStages as unknown as Awaited<ReturnType<typeof pipelineRepo.getStagesForJob>>);
 
     const callTimeline: string[] = [];
 
@@ -159,8 +159,8 @@ describe("PipelineEngine - Concurrent DAG Execution", () => {
       competitor: { status: "pending" },
     };
 
-    vi.mocked(pipelineRepo.getJob).mockResolvedValue(mockJobRecord as any);
-    vi.mocked(pipelineRepo.getStagesForJob).mockResolvedValue(mockStages as any);
+    vi.mocked(pipelineRepo.getJob).mockResolvedValue(mockJobRecord as unknown as NonNullable<Awaited<ReturnType<typeof pipelineRepo.getJob>>>);
+    vi.mocked(pipelineRepo.getStagesForJob).mockResolvedValue(mockStages as unknown as Awaited<ReturnType<typeof pipelineRepo.getStagesForJob>>);
 
     const callTimeline: string[] = [];
 
@@ -262,8 +262,8 @@ describe("PipelineEngine - Concurrent DAG Execution", () => {
       competitor: { status: "completed", output: [] },
     };
 
-    vi.mocked(pipelineRepo.getJob).mockResolvedValue(mockJobRecord as any);
-    vi.mocked(pipelineRepo.getStagesForJob).mockResolvedValue(mockStages as any);
+    vi.mocked(pipelineRepo.getJob).mockResolvedValue(mockJobRecord as unknown as NonNullable<Awaited<ReturnType<typeof pipelineRepo.getJob>>>);
+    vi.mocked(pipelineRepo.getStagesForJob).mockResolvedValue(mockStages as unknown as Awaited<ReturnType<typeof pipelineRepo.getStagesForJob>>);
 
     const callTimeline: string[] = [];
 

@@ -1,11 +1,8 @@
 import { callLlm } from "../../services/llmGateway.js";
-import type { RawListingData, SemanticGap } from "../../pipeline/pipeline.types.js";
+import type { AnalysisResult, CompetitorBenchmark, RawListingData, SemanticGap } from "../../pipeline/pipeline.types.js";
+import { generateGroundedRufusSimulation } from "../rufus/intentSimulator.js";
 
-interface AnalysisInput {
-  rufusScore: number;
-  cosmoScore: number;
-  semanticGaps: SemanticGap[];
-}
+type AnalysisInput = AnalysisResult;
 
 export interface StageCopy {
   // Stage 1: Hero
@@ -33,6 +30,15 @@ export interface StageCopy {
   // Stage 8: CTA
   ctaHeadline: string;
   ctaGuarantee: string;
+  // Competitor loss audit panel
+  competitorAudit: CompetitorAuditItem[];
+}
+
+export interface CompetitorAuditItem {
+  query: string;
+  competitorName: string;
+  competitorAdvantage: string;
+  yourGap: string;
 }
 
 export interface SimulatorScenario {
@@ -54,13 +60,19 @@ export async function generateAllStageCopy(
   analysis: AnalysisInput,
   listing: RawListingData,
   prospectName: string,
-  expectedRevenue?: string
+  expectedRevenue?: string,
+  competitors?: CompetitorBenchmark[]
 ): Promise<StageCopy> {
-  const fallback = buildFallbackCopy(analysis, listing, prospectName);
+  const fallback = buildFallbackCopy(analysis, listing, prospectName, competitors);
 
   const topGaps = (analysis.semanticGaps || [])
     .slice(0, 5)
     .map((g) => `${g.dimension} (gap: ${Math.round(g.gap * 100)}%)`)
+    .join(", ");
+
+  const predictedIntentSummary = (analysis.predictedIntents || [])
+    .slice(0, 5)
+    .map((i) => `${i.dimension} (${i.coverage}% coverage, ${i.priority})`)
     .join(", ");
 
   const bulletsSummary = (listing.bullets || []).slice(0, 3).join(" | ");
@@ -117,6 +129,7 @@ PROSPECT DATA:
 - Rufus Score: ${analysis.rufusScore}/100
 - COSMO Score: ${analysis.cosmoScore}/100
 - Top Semantic Gaps: ${topGaps}
+- Predicted Buyer Intents: ${predictedIntentSummary || "Not available"}
 ${revenueStrategyPrompt}
 
 Your task is to write personalized landing page copy for ALL 8 stages of the "Listing Autopsy" diagnostic report. The copy must explain that we optimize listings for Amazon's conversational search AI (Rufus & COSMO) by sealing their semantic gaps, seeding high-weight Q&A roadmaps, and setting up Page 2 organic rank conquesting PPC campaigns.
@@ -140,6 +153,7 @@ Return a JSON object with these exact keys:
 15. "urgencyCTA": Scarcity warning (e.g., "Only 5 client slots this week to protect human copywriter review time. 2 left.").
 16. "ctaHeadline": Direct, commanding booking CTA: "Book Your 15-Minute Listing Autopsy, ${prospectName}."
 17. "ctaGuarantee": A Grand Slam risk-reversal guarantee: "If we don't find at least $5,000/year in hidden leaks during our call, we'll send you $100 cash. If we optimize your listing and your Rufus SOV doesn't improve, we refund every single cent."
+18. "competitorAudit": Array of 3 objects with "query", "competitorName", "competitorAdvantage", "yourGap". Ground each item in the simulator scenarios.
 
 CRITICAL RULES:
 - Use the prospect's first name naturally.
@@ -147,6 +161,8 @@ CRITICAL RULES:
 - Write in punchy, Hormozi-style copy: short sentences, bold claims, specific numbers, and absolute risk reversals.
 
 Return ONLY a valid JSON object.`;
+
+  const groundedSimulation = generateGroundedRufusSimulation(analysis, listing, competitors || []);
 
   try {
     const llmResponse = await callLlm(
@@ -193,6 +209,9 @@ Return ONLY a valid JSON object.`;
       urgencyCTA: content.urgencyCTA || fallback.urgencyCTA,
       ctaHeadline: content.ctaHeadline || fallback.ctaHeadline,
       ctaGuarantee: content.ctaGuarantee || fallback.ctaGuarantee,
+      competitorAudit: Array.isArray(content.competitorAudit) && content.competitorAudit.length >= 3
+        ? content.competitorAudit
+        : groundedSimulation.competitorAudit,
     };
   } catch (err) {
     console.error("Failed to generate stage copy:", err);
@@ -207,7 +226,8 @@ Return ONLY a valid JSON object.`;
 function buildFallbackCopy(
   analysis: AnalysisInput,
   listing: RawListingData,
-  prospectName: string
+  prospectName: string,
+  competitors?: CompetitorBenchmark[]
 ): StageCopy {
   const brand = listing.brand || "your brand";
   const category = listing.category || "your category";
@@ -218,6 +238,8 @@ function buildFallbackCopy(
     .join(", ");
 
   const bullets = listing.bullets || [];
+
+  const grounded = generateGroundedRufusSimulation(analysis, listing, competitors || []);
 
   return {
     heroHeadline: `${prospectName}, Your ${brand} Listing is Bleeding Sales to Competitors on Amazon Rufus`,
@@ -284,6 +306,7 @@ function buildFallbackCopy(
     urgencyCTA: `⚡ Only taking 5 brand audits this week to ensure direct human copy review. 2 slots left.`,
     ctaHeadline: `Book Your 15-Minute Listing Autopsy, ${prospectName}`,
     ctaGuarantee: `If we don't find at least $5,000/year in hidden leaks during our call, we'll send you $100 cash. If we optimize your listing and your Rufus SOV doesn't improve, we refund every single cent. No risk. No friction.`,
+    competitorAudit: grounded.competitorAudit,
   };
 }
 

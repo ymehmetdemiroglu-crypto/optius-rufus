@@ -117,6 +117,10 @@ describe("Semantic Analysis Engine", () => {
       expect(result).toHaveProperty("rufusScore");
       expect(result).toHaveProperty("cosmoScore");
       expect(result.semanticGaps.length).toBeGreaterThan(0);
+      expect(result.predictedIntents.length).toBeGreaterThan(0);
+      expect(result.intentCoverage.overall).toBeGreaterThanOrEqual(0);
+      expect(result.intentCoverage.overall).toBeLessThanOrEqual(100);
+      expect(Object.keys(result.intentCoverage.byJourney)).toContain("usage");
 
       // Verify that Rufus score is in range 0-100
       expect(result.rufusScore).toBeGreaterThanOrEqual(0);

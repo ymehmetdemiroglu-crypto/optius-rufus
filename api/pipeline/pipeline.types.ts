@@ -38,6 +38,32 @@ export interface CleanedText {
   source: RawListingData;
 }
 
+export type IntentJourney =
+  | "informational"
+  | "transactional"
+  | "comparison"
+  | "safety_trust"
+  | "usage";
+
+export interface PredictedIntent {
+  dimension: string;
+  query: string;
+  journey: IntentJourney;
+  coverage: number; // 0-100
+  weight: number;
+  priority: "critical" | "high" | "medium" | "low";
+  signals: string[]; // detected signals in the listing
+  missingSignals: string[]; // signals that would close the gap
+}
+
+export interface IntentCoverage {
+  overall: number; // 0-100
+  byJourney: Record<IntentJourney, number>;
+  totalIntents: number;
+  criticalCount: number;
+  highCount: number;
+}
+
 export interface SemanticGap {
   dimension: string;
   currentScore: number;
@@ -51,6 +77,8 @@ export interface AnalysisResult {
   rufusScore: number;
   cosmoScore: number;
   semanticGaps: SemanticGap[];
+  predictedIntents: PredictedIntent[];
+  intentCoverage: IntentCoverage;
 }
 
 export interface QAPair {
@@ -60,11 +88,27 @@ export interface QAPair {
   priority: "critical" | "high" | "medium" | "low";
 }
 
+export interface KeywordPreservationReport {
+  inventory: string[]; // keywords extracted from original listing
+  preserved: string[];
+  missing: string[];
+  score: number; // 0-100
+}
+
+export interface ContentVariant {
+  label: string;
+  title: string;
+  bullets: string[];
+  description: string | null;
+}
+
 export interface OptimizedContent {
   title: string;
   bullets: string[];
   description: string | null;
   qas: QAPair[];
+  keywordPreservationReport: KeywordPreservationReport;
+  variantB?: ContentVariant;
 }
 
 export interface CompetitorBenchmark {

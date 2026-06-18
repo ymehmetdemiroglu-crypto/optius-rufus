@@ -19,6 +19,7 @@ import type {
 import { mapListingRecordToRawListingData } from "../../lib/mapping.js";
 import { safeJsonParse } from "../../lib/json.js";
 import type { ListingRecord } from "../../db/schema.types.js";
+import type { OptimizedContent } from "../../pipeline/pipeline.types.js";
 
 
 
@@ -57,6 +58,8 @@ interface AnalysisMetrics {
   semanticScore: number;
   contentScore: number;
   visualScore: number;
+  predictedIntents: AnalysisResult["predictedIntents"];
+  intentCoverage: AnalysisResult["intentCoverage"];
 }
 
 function computeMetrics(analysisResult: AnalysisResult | undefined): AnalysisMetrics {
@@ -86,6 +89,14 @@ function computeMetrics(analysisResult: AnalysisResult | undefined): AnalysisMet
     semanticScore: Math.round(rufusScore * 0.9),
     contentScore: Math.round(optimizedRufusScore * 0.95),
     visualScore: Math.round((analysisResult?.cosmoScore || 0) * 0.85),
+    predictedIntents: analysisResult?.predictedIntents ?? [],
+    intentCoverage: analysisResult?.intentCoverage ?? {
+      overall: 0,
+      byJourney: { informational: 0, transactional: 0, comparison: 0, safety_trust: 0, usage: 0 },
+      totalIntents: 0,
+      criticalCount: 0,
+      highCount: 0,
+    },
   };
 }
 
@@ -99,13 +110,8 @@ async function resolveStageCopy(
   const existing = optimized?.stageCopy as StageCopy | undefined;
   if (existing) return existing;
 
-  const gaps = analysisResult?.semanticGaps || [];
   return generateAllStageCopy(
-    {
-      rufusScore: analysisResult?.rufusScore ?? 0,
-      cosmoScore: analysisResult?.cosmoScore ?? 0,
-      semanticGaps: gaps,
-    },
+    analysisResult ?? { rufusScore: 0, cosmoScore: 0, semanticGaps: [], predictedIntents: [], intentCoverage: { overall: 0, byJourney: { informational: 0, transactional: 0, comparison: 0, safety_trust: 0, usage: 0 }, totalIntents: 0, criticalCount: 0, highCount: 0 } },
     rawListing,
     prospectName,
     expectedRevenue
@@ -119,6 +125,8 @@ function buildAnalysisInsertInput(
   stageCopy: StageCopy,
   job: PipelineJob
 ): InsertAnalysisInput {
+  const optimizedOutput = job.stages.optimize?.output as OptimizedContent | undefined;
+
   return {
     listingId: listing.id,
     prospectId: prospect.id,
@@ -135,6 +143,10 @@ function buildAnalysisInsertInput(
     aiAnalysisRaw: JSON.stringify({
       jobId: job.id,
       stages: Object.keys(job.stages),
+      predictedIntents: metrics.predictedIntents,
+      intentCoverage: metrics.intentCoverage,
+      keywordPreservation: optimizedOutput?.keywordPreservationReport,
+      variantB: optimizedOutput?.variantB,
     }),
     copyPersonalizedHook: stageCopy.heroHeadline,
     copyProblemNarrative: stageCopy.autopsyBody,
@@ -156,6 +168,8 @@ function buildAnalysisInsertInput(
     copySocialProofHeadline: stageCopy.socialProofHeadline,
     copyCtaHeadline: stageCopy.ctaHeadline,
     copyCtaGuarantee: stageCopy.ctaGuarantee,
+    copyCompetitorAudit: JSON.stringify(stageCopy.competitorAudit),
+    copyFreeQAs: JSON.stringify(optimizedOutput?.qas || []),
     packageType: prospect.packageType || "package_2",
     pricePoint: prospect.pricePoint ?? 1500,
   };
@@ -367,6 +381,8 @@ export async function regenerateCopy(
         rufusScore: analysisRow.rufusScore,
         cosmoScore: analysisRow.cosmoScore,
         semanticGaps: gaps,
+        predictedIntents: [],
+        intentCoverage: { overall: 0, byJourney: { informational: 0, transactional: 0, comparison: 0, safety_trust: 0, usage: 0 }, totalIntents: 0, criticalCount: 0, highCount: 0 },
       },
       rawListing,
       prospectName,
@@ -396,6 +412,7 @@ export async function regenerateCopy(
       socialProofHeadline: stageCopy.socialProofHeadline,
       ctaHeadline: stageCopy.ctaHeadline,
       ctaGuarantee: stageCopy.ctaGuarantee,
+      competitorAudit: JSON.stringify(stageCopy.competitorAudit) as unknown as StageCopy["competitorAudit"],
     });
   } catch (err) {
     throw new Error(`Failed to update copy for analysis ${analysisId}`, {

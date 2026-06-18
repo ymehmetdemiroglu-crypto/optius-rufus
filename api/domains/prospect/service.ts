@@ -29,6 +29,35 @@ export interface ListProspectsOptions {
   offset?: number;
 }
 
+interface ApolloWebhookPayload {
+  contact?: {
+    email?: string;
+    first_name?: string;
+    last_name?: string;
+    organization_name?: string;
+    custom_fields?: {
+      expected_revenue?: string;
+      asin?: string;
+      ASIN?: string;
+      [key: string]: unknown;
+    };
+  };
+  email_message?: {
+    sender_email?: string;
+    body_text?: string;
+    subject?: string;
+    [key: string]: unknown;
+  };
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  company?: string;
+  expectedRevenue?: string;
+  asin?: string;
+  body_text?: string;
+  [key: string]: unknown;
+}
+
 function generateSlug(): string {
   return Math.random().toString(36).substring(2, 10);
 }
@@ -133,7 +162,7 @@ export async function createProspect(
   }
 }
 
-export async function handleApolloReply(payload: any): Promise<{
+export async function handleApolloReply(payload: ApolloWebhookPayload): Promise<{
   success: boolean;
   prospectId: number;
   slug: string;

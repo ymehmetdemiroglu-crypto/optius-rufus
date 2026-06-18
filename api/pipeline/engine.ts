@@ -2,7 +2,7 @@ import * as pipelineRepo from "../domains/pipeline/repository.js";
 import { eventBus } from "../infra/eventBus.js";
 import { logger } from "../infra/logger.js";
 import { pipelineQueue } from "../infra/queue.js";
-import type { PipelineJob, StageName, StageOutput, StageContext, PipelineStageState } from "./pipeline.types.js";
+import type { PipelineJob, StageName, StageOutput, StageContext } from "./pipeline.types.js";
 import { STAGE_ORDER } from "./definitions.js";
 import { stageExecutors } from "./executors.js";
 
@@ -123,7 +123,7 @@ export class PipelineEngine {
       await pipelineRepo.updateJobStatus(jobId, "running");
 
       const stageOutputs: StageOutput = {};
-      const stagePromises: Record<StageName, Promise<unknown>> = {} as any;
+      const stagePromises = {} as Record<StageName, Promise<unknown>>;
       const executedStages = new Set<StageName>();
 
       const executeStage = async (stageDef: typeof STAGE_ORDER[number]): Promise<unknown> => {

@@ -9,7 +9,6 @@ import { eventBus } from "../infra/eventBus.js";
 import * as listingService from "../domains/listing/service.js";
 import * as prospectService from "../domains/prospect/service.js";
 import { executeWithRetry } from "./executeWithRetry.js";
-import { safeJsonParse } from "../lib/json.js";
 import { mapListingRecordToRawListingData, mapScrapedDataToRawListingData } from "../lib/mapping.js";
 import type {
   StageExecutor,
@@ -263,10 +262,14 @@ export const stageExecutors: StageExecutor[] = [
         const analysis = ctx.stageOutputs.analysis;
         const listing = ctx.stageOutputs.rawListing;
 
+        const competitors = ctx.stageOutputs.competitors || [];
+
         const stageCopy = await generateAllStageCopy(
-          { rufusScore: analysis.rufusScore, cosmoScore: 0, semanticGaps: analysis.semanticGaps },
+          analysis,
           listing,
-          prospectName
+          prospectName,
+          prospect.expectedRevenue || undefined,
+          competitors
         );
 
         const agentOutput = await executeWithRetry<OptimizedContent>(

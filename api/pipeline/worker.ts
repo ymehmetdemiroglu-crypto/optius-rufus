@@ -11,6 +11,7 @@ import { pipelineEngine } from "./engine.js";
 export class QueueWorker {
   private running = false;
   private timer?: NodeJS.Timeout;
+  private activePromise?: Promise<unknown>;
   private readonly pollIntervalMs: number;
 
   constructor(pollIntervalMs = 2000) {
@@ -52,6 +53,21 @@ export class QueueWorker {
     }
   }
 
+  private async tick(): Promise<void> {
+    if (!this.running) return;
+    try {
+      this.activePromise = this.processOne();
+      const hadWork = await this.activePromise;
+      this.activePromise = undefined;
+      // If work was found, process again immediately; otherwise wait
+      this.timer = setTimeout(() => this.tick(), hadWork ? 0 : this.pollIntervalMs);
+    } catch (err) {
+      this.activePromise = undefined;
+      logger.error("QueueWorker tick error", { error: String(err) });
+      this.timer = setTimeout(() => this.tick(), this.pollIntervalMs);
+    }
+  }
+
   /**
    * Start continuous polling loop.
    */
@@ -59,28 +75,21 @@ export class QueueWorker {
     if (this.running) return;
     this.running = true;
     logger.info("QueueWorker started", { intervalMs: this.pollIntervalMs });
-
-    const tick = async () => {
-      if (!this.running) return;
-      try {
-        const hadWork = await this.processOne();
-        // If work was found, process again immediately; otherwise wait
-        this.timer = setTimeout(tick, hadWork ? 0 : this.pollIntervalMs);
-      } catch (err) {
-        logger.error("QueueWorker tick error", { error: String(err) });
-        this.timer = setTimeout(tick, this.pollIntervalMs);
-      }
-    };
-
-    tick();
+    this.tick();
   }
 
   /**
-   * Stop the polling loop.
+   * Stop the polling loop and wait for the active job to finish.
    */
-  stop(): void {
+  async stop(): Promise<void> {
     this.running = false;
     if (this.timer) clearTimeout(this.timer);
+    if (this.activePromise) {
+      logger.info("QueueWorker waiting for active job to finish...");
+      await this.activePromise.catch((err) => {
+        logger.error("Active job failed during shutdown", { error: String(err) });
+      });
+    }
     logger.info("QueueWorker stopped");
   }
 }

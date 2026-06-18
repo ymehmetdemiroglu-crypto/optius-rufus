@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import { ShieldCheck, Layers, CheckSquare, Compass, Send } from 'lucide-react';
+import { Layers, CheckSquare, Compass, Send } from 'lucide-react';
 import type { ProspectData } from '../../dtos/prospect.dto';
 
 interface StageAEOPDFAuditProps {
@@ -19,7 +19,6 @@ export default function StageAEOPDFAudit({
   prospect,
   brandData,
   visible,
-  isPrint,
 }: StageAEOPDFAuditProps): JSX.Element | null {
   if (!visible) return null;
 

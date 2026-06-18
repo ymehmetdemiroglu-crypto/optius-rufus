@@ -23,7 +23,9 @@ export const ppcRouter = router({
         return plan;
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
-        throw new Error(`Failed to generate PPC plan: ${message}`);
+        throw new Error(`Failed to generate PPC plan: ${message}`, {
+          cause: err,
+        });
       }
     }),
 
@@ -54,7 +56,9 @@ export const ppcRouter = router({
         };
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
-        throw new Error(`Failed to download bulk sheet: ${message}`);
+        throw new Error(`Failed to download bulk sheet: ${message}`, {
+          cause: err,
+        });
       }
     }),
 });

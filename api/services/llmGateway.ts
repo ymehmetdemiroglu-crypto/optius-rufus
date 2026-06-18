@@ -45,8 +45,9 @@ export async function callLlm(
   if (options.prospectId !== undefined && options.estimatedCostCents !== undefined) {
     try {
       await tokenBudgetService.checkBudget(options.prospectId, options.estimatedCostCents);
-    } catch (err: any) {
-      logger.warn(`Token budget check bypassed: ${err.message}`, { prospectId: options.prospectId });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      logger.warn(`Token budget check bypassed: ${message}`, { prospectId: options.prospectId });
     }
   }
 
@@ -128,8 +129,9 @@ export async function callLlm(
           completionTokens,
           costCents
         );
-      } catch (err: any) {
-        logger.warn(`Token usage tracking failed: ${err.message}`, { prospectId: options.prospectId });
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        logger.warn(`Token usage tracking failed: ${message}`, { prospectId: options.prospectId });
       }
     }
 
@@ -272,8 +274,9 @@ export async function callEmbedding(
           0,
           costCents
         );
-      } catch (err: any) {
-        logger.warn(`Embedding usage tracking failed: ${err.message}`, { prospectId: options.prospectId });
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        logger.warn(`Embedding usage tracking failed: ${message}`, { prospectId: options.prospectId });
       }
     }
 

@@ -1,8 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { JobRepository } from "../jobRepository.js";
 
+type MockDb = {
+  insert: ReturnType<typeof vi.fn>;
+  select: ReturnType<typeof vi.fn>;
+  update: ReturnType<typeof vi.fn>;
+};
+
 describe("JobRepository - Requeue Backoff Fix", () => {
-  let mockDb: any;
+  let mockDb: MockDb;
   let repository: JobRepository;
 
   beforeEach(() => {
@@ -23,7 +29,7 @@ describe("JobRepository - Requeue Backoff Fix", () => {
         })),
       })),
     };
-    repository = new JobRepository(mockDb);
+    repository = new JobRepository(mockDb as unknown as ConstructorParameters<typeof JobRepository>[0]);
   });
 
   it("should update timestamp to now and set delay to backoff on requeue", async () => {
@@ -40,7 +46,7 @@ describe("JobRepository - Requeue Backoff Fix", () => {
     // Verify update was called on jobs table
     expect(mockDb.update).toHaveBeenCalled();
     expect(setMock).toHaveBeenCalled();
-    const setArgs = (setMock.mock.calls[0] as any[])[0] as any;
+    const setArgs = (setMock.mock.calls[0] as unknown[])[0] as Record<string, unknown>;
 
     // Timestamp should be recent (within 1000ms of now)
     expect(setArgs.timestamp).toBeGreaterThan(Date.now() - 1000);

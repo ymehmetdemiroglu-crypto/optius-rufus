@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { initTRPC } from "@trpc/server";
 
 export async function createContext({ req }: { req: Request }) {

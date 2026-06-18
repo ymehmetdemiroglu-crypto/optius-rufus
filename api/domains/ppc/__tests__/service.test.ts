@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as ppcPlannerService from "../service.js";
 import * as listingRepo from "../../listing/repository.js";
 import * as analysisRepo from "../../analysis/repository.js";
+import type { ListingRecord, ListingAnalysisRecord } from "../../../db/schema.types.js";
 
 vi.mock("../../listing/repository.js", () => {
   return {
@@ -91,8 +92,8 @@ describe("ppcPlannerService", () => {
         createdAt: "2026-06-07T12:00:00Z",
       };
 
-      vi.mocked(listingRepo.getLatestByProspectId).mockResolvedValue(mockListing as any);
-      vi.mocked(analysisRepo.getLatestByProspectId).mockResolvedValue(mockAnalysis as any);
+      vi.mocked(listingRepo.getLatestByProspectId).mockResolvedValue(mockListing as unknown as ListingRecord);
+      vi.mocked(analysisRepo.getLatestByProspectId).mockResolvedValue(mockAnalysis as unknown as ListingAnalysisRecord);
 
       const plan = await ppcPlannerService.generatePpcPlan(10, {
         dailyBudget: 60,

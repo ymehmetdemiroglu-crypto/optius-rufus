@@ -2,8 +2,19 @@ import { FolderOpen } from 'lucide-react';
 import Card from '../ui/Card';
 import Badge from '../ui/Badge';
 
+interface Prospect {
+  id: number;
+  email: string;
+  firstName?: string;
+  company?: string;
+  asin?: string;
+  status: string;
+  landingPageViews: number;
+  createdAt: string;
+}
+
 interface ClientDirectoryProps {
-  prospects: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
+  prospects: Prospect[];
   selectedProspectId: number | null;
   onSelectProspect: (id: number) => void;
 }
@@ -17,7 +28,7 @@ export default function ClientDirectory({ prospects, selectedProspectId, onSelec
       
       <div className="divide-y-[2px] divide-brand-dark/10 max-h-[500px] overflow-y-auto pr-2">
         {prospects && prospects.length > 0 ? (
-          prospects.map((p: any) => (
+          prospects.map((p) => (
             <div 
               key={p.id} 
               onClick={() => onSelectProspect(p.id)}

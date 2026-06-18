@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { trpc } from '../shared/providers/trpc';
 import { Cpu, Layers, Download, ExternalLink, RefreshCw } from 'lucide-react';
 import PipelineStatusPanel from './PipelineStatusPanel';
@@ -19,19 +19,32 @@ export default function ProspectDetailPanel({ prospectId }: ProspectDetailPanelP
   const [rankBooster, setRankBooster] = useState(true);
 
   // Q&A Checklist state
-  const [qaItems, setQaItems] = useState([
-    { id: 1, text: "Dosage limits & safety warning seeded", checked: true },
-    { id: 2, text: "Taste profile / aftertaste details addressed", checked: true },
-    { id: 3, text: "Routine integration & timing instructions clarified", checked: false },
-    { id: 4, text: "Direct comparison with standard category products seeded", checked: false },
-    { id: 5, text: "Form advantages (e.g. capsules vs gummies) explained", checked: false }
-  ]);
+  const defaultQaItems = useMemo(
+    () => [
+      { id: 1, text: "Dosage limits & safety warning seeded", checked: true },
+      { id: 2, text: "Taste profile / aftertaste details addressed", checked: true },
+      { id: 3, text: "Routine integration & timing instructions clarified", checked: false },
+      { id: 4, text: "Direct comparison with standard category products seeded", checked: false },
+      { id: 5, text: "Form advantages (e.g. capsules vs gummies) explained", checked: false }
+    ],
+    []
+  );
+  const [manualOverrides, setManualOverrides] = useState<Record<number, boolean>>({});
 
   // tRPC Queries & Mutations
   const { data: detailData, isLoading } = trpc.prospects.getById.useQuery({ id: prospectId });
   const { data: sovHistory, refetch: refetchSOV } = trpc.rufusTracker.getSOVHistory.useQuery({ prospectId });
   const { data: graphData, refetch: refetchGraph } = trpc.catalogGraph.getGraph.useQuery({ prospectId });
   const { data: brandSettings } = trpc.branding.getSettings.useQuery();
+
+  const qaItems = useMemo(() => {
+    const coverage = sovHistory?.currentQaCoverage ?? 40;
+    const checkedLength = Math.round((coverage / 100) * defaultQaItems.length);
+    return defaultQaItems.map((item, idx) => ({
+      ...item,
+      checked: manualOverrides[item.id] ?? idx < checkedLength,
+    }));
+  }, [sovHistory, defaultQaItems, manualOverrides]);
 
   const runSOV = trpc.rufusTracker.runSOVSimulation.useMutation({
     onSuccess: () => {
@@ -49,23 +62,14 @@ export default function ProspectDetailPanel({ prospectId }: ProspectDetailPanelP
     });
   };
 
-  // Sync checklist with database Q&A coverage ratio
-  useEffect(() => {
-    if (sovHistory) {
-      const initialCoverage = sovHistory.currentQaCoverage || 40;
-      const checkedLength = Math.round((initialCoverage / 100) * qaItems.length);
-      setQaItems(prev => prev.map((item, idx) => ({
-        ...item,
-        checked: idx < checkedLength
-      })));
-    }
-  }, [prospectId, sovHistory]);
-
   const checkedCount = qaItems.filter(item => item.checked).length;
   const localQaCoverageRatio = Math.round((checkedCount / qaItems.length) * 100);
 
   const toggleQaItem = (id: number) => {
-    setQaItems(prev => prev.map(item => item.id === id ? { ...item, checked: !item.checked } : item));
+    setManualOverrides(prev => ({
+      ...prev,
+      [id]: !(prev[id] ?? qaItems.find(item => item.id === id)?.checked),
+    }));
   };
 
   const { refetch: fetchBulkSheet } = trpc.ppc.downloadBulkSheet.useQuery({

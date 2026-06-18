@@ -15,7 +15,6 @@ const DOCS_DIR = resolve(REPO_ROOT, "docs");
 const ALLOWED_STATUS = new Set(["draft", "review", "canonical", "retired", "stale"]);
 const ALLOWED_DIATAXIS = new Set(["tutorial", "how-to", "reference", "explanation"]);
 const ALLOWED_C4 = new Set(["context", "container", "component", "code"]);
-const ALLOWED_AUDIENCE = new Set(["engineering", "engineering,product"]);
 
 const SOURCES_RE = /^[a-zA-Z0-9_\-/.]+:\d+(-\d+)?$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;

@@ -1,5 +1,6 @@
 import * as listingRepo from "../listing/repository.js";
 import * as analysisRepo from "../analysis/repository.js";
+import type { SemanticGap } from "../../pipeline/pipeline.types.js";
 
 export interface PpcKeywordData {
   intent: string;
@@ -37,7 +38,7 @@ export function generateNegatives(
   title: string,
   description: string,
   bullets: string[],
-  gaps: any[]
+  gaps: SemanticGap[]
 ): string[] {
   const text = `${title} ${description} ${bullets.join(" ")}`.toLowerCase();
 
@@ -151,11 +152,13 @@ export async function generatePpcPlan(
   }));
 
   // 5. Budget Defense: generate negative phrase keywords
-  let gaps: any[] = [];
+  let gaps: SemanticGap[] = [];
   if (analysis.gaps) {
     try {
-      gaps = typeof analysis.gaps === "string" ? JSON.parse(analysis.gaps) : analysis.gaps;
-    } catch {}
+      gaps = JSON.parse(analysis.gaps) as SemanticGap[];
+    } catch {
+      // ignore malformed gaps JSON
+    }
   }
   const bullets: string[] = Array.isArray(listing.bullets) ? (listing.bullets as string[]) : [];
   const negativeKeywords = generateNegatives(

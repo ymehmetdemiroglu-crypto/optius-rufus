@@ -38,8 +38,9 @@ async function sendTelegramNotification(booking: BookingRecord) {
     } else {
       console.log("✅ Telegram booking notification sent successfully!");
     }
-  } catch (err: any) {
-    console.error("Error sending Telegram notification:", err.message);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("Error sending Telegram notification:", message);
   }
 }
 
