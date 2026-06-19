@@ -32,6 +32,7 @@ export const prospects = pgTable(
     jobTitle: text("job_title"),
     linkedinUrl: text("linkedin_url"),
     websiteUrl: text("website_url"),
+    outreachEmails: jsonb("outreach_emails"),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
   (table) => ({
@@ -189,6 +190,9 @@ export const brandSettings = pgTable("brand_settings", {
   logoBase64: text("logo_base64"),
   primaryColor: text("primary_color").default("#b8860b"),
   website: text("website"),
+  sequenceEnterprise: text("sequence_enterprise"),
+  sequenceGrowth: text("sequence_growth"),
+  sequenceStarter: text("sequence_starter"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 

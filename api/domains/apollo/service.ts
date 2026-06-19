@@ -52,6 +52,63 @@ export async function enrollInSequence(
   return { id: result.emailer_campaign_membership?.id || result.id || `mock-enrollment-${Date.now()}` };
 }
 
+const FIELD_KEYS = {
+  rufusScore: process.env.APOLLO_FIELD_RUFUS_SCORE || "rufus_score",
+  topGap: process.env.APOLLO_FIELD_TOP_GAP || "top_gap",
+  competitorName: process.env.APOLLO_FIELD_COMPETITOR_NAME || "competitor_name",
+  auditUrl: process.env.APOLLO_FIELD_AUDIT_URL || "audit_url",
+  category: process.env.APOLLO_FIELD_CATEGORY || "product_category",
+  customSubject1: process.env.APOLLO_FIELD_CUSTOM_SUBJECT_1 || "custom_subject_1",
+  customBody1: process.env.APOLLO_FIELD_CUSTOM_BODY_1 || "custom_body_1",
+  customBody2: process.env.APOLLO_FIELD_CUSTOM_BODY_2 || "custom_body_2",
+  customBody3: process.env.APOLLO_FIELD_CUSTOM_BODY_3 || "custom_body_3",
+  customBody4: process.env.APOLLO_FIELD_CUSTOM_BODY_4 || "custom_body_4",
+  customBody5: process.env.APOLLO_FIELD_CUSTOM_BODY_5 || "custom_body_5",
+};
+
+export async function syncCustomFieldsToApollo(
+  contactId: string,
+  fields: {
+    rufusScore: number;
+    topGap: string;
+    competitorName: string;
+    auditUrl: string;
+    category: string;
+    customSubject1: string;
+    customBody1: string;
+    customBody2: string;
+    customBody3: string;
+    customBody4: string;
+    customBody5: string;
+  }
+): Promise<void> {
+  if (!APOLLO_API_KEY || contactId.startsWith("mock-")) {
+    return;
+  }
+
+  const body = {
+    custom_fields: {
+      [FIELD_KEYS.rufusScore]: fields.rufusScore,
+      [FIELD_KEYS.topGap]: fields.topGap,
+      [FIELD_KEYS.competitorName]: fields.competitorName,
+      [FIELD_KEYS.auditUrl]: fields.auditUrl,
+      [FIELD_KEYS.category]: fields.category,
+      
+      [FIELD_KEYS.customSubject1]: fields.customSubject1,
+      [FIELD_KEYS.customBody1]: fields.customBody1,
+      [FIELD_KEYS.customBody2]: fields.customBody2,
+      [FIELD_KEYS.customBody3]: fields.customBody3,
+      [FIELD_KEYS.customBody4]: fields.customBody4,
+      [FIELD_KEYS.customBody5]: fields.customBody5,
+    },
+  };
+
+  await apolloFetch(`/contacts/${contactId}`, {
+    method: "PUT",
+    body: JSON.stringify(body),
+  });
+}
+
 export async function getSequences(): Promise<Array<{ id: string; name: string }>> {
   if (!APOLLO_API_KEY) {
     return [

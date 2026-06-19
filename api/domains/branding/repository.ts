@@ -26,7 +26,7 @@ export async function upsertSettings(
     if (existing.length > 0) {
       const result = await pgDb
         .update(schema.brandSettings)
-        .set(input as Partial<InsertBrandSettingsInput>)
+        .set(input as unknown as Partial<InsertBrandSettingsInput>)
         .where(eq(schema.brandSettings.id, existing[0].id))
         .returning();
       return result[0] as unknown as BrandSettingsRecord;
@@ -34,7 +34,7 @@ export async function upsertSettings(
 
     const result = await pgDb
       .insert(schema.brandSettings)
-      .values(input as Partial<InsertBrandSettingsInput>)
+      .values(input as unknown as Partial<InsertBrandSettingsInput>)
       .returning();
     return result[0] as unknown as BrandSettingsRecord;
   } catch (err) {

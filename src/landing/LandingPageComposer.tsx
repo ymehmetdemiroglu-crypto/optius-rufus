@@ -1,6 +1,6 @@
 import { useReducer, useEffect } from 'react';
 import type { JSX } from 'react';
-import type { ProspectData } from '../../dtos/prospect.dto';
+import type { ProspectData } from '../dtos/prospect.dto';
 import ProgressBar from './ProgressBar';
 import StageHero from './StageHero';
 import StageAutopsy from './StageAutopsy';

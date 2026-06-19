@@ -5,7 +5,7 @@ import type {
   ProspectScoreBreakdown,
   ProspectListing,
   StageCopyData,
-} from '../dtos/prospect.dto';
+} from '../../dtos/prospect.dto';
 import { safeJsonParse } from './utils';
 import {
   getDefaultSimulatorScenarios,
@@ -58,7 +58,6 @@ export function mapBackendToProspectData(data: any): ProspectData {
         bullets: [],
       };
 
-  // ── Scores ──
   const scores: ProspectScoreBreakdown = analysis
     ? {
         overallScore: typeof analysis.overallScore === 'number' ? analysis.overallScore : 0,
@@ -66,6 +65,7 @@ export function mapBackendToProspectData(data: any): ProspectData {
         cosmoScore: typeof analysis.cosmoScore === 'number' ? analysis.cosmoScore : 0,
         semanticScore: typeof analysis.semanticScore === 'number' ? analysis.semanticScore : 0,
         contentScore: typeof analysis.contentScore === 'number' ? analysis.contentScore : 0,
+        visualScore: typeof analysis.visualScore === 'number' ? analysis.visualScore : 0,
         categoryAverage: 54,
       }
     : {
@@ -74,6 +74,7 @@ export function mapBackendToProspectData(data: any): ProspectData {
         cosmoScore: 0,
         semanticScore: 0,
         contentScore: 0,
+        visualScore: 0,
         categoryAverage: 54,
       };
 
@@ -201,6 +202,7 @@ export function mapBackendToProspectData(data: any): ProspectData {
     opportunities,
     stageCopy,
     status: (prospect.status as ProspectData['status']) || 'new',
+    outreachEmails: prospect.outreachEmails || undefined,
     views: typeof prospect.landingPageViews === 'number' ? prospect.landingPageViews : 0,
     packageType: (prospect.packageType as string) || 'package_2',
     pricePoint: typeof prospect.pricePoint === 'number' ? prospect.pricePoint : 1500,

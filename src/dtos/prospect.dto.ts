@@ -21,6 +21,7 @@ export interface ProspectScoreBreakdown {
   cosmoScore: number;
   semanticScore: number;
   contentScore: number;
+  visualScore: number;
   categoryAverage?: number;
 }
 
@@ -149,7 +150,15 @@ export interface ProspectData {
   narrative: string;
   opportunities: ProspectOpportunity[];
   stageCopy: StageCopyData;
-  status: 'new' | 'scraped' | 'analyzed' | 'emailed' | 'visited' | 'booked';
+  status: 'new' | 'scraped' | 'analyzed' | 'drafted' | 'emailed' | 'visited' | 'booked';
+  outreachEmails?: {
+    subject: string;
+    body1: string;
+    body2: string;
+    body3: string;
+    body4: string;
+    body5: string;
+  };
   views: number;
   packageType?: string;
   pricePoint?: number;

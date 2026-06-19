@@ -206,3 +206,29 @@ export async function updateReplyDetails(
     throw new Error(`Failed to update reply details for prospect ${id}: ${message}`, { cause: err });
   }
 }
+
+export async function updateOutreachEmails(
+  id: number,
+  emails: {
+    subject: string;
+    body1: string;
+    body2: string;
+    body3: string;
+    body4: string;
+    body5: string;
+  }
+): Promise<void> {
+  try {
+    await pgDb
+      .update(schema.prospects)
+      .set({ outreachEmails: emails })
+      .where(eq(schema.prospects.id, id));
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    throw new Error(
+      `Failed to update outreach emails for prospect ${id}: ${message}`,
+      { cause: err }
+    );
+  }
+}
+

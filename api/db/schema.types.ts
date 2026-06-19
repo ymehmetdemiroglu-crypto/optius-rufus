@@ -34,6 +34,14 @@ export interface ProspectRecord {
   jobTitle?: string;
   linkedinUrl?: string;
   websiteUrl?: string;
+  outreachEmails?: {
+    subject: string;
+    body1: string;
+    body2: string;
+    body3: string;
+    body4: string;
+    body5: string;
+  };
   createdAt: string;
 }
 
@@ -136,6 +144,9 @@ export interface BrandSettingsRecord {
   logoBase64?: string;
   primaryColor?: string;
   website?: string;
+  sequenceEnterprise?: string;
+  sequenceGrowth?: string;
+  sequenceStarter?: string;
   createdAt: string;
 }
 

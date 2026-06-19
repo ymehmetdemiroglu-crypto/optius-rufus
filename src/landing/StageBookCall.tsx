@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CheckCircle2, Loader2, Shield } from 'lucide-react';
-import type { BookingFormData } from '../../dtos/prospect.dto';
+import type { BookingFormData } from '../dtos/prospect.dto';
 import { trpc } from '../shared/providers/trpc';
 
 interface StageBookCallProps {

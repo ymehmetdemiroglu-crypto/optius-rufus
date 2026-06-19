@@ -256,7 +256,7 @@ export default function PeopleSearch({ onProspectImported }: PeopleSearchProps) 
             <h4 className="font-display font-black uppercase text-lg flex items-center gap-2 text-brutal-red">
               <AlertTriangle size={20} /> API Query Failure
             </h4>
-            <p className="font-mono text-xs">{(error as Error)?.message || "Verify your APOLLO_API_KEY environment variable."}</p>
+            <p className="font-mono text-xs">{error?.message || "Verify your APOLLO_API_KEY environment variable."}</p>
           </div>
         ) : !data || data.people.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center text-gray-500 space-y-2">

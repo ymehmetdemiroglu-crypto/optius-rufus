@@ -13,13 +13,20 @@ const TIER_BUDGETS_CENTS: Record<string, number> = {
 };
 
 export class TokenBudgetExceededError extends Error {
+  public prospectId: number;
+  public remainingCents: number;
+  public requestedCents: number;
+
   constructor(
     message: string,
-    public prospectId: number,
-    public remainingCents: number,
-    public requestedCents: number
+    prospectId: number,
+    remainingCents: number,
+    requestedCents: number
   ) {
     super(message);
+    this.prospectId = prospectId;
+    this.remainingCents = remainingCents;
+    this.requestedCents = requestedCents;
     this.name = "TokenBudgetExceededError";
   }
 }

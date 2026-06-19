@@ -17,11 +17,13 @@ function buildPoolConfig(): PoolConfig {
   const sslMode = process.env.DATABASE_SSL_MODE;
 
   const ssl: PoolConfig["ssl"] =
-    sslMode === "require" || sslMode === "true" || process.env.NODE_ENV === "production"
-      ? { rejectUnauthorized: true }
-      : sslMode === "prefer"
-        ? { rejectUnauthorized: false }
-        : undefined;
+    sslMode === "disable" || sslMode === "false"
+      ? undefined
+      : sslMode === "require" || sslMode === "true" || process.env.NODE_ENV === "production"
+        ? { rejectUnauthorized: true }
+        : sslMode === "prefer"
+          ? { rejectUnauthorized: false }
+          : undefined;
 
   return {
     connectionString: databaseUrl,

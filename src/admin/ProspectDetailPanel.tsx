@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react';
 import { trpc } from '../shared/providers/trpc';
-import { Cpu, Layers, Download, ExternalLink, RefreshCw } from 'lucide-react';
+import { Cpu, Layers, Download, ExternalLink, RefreshCw, Mail } from 'lucide-react';
 import PipelineStatusPanel from './PipelineStatusPanel';
 import COSMOCanvas from './COSMOCanvas';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
+import OutreachCampaignTab from './OutreachCampaignTab';
 
 interface ProspectDetailPanelProps {
   prospectId: number;
@@ -12,6 +13,7 @@ interface ProspectDetailPanelProps {
 
 export default function ProspectDetailPanel({ prospectId }: ProspectDetailPanelProps) {
   const [simulating, setSimulating] = useState(false);
+  const [activePanelTab, setActivePanelTab] = useState<"diagnostics" | "outreach">("diagnostics");
 
   // PPC Planner Control Box states
   const [dailyBudget, setDailyBudget] = useState(50);
@@ -32,7 +34,7 @@ export default function ProspectDetailPanel({ prospectId }: ProspectDetailPanelP
   const [manualOverrides, setManualOverrides] = useState<Record<number, boolean>>({});
 
   // tRPC Queries & Mutations
-  const { data: detailData, isLoading } = trpc.prospects.getById.useQuery({ id: prospectId });
+  const { data: detailData, isLoading, refetch: refetchProspect } = trpc.prospects.getById.useQuery({ id: prospectId });
   const { data: sovHistory, refetch: refetchSOV } = trpc.rufusTracker.getSOVHistory.useQuery({ prospectId });
   const { data: graphData, refetch: refetchGraph } = trpc.catalogGraph.getGraph.useQuery({ prospectId });
   const { data: brandSettings } = trpc.branding.getSettings.useQuery();
@@ -168,8 +170,30 @@ export default function ProspectDetailPanel({ prospectId }: ProspectDetailPanelP
         <PipelineStatusPanel prospectId={prospect.id} />
       </Card>
 
-      {/* PPC Planner Control Box Card */}
-      <Card className="bg-white space-y-4">
+      {/* Tab Switcher */}
+      <div className="flex border-[3px] border-brand-dark bg-white font-mono text-xs uppercase font-bold select-none shadow-brutal-sm">
+        <button
+          onClick={() => setActivePanelTab("diagnostics")}
+          className={`flex-1 py-3 text-center border-r-[3px] border-brand-dark transition-colors ${
+            activePanelTab === "diagnostics" ? "bg-brand-gold text-brand-dark font-black" : "bg-white hover:bg-gray-50 text-gray-500"
+          }`}
+        >
+          Listing Diagnostics
+        </button>
+        <button
+          onClick={() => setActivePanelTab("outreach")}
+          className={`flex-1 py-3 text-center transition-colors ${
+            activePanelTab === "outreach" ? "bg-brand-gold text-brand-dark font-black" : "bg-white hover:bg-gray-50 text-gray-500"
+          }`}
+        >
+          Outreach Campaign
+        </button>
+      </div>
+
+      {activePanelTab === "diagnostics" ? (
+        <>
+          {/* PPC Planner Control Box Card */}
+          <Card className="bg-white space-y-4">
         <h3 className="font-display font-black text-lg uppercase tracking-wider border-b-[2px] border-brand-dark pb-2">
           PPC Planner Control Box
         </h3>
@@ -490,6 +514,10 @@ export default function ProspectDetailPanel({ prospectId }: ProspectDetailPanelP
           </div>
         )}
       </Card>
+        </>
+      ) : (
+        <OutreachCampaignTab prospectId={prospectId} onStatusUpdated={refetchProspect} />
+      )}
     </div>
   );
 }

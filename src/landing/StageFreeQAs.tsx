@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { HelpCircle, Copy, Check, MessageSquare } from 'lucide-react';
-import type { FreeQAItem } from '../../dtos/prospect.dto';
+import type { FreeQAItem } from '../dtos/prospect.dto';
 
 interface StageFreeQAsProps {
   freeQAs: FreeQAItem[];

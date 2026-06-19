@@ -10,8 +10,19 @@ interface BrandingPanelProps {
     website?: string | null;
     primaryColor: string;
     logoBase64?: string | null;
+    sequenceEnterprise?: string | null;
+    sequenceGrowth?: string | null;
+    sequenceStarter?: string | null;
   } | null;
-  onSave: (data: { companyName: string; website: string; primaryColor: string; logoBase64: string }) => void;
+  onSave: (data: {
+    companyName: string;
+    website: string;
+    primaryColor: string;
+    logoBase64: string;
+    sequenceEnterprise: string;
+    sequenceGrowth: string;
+    sequenceStarter: string;
+  }) => void;
 }
 
 export default function BrandingPanel({ brandData, onSave }: BrandingPanelProps) {
@@ -19,6 +30,9 @@ export default function BrandingPanel({ brandData, onSave }: BrandingPanelProps)
   const [website, setWebsite] = useState("");
   const [primaryColor, setPrimaryColor] = useState("#b8860b");
   const [logoBase64, setLogoBase64] = useState("");
+  const [sequenceEnterprise, setSequenceEnterprise] = useState("");
+  const [sequenceGrowth, setSequenceGrowth] = useState("");
+  const [sequenceStarter, setSequenceStarter] = useState("");
 
   useEffect(() => {
     if (brandData) {
@@ -27,6 +41,9 @@ export default function BrandingPanel({ brandData, onSave }: BrandingPanelProps)
         setWebsite(brandData.website || "");
         setPrimaryColor(brandData.primaryColor);
         setLogoBase64(brandData.logoBase64 || "");
+        setSequenceEnterprise(brandData.sequenceEnterprise || "");
+        setSequenceGrowth(brandData.sequenceGrowth || "");
+        setSequenceStarter(brandData.sequenceStarter || "");
       }, 0);
     }
   }, [brandData]);
@@ -46,7 +63,15 @@ export default function BrandingPanel({ brandData, onSave }: BrandingPanelProps)
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({ companyName, website, primaryColor, logoBase64 });
+    onSave({
+      companyName,
+      website,
+      primaryColor,
+      logoBase64,
+      sequenceEnterprise,
+      sequenceGrowth,
+      sequenceStarter,
+    });
   };
 
   return (
@@ -134,6 +159,44 @@ export default function BrandingPanel({ brandData, onSave }: BrandingPanelProps)
                   </label>
                 </div>
               )}
+            </div>
+          </div>
+
+          <div className="border-t-[2px] border-brand-dark pt-6 space-y-4">
+            <h3 className="font-display font-black text-sm uppercase tracking-wider text-brand-blue">
+              Default Apollo Sequence ID Mappings
+            </h3>
+            <p className="font-mono text-[10px] text-gray-500 leading-normal">
+              Map your targeted revenue classifications to specific outreach campaigns configured in your Apollo account.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-1">
+                <label className="font-mono text-[9px] uppercase font-bold text-gray-500">Enterprise (Class A)</label>
+                <Input 
+                  type="text" 
+                  value={sequenceEnterprise}
+                  onChange={(e) => setSequenceEnterprise(e.target.value)}
+                  placeholder="Sequence ID"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="font-mono text-[9px] uppercase font-bold text-gray-500">Growth (Class B)</label>
+                <Input 
+                  type="text" 
+                  value={sequenceGrowth}
+                  onChange={(e) => setSequenceGrowth(e.target.value)}
+                  placeholder="Sequence ID"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="font-mono text-[9px] uppercase font-bold text-gray-500">Starter (Class C)</label>
+                <Input 
+                  type="text" 
+                  value={sequenceStarter}
+                  onChange={(e) => setSequenceStarter(e.target.value)}
+                  placeholder="Sequence ID"
+                />
+              </div>
             </div>
           </div>
 

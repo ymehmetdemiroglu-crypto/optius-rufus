@@ -76,4 +76,48 @@ export const prospectsRouter = router({
       );
       return { success: true };
     }),
+
+  saveOutreachEmails: publicProcedure
+    .input(
+      z.object({
+        id: z.number().int(),
+        emails: z.object({
+          subject: z.string(),
+          body1: z.string(),
+          body2: z.string(),
+          body3: z.string(),
+          body4: z.string(),
+          body5: z.string(),
+        }),
+      })
+    )
+    .mutation(async ({ input }) => {
+      await prospectService.saveOutreachEmails(input.id, input.emails);
+      return { success: true };
+    }),
+
+  approveAndEnroll: publicProcedure
+    .input(
+      z.object({
+        id: z.number().int(),
+        sequenceId: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      await prospectService.approveAndEnroll(input.id, input.sequenceId);
+      return { success: true };
+    }),
+
+  regenerateOutreach: publicProcedure
+    .input(z.object({ id: z.number().int() }))
+    .mutation(async ({ input }) => {
+      return prospectService.regenerateOutreachCopy(input.id);
+    }),
+
+  getDefaultSequenceId: publicProcedure
+    .input(z.object({ id: z.number().int() }))
+    .query(async ({ input }) => {
+      const sequenceId = await prospectService.getDefaultSequenceIdForProspect(input.id);
+      return { sequenceId };
+    }),
 });

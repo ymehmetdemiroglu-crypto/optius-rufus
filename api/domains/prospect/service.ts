@@ -127,9 +127,9 @@ export async function createProspect(
   try {
     const prospect = await prospectRepo.create(insertInput);
 
-    // Auto-enroll the prospect in the matching Apollo sequence based on expected revenue
+    // Auto-create contact in Apollo to obtain contact ID
     try {
-      const { createContact, enrollInSequence } = await import("../apollo/service.js");
+      const { createContact } = await import("../apollo/service.js");
       const contact = await createContact({
         email: prospect.email,
         firstName: prospect.firstName || undefined,
@@ -137,23 +137,12 @@ export async function createProspect(
         company: prospect.company || undefined,
       });
 
-      const tier = classifyProspectRevenue(prospect.expectedRevenue || undefined);
-      const sequenceMap = {
-        Class_A: "6a3005fee287cb000c007e03", // Enterprise
-        Class_B: "6a300617700f6b000cee5416", // Growth
-        Class_C: "6a30063082147b001cd1f361", // Starter
-      };
-      const sequenceId = sequenceMap[tier];
-
-      await enrollInSequence(contact.id, sequenceId);
-
       await prospectRepo.updateApolloFields(prospect.id, {
         apolloContactId: contact.id,
-        apolloSequenceId: sequenceId,
-        status: "emailed",
+        status: "new",
       });
     } catch (apolloErr) {
-      console.error("Failed to auto-enroll prospect in Apollo campaign:", apolloErr);
+      console.error("Failed to auto-create contact in Apollo:", apolloErr);
     }
 
     return (await prospectRepo.getById(prospect.id)) || prospect;
@@ -409,3 +398,118 @@ export async function recordActivity(
   // Emit async domain event for downstream webhook delivery
   eventBus.emit("prospect:activity", { prospectId, eventType, eventData, interestScore });
 }
+
+export async function saveOutreachEmails(
+  id: number,
+  emails: {
+    subject: string;
+    body1: string;
+    body2: string;
+    body3: string;
+    body4: string;
+    body5: string;
+  }
+): Promise<void> {
+  await prospectRepo.updateOutreachEmails(id, emails);
+}
+
+export async function approveAndEnroll(
+  id: number,
+  sequenceId: string
+): Promise<void> {
+  const data = await getProspectById(id);
+  const { prospect, listing, analysis } = data;
+  if (!prospect.apolloContactId) {
+    throw new Error(`Prospect ${id} has no associated Apollo Contact ID.`);
+  }
+
+  const emails = prospect.outreachEmails;
+  if (!emails) {
+    throw new Error(`Prospect ${id} has no drafted outreach emails to send.`);
+  }
+
+  const rufusScore = analysis?.rufusScore ?? 45;
+  const auditUrl = `https://optimusrufus.com/audit/${prospect.slug}`;
+  const category = listing?.category || "product listing";
+
+  // Parse gaps and competitor from copySimulatorScenarios
+  let topGap = "safety warnings and usage routine guidelines";
+  let competitorName = "your direct rivals";
+
+  if (analysis?.copySimulatorScenarios) {
+    try {
+      const scenarios = typeof analysis.copySimulatorScenarios === "string"
+        ? JSON.parse(analysis.copySimulatorScenarios)
+        : analysis.copySimulatorScenarios;
+      if (Array.isArray(scenarios) && scenarios.length > 0) {
+        const gapItems = scenarios.map((s: any) => s.failReason || s.buyerQuestion).slice(0, 2).filter(Boolean);
+        if (gapItems.length > 0) {
+          topGap = gapItems.join(" and ");
+        }
+        competitorName = scenarios[0].competitorName || competitorName;
+      }
+    } catch (e) {
+      // Ignored
+    }
+  }
+
+  // 1. Sync custom fields to Apollo
+  const { syncCustomFieldsToApollo, enrollInSequence } = await import("../apollo/service.js");
+  await syncCustomFieldsToApollo(prospect.apolloContactId, {
+    rufusScore,
+    topGap,
+    competitorName,
+    auditUrl,
+    category,
+    customSubject1: emails.subject,
+    customBody1: emails.body1,
+    customBody2: emails.body2,
+    customBody3: emails.body3,
+    customBody4: emails.body4,
+    customBody5: emails.body5,
+  });
+
+  // 2. Enroll in sequence
+  await enrollInSequence(prospect.apolloContactId, sequenceId);
+
+  // 3. Update local DB fields
+  await prospectRepo.updateApolloFields(id, {
+    apolloSequenceId: sequenceId,
+    status: "emailed",
+  });
+
+  // 4. Record outreach enrolled activity
+  await recordActivity(id, "outreach_enrolled", {
+    sequenceId,
+    subject: emails.subject,
+  }, 10);
+}
+
+export async function regenerateOutreachCopy(id: number): Promise<{
+  subject: string;
+  body1: string;
+  body2: string;
+  body3: string;
+  body4: string;
+  body5: string;
+}> {
+  const { generateOutreachCopy } = await import("./outreach.js");
+  const emails = await generateOutreachCopy(id);
+  await prospectRepo.updateOutreachEmails(id, emails);
+  await prospectRepo.updateStatus(id, "drafted");
+  return emails;
+}
+
+export async function getDefaultSequenceIdForProspect(prospectId: number): Promise<string | undefined> {
+  const prospect = await prospectRepo.getById(prospectId);
+  if (!prospect) return undefined;
+
+  const { getSettings } = await import("../branding/repository.js");
+  const brand = await getSettings();
+  const tier = classifyProspectRevenue(prospect.expectedRevenue || undefined);
+
+  if (tier === "Class_A") return brand?.sequenceEnterprise || "6a3005fee287cb000c007e03";
+  if (tier === "Class_B") return brand?.sequenceGrowth || "6a300617700f6b000cee5416";
+  return brand?.sequenceStarter || "6a30063082147b001cd1f361";
+}
+

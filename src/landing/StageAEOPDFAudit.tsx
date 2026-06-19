@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { Layers, CheckSquare, Compass, Send } from 'lucide-react';
-import type { ProspectData } from '../../dtos/prospect.dto';
+import type { ProspectData } from '../dtos/prospect.dto';
 
 interface StageAEOPDFAuditProps {
   prospect: ProspectData;

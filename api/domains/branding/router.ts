@@ -13,6 +13,9 @@ export const brandingRouter = router({
           logoBase64: row.logoBase64 || "",
           primaryColor: row.primaryColor || "#b8860b",
           website: row.website || "",
+          sequenceEnterprise: row.sequenceEnterprise || "6a3005fee287cb000c007e03",
+          sequenceGrowth: row.sequenceGrowth || "6a300617700f6b000cee5416",
+          sequenceStarter: row.sequenceStarter || "6a30063082147b001cd1f361",
         };
       }
     } catch (err) {
@@ -25,6 +28,9 @@ export const brandingRouter = router({
       logoBase64: "",
       primaryColor: "#b8860b",
       website: "optimusrufus.com",
+      sequenceEnterprise: "6a3005fee287cb000c007e03",
+      sequenceGrowth: "6a300617700f6b000cee5416",
+      sequenceStarter: "6a30063082147b001cd1f361",
     };
   }),
 
@@ -36,6 +42,9 @@ export const brandingRouter = router({
         logoBase64: z.string().optional(),
         primaryColor: z.string().optional(),
         website: z.string().optional(),
+        sequenceEnterprise: z.string().optional(),
+        sequenceGrowth: z.string().optional(),
+        sequenceStarter: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {

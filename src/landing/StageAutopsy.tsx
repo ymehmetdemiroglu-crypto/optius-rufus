@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Network, MessageSquare, BarChart3 } from 'lucide-react';
-import type { ProspectScoreBreakdown, CosmoNodeData, ReviewSentimentProfile } from '../../dtos/prospect.dto';
+import type { ProspectScoreBreakdown, CosmoNodeData, ReviewSentimentProfile } from '../dtos/prospect.dto';
 import { getScoreLevel, getScoreColor } from '../shared/lib/score';
 
 interface StageAutopsyProps {
@@ -84,7 +84,7 @@ export default function StageAutopsy({
   reviewSentiment,
   isPrint,
 }: StageAutopsyProps) {
-  const [hasAnimated, setHasAnimated] = useState(isPrint);
+  const [hasAnimated, setHasAnimated] = useState(!!isPrint);
   const [activeTab, setActiveTab] = useState<'scores' | 'cosmo' | 'reviews'>('scores');
   const sectionRef = useRef<HTMLElement>(null);
 

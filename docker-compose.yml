@@ -1,0 +1,99 @@
+version: '3.8'
+
+services:
+  # Primary PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: optimus-rufus-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-amazon_optimizer}
+      POSTGRES_USER: ${POSTGRES_USER:-root}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - optimus-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Qdrant Vector Database
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: optimus-rufus-qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - optimus-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Application (Vite Frontend + Hono API + Background Workers)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: optimus-rufus-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgres://${POSTGRES_USER:-root}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-amazon_optimizer}
+      - DATABASE_SSL_MODE=disable # Internal container network doesn't require SSL
+      - QDRANT_URL=http://qdrant:6333
+      # Inherit credentials/keys from the host .env file
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL}
+      - APIFY_TOKEN=${APIFY_TOKEN}
+      - APIFY_API_TOKEN=${APIFY_API_TOKEN}
+      - APOLLO_API_KEY=${APOLLO_API_KEY}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - VITE_CALENDLY_URL=${VITE_CALENDLY_URL}
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-min-32-chars}
+      - API_KEY=${API_KEY:-your-super-secret-api-key-min-32-chars}
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+    networks:
+      - optimus-network
+
+  # Optional: Cloudflare Tunnel for secure public access (as suggested in Step 4 of the roadmap)
+  # To use this, configure your tunnel on Cloudflare Zero Trust, copy the token, and add
+  # CLOUDFLARE_TUNNEL_TOKEN=<token> to your .env file, then uncomment this service.
+  # tunnel:
+  #   image: cloudflare/cloudflare/cloudflared:latest
+  #   container_name: optimus-rufus-tunnel
+  #   restart: unless-stopped
+  #   command: tunnel run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+  #   depends_on:
+  #     - app
+  #   networks:
+  #     - optimus-network
+
+volumes:
+  postgres_data:
+  qdrant_data:
+
+networks:
+  optimus-network:
+    driver: bridge
