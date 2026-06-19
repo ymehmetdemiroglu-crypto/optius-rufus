@@ -12,8 +12,8 @@ RUN npm ci
 # Copy all source files
 COPY . .
 
-# Build Vite client and compile TypeScript API server
-RUN npm run build
+# Compile TypeScript API server
+RUN npm run build:server
 
 # Prune node_modules to keep only production dependencies
 RUN npm prune --production
@@ -40,4 +40,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
   CMD curl -f http://localhost:3000/health || exit 1
 
-CMD ["node", "dist/api/boot.js"]
+CMD ["node", "dist/api/daemon.js"]

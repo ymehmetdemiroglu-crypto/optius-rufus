@@ -14,6 +14,10 @@ export class QueueWorker {
   private activePromise?: Promise<unknown>;
   private readonly pollIntervalMs: number;
 
+  get isRunning(): boolean {
+    return this.running;
+  }
+
   constructor(pollIntervalMs = 2000) {
     this.pollIntervalMs = pollIntervalMs;
   }

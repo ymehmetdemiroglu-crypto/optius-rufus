@@ -86,6 +86,17 @@ class CircuitBreaker {
   getState(): CircuitState {
     return this.state;
   }
+
+  reset(): void {
+    this.state = "closed";
+    this.failures = [];
+    this.lastFailureTime = undefined;
+    this.nextAttempt = undefined;
+    logger.info(`Circuit breaker ${this.opts.name} manually reset to closed`, {
+      service: this.opts.name,
+    });
+    eventBus.emit("circuit-breaker:closed", { name: this.opts.name });
+  }
 }
 
 const breakers = new Map<string, CircuitBreaker>();
@@ -95,4 +106,8 @@ export function getCircuitBreaker(name: string): CircuitBreaker {
     breakers.set(name, new CircuitBreaker({ name }));
   }
   return breakers.get(name)!;
+}
+
+export function getAllCircuitBreakers(): Map<string, CircuitBreaker> {
+  return breakers;
 }

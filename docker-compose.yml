@@ -40,7 +40,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # Application (Vite Frontend + Hono API + Background Workers)
+  # Application (Headless Daemon + Private HTTP API + Background Workers)
   app:
     build:
       context: .
@@ -67,6 +67,7 @@ services:
       - VITE_CALENDLY_URL=${VITE_CALENDLY_URL}
       - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-min-32-chars}
       - API_KEY=${API_KEY:-your-super-secret-api-key-min-32-chars}
+      - CLOUDFLARE_TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
     env_file:
       - .env
     depends_on:
@@ -77,18 +78,16 @@ services:
     networks:
       - optimus-network
 
-  # Optional: Cloudflare Tunnel for secure public access (as suggested in Step 4 of the roadmap)
-  # To use this, configure your tunnel on Cloudflare Zero Trust, copy the token, and add
-  # CLOUDFLARE_TUNNEL_TOKEN=<token> to your .env file, then uncomment this service.
-  # tunnel:
-  #   image: cloudflare/cloudflare/cloudflared:latest
-  #   container_name: optimus-rufus-tunnel
-  #   restart: unless-stopped
-  #   command: tunnel run --token ${CLOUDFLARE_TUNNEL_TOKEN}
-  #   depends_on:
-  #     - app
-  #   networks:
-  #     - optimus-network
+  # Cloudflare Tunnel for secure public access (as suggested in Step 4 of the roadmap)
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: optimus-rufus-tunnel
+    restart: unless-stopped
+    command: tunnel run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - app
+    networks:
+      - optimus-network
 
 volumes:
   postgres_data:

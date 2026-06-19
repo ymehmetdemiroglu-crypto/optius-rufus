@@ -19,6 +19,10 @@ export class WebhookWorker {
   private activePromise?: Promise<unknown>;
   private readonly pollIntervalMs: number;
 
+  get isRunning(): boolean {
+    return this.running;
+  }
+
   constructor(pollIntervalMs = 3000) {
     this.pollIntervalMs = pollIntervalMs;
   }
