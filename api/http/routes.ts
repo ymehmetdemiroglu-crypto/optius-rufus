@@ -123,7 +123,17 @@ export function registerHttpRoutes(app: Hono<{ Variables: AppVariables }>) {
   });
 
   app.get("/api/pdf/:slug", async (c) => {
-    return c.json({ error: "PDF generation disabled in headless mode" }, 501);
+    const slug = c.req.param("slug");
+    try {
+      const { generatePdf } = await import("../infra/pdf.js");
+      const pdfBuffer = await generatePdf(slug);
+      c.header("Content-Type", "application/pdf");
+      c.header("Content-Disposition", `attachment; filename="${slug}-rufus-audit.pdf"`);
+      return c.body(pdfBuffer);
+    } catch (err: any) {
+      logger.error("Failed to generate PDF", { error: err.message, slug });
+      return c.json({ error: "Failed to generate PDF: " + err.message }, 500);
+    }
   });
 
   app.post("/api/admin/circuit-breaker/reset", async (c) => {

@@ -5,10 +5,15 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function safeJsonParse<T>(str: string | null | undefined, fallback: T): T {
-  if (!str) return fallback;
+export function safeJsonParse<T>(str: unknown, fallback: T): T {
+  if (str === null || str === undefined) return fallback;
+  if (typeof str !== 'string') {
+    return str as T;
+  }
+  const trimmed = str.trim();
+  if (!trimmed) return fallback;
   try {
-    return JSON.parse(str) as T;
+    return JSON.parse(trimmed) as T;
   } catch {
     return fallback;
   }

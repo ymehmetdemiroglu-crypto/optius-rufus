@@ -6,6 +6,16 @@ import type { PipelineJob, StageName, StageOutput, StageContext } from "./pipeli
 import { STAGE_ORDER } from "./definitions.js";
 import { stageExecutors } from "./executors.js";
 
+const STAGE_OUTPUT_KEY_MAP: Record<string, string> = {
+  fetch: "rawListing",
+  preprocess: "cleaned",
+  embedding: "embedding",
+  semantic: "analysis",
+  optimize: "optimized",
+  competitor: "competitors",
+};
+
+
 export class PipelineEngine {
   /**
    * Insert pipeline job and stage rows into DB.
@@ -141,6 +151,10 @@ export class PipelineEngine {
         const stageState = job.stages[stageDef.name];
         if (!hasExecutedDeps && stageState && stageState.status === "completed" && stageState.output !== undefined) {
           (stageOutputs as Record<string, unknown>)[stageDef.name] = stageState.output;
+          const mappedKey = STAGE_OUTPUT_KEY_MAP[stageDef.name];
+          if (mappedKey) {
+            (stageOutputs as Record<string, unknown>)[mappedKey] = stageState.output;
+          }
           return stageState.output;
         }
 
@@ -155,6 +169,7 @@ export class PipelineEngine {
         const ctx: StageContext = {
           jobId,
           prospectId: job.prospectId,
+          listingId: job.listingId,
           packageType: job.packageType,
           correlationId,
           stageOutputs,
@@ -163,6 +178,10 @@ export class PipelineEngine {
         try {
           const output = await executor.execute(ctx);
           (stageOutputs as Record<string, unknown>)[stageDef.name] = output;
+          const mappedKey = STAGE_OUTPUT_KEY_MAP[stageDef.name];
+          if (mappedKey) {
+            (stageOutputs as Record<string, unknown>)[mappedKey] = output;
+          }
           await pipelineRepo.updateStageStatus(jobId, stageDef.name, "completed", output);
           executedStages.add(stageDef.name);
           return output;

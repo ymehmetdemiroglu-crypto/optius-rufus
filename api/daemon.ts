@@ -64,7 +64,7 @@ app.onError((err, c) => {
 });
 
 const port = parseInt(process.env.PORT || "3000", 10);
-const host = "127.0.0.1"; // Hardcoded to localhost for daemon security
+const host = process.env.HOST || "127.0.0.1";
 
 async function boot() {
   logger.info("Initializing Optimus Rufus headless daemon...");

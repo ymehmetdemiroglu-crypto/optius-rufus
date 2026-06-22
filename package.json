@@ -23,15 +23,15 @@
     "codegen:domains": "tsx scripts/codegen/domain-catalog.ts --write",
     "docs:drift": "tsx scripts/lint/api-drift-check.ts",
     "docs:check": "pnpm docs:lint && pnpm docs:frontmatter && pnpm docs:codegen:check && pnpm docs:stale",
-    "dev:daemon": "tsx api/daemon.ts",
+    "dev:daemon": "tsx --env-file=.env api/daemon.ts",
     "build:daemon": "tsc -p tsconfig.server.json",
     "daemon:start": "pm2 start ecosystem.config.cjs",
     "daemon:stop": "pm2 stop optimus-rufus-daemon",
     "daemon:restart": "pm2 restart optimus-rufus-daemon",
     "daemon:status": "pm2 status",
     "daemon:logs": "pm2 logs optimus-rufus-daemon --lines 100",
-    "daemon:health": "tsx scripts/agent/health.ts",
-    "daemon:diagnostics": "tsx scripts/agent/diagnostics.ts"
+    "daemon:health": "tsx --env-file=.env scripts/agent/health.ts",
+    "daemon:diagnostics": "tsx --env-file=.env scripts/agent/diagnostics.ts"
   },
   "dependencies": {
     "@hono/node-server": "^2.0.5",

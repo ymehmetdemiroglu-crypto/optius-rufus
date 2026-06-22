@@ -43,7 +43,8 @@ export async function createListing(
   try {
     return await listingRepo.create(insertInput);
   } catch (err) {
-    throw new Error("Failed to create listing", { cause: err });
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new Error(`Failed to create listing: ${msg}`, { cause: err });
   }
 }
 

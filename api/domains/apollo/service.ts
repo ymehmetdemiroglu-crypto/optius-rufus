@@ -42,7 +42,7 @@ export async function enrollInSequence(
   contactId: string,
   sequenceId: string
 ): Promise<{ id: string }> {
-  if (!APOLLO_API_KEY) {
+  if (!APOLLO_API_KEY || contactId.toLowerCase().startsWith("mock")) {
     return { id: `mock-enrollment-${Date.now()}` };
   }
   const result = (await apolloFetch("/emailer_campaigns/enroll_contact", {
@@ -82,7 +82,7 @@ export async function syncCustomFieldsToApollo(
     customBody5: string;
   }
 ): Promise<void> {
-  if (!APOLLO_API_KEY || contactId.startsWith("mock-")) {
+  if (!APOLLO_API_KEY || contactId.toLowerCase().startsWith("mock")) {
     return;
   }
 

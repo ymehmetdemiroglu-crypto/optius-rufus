@@ -34,11 +34,6 @@ services:
       - qdrant_data:/qdrant/storage
     networks:
       - optimus-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
 
   # Application (Headless Daemon + Private HTTP API + Background Workers)
   app:
@@ -52,6 +47,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - HOST=0.0.0.0
       - DATABASE_URL=postgres://${POSTGRES_USER:-root}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-amazon_optimizer}
       - DATABASE_SSL_MODE=disable # Internal container network doesn't require SSL
       - QDRANT_URL=http://qdrant:6333
@@ -74,7 +70,7 @@ services:
       postgres:
         condition: service_healthy
       qdrant:
-        condition: service_healthy
+        condition: service_started
     networks:
       - optimus-network
 

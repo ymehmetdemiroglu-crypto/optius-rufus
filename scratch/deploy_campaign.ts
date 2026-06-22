@@ -45,15 +45,11 @@ const limitArg = cleanArgs[0] || "10";
 const LIMIT = limitArg.toLowerCase() === "all" ? 999999 : parseInt(limitArg, 10);
 
 console.log("=================================================");
-console.log("🚀 APOLLO DRAFT SYNC & AI THREADED COPYWRITER");
+console.log("🚀 HIGH-VALUE PROSPECT DEPLOYMENT TOOL");
 console.log(`Target Limit: ${LIMIT === 999999 ? "ALL" : LIMIT}`);
 console.log(`Dry Run Mode: ${DRY_RUN ? "ENABLED" : "DISABLED"}`);
 console.log("=================================================");
 
-/**
- * CONFIGURATION: Apollo Custom Field Keys
- * Configured for a threaded sequence (1 subject, 5 bodies = 6 variables)
- */
 const FIELD_KEYS = {
   rufusScore: process.env.APOLLO_FIELD_RUFUS_SCORE || "rufus_score",
   topGap: process.env.APOLLO_FIELD_TOP_GAP || "top_gap",
@@ -61,7 +57,6 @@ const FIELD_KEYS = {
   auditUrl: process.env.APOLLO_FIELD_AUDIT_URL || "audit_url",
   category: process.env.APOLLO_FIELD_CATEGORY || "product_category",
   
-  // 6 outreach variables
   customSubject1: process.env.APOLLO_FIELD_CUSTOM_SUBJECT_1 || "custom_subject_1",
   customBody1: process.env.APOLLO_FIELD_CUSTOM_BODY_1 || "custom_body_1",
   customBody2: process.env.APOLLO_FIELD_CUSTOM_BODY_2 || "custom_body_2",
@@ -74,7 +69,13 @@ function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+let apolloFailedPermanently = false;
+
 async function apolloRequestWithRetry(url: string, method: string, body: any, retries = 3): Promise<any> {
+  if (apolloFailedPermanently) {
+    throw new Error("Apollo API bypassed due to permanent auth failure");
+  }
+
   for (let i = 0; i < retries; i++) {
     try {
       const response = await fetch(url, {
@@ -95,21 +96,25 @@ async function apolloRequestWithRetry(url: string, method: string, body: any, re
       }
 
       if (!response.ok) {
-        throw new Error(`Apollo API error: ${response.status} - ${await response.text()}`);
+        const errorText = await response.text();
+        const err = new Error(`Apollo API error: ${response.status} - ${errorText}`);
+        if (response.status === 401 || response.status === 403) {
+          apolloFailedPermanently = true;
+          console.warn(`  ❌ Permanent Apollo authentication error: ${response.status}. Skipping subsequent Apollo calls.`);
+          throw err;
+        }
+        throw err;
       }
 
       return await response.json();
     } catch (err: any) {
-      if (i === retries - 1) throw err;
+      if (apolloFailedPermanently || i === retries - 1) throw err;
       console.warn(`  ⚠️ Request failed: ${err.message}. Retrying in 5 seconds...`);
       await sleep(5000);
     }
   }
 }
 
-/**
- * Update the custom fields for a contact in Apollo.
- */
 async function syncCustomFieldsToApollo(contactId: string, fields: Record<string, any>) {
   const url = `https://api.apollo.io/v1/contacts/${contactId}`;
   
@@ -150,7 +155,7 @@ function parseSemanticGaps(scenariosRaw: string | null): string {
       return scenarios.map(s => s.failReason || s.buyerQuestion).slice(0, 2).join(" and ");
     }
   } catch (e) {
-    // Ignore and fallback
+    // Ignore
   }
   return "safety warnings and daily dosage timing guidelines";
 }
@@ -163,7 +168,7 @@ function extractCompetitor(scenariosRaw: string | null): string {
       return scenarios[0].competitorName || "your top rival";
     }
   } catch (e) {
-    // Ignore and fallback
+    // Ignore
   }
   return "your top rival";
 }
@@ -172,15 +177,9 @@ function getTierDescription(sequenceId: string | null): string {
   if (sequenceId === "6a3005fee287cb000c007e03") {
     return "Enterprise supplements/beauty brand (GMV $1M-$20M). They care about category conquesting, organic market share defense against named rivals, and catalog bundling blueprints. Keep it highly professional and business-focused.";
   }
-  if (sequenceId === "6a300617700f6b000cee5416") {
-    return "Growth supplements/beauty brand (GMV $100k-$1M). They care about organic search visibility vs. expensive PPC ad costs, listing structure gaps, and customer Q&As. Focus on ad cost reduction and efficiency.";
-  }
-  return "Starter supplements/beauty brand (GMV <$100k). They care about basic Rufus visibility, conversational bullet point structuring, and gaining initial traction. Keep it highly practical and accessible.";
+  return "Growth supplements/beauty brand (GMV $100k-$1M). They care about organic search visibility vs. expensive PPC ad costs, listing structure gaps, and customer Q&As. Focus on ad cost reduction and efficiency.";
 }
 
-/**
- * AI THREADED COPYWRITER AGENT: Generates 1 subject line and 5 email bodies.
- */
 async function generateThreadedOutreachCopy(
   p: any, 
   rufusScore: number, 
@@ -196,6 +195,8 @@ async function generateThreadedOutreachCopy(
   body_5: string; 
 }> {
   const { callLlm } = await import("../api/services/llmGateway.js");
+  const tierDescription = getTierDescription(sequenceId);
+
   const category = p.category || "product listing";
   const lowerCat = category.toLowerCase();
   const isSupplements = lowerCat.includes("supplement") || lowerCat.includes("vitamin") || lowerCat.includes("dietary") || lowerCat.includes("health") || lowerCat.includes("gummy") || lowerCat.includes("capsule") || lowerCat.includes("protein");
@@ -291,7 +292,6 @@ Output your response as JSON in the following format:
     };
   } catch (err: any) {
     console.warn(`  ⚠️ AI copywriter failed for prospect ${p.email}: ${err.message}. Using defaults.`);
-    // Fallback defaults
     return {
       subject_1: `quick scorecard for ${(p.company || "your brand").toLowerCase()}`,
       body_1: `Hey ${p.firstName || "there"},\n\nWas looking at your Amazon listing for ${category} (${p.asin || "your product"}) and noticed ${competitorName} is capturing the primary Rufus citations instead of you. \n\nRan a quick diagnostic on your listing. A few gaps:\n• You're missing ${topGap}.\n• Semantic overlap in your bullet points is confusing the LLM crawler.\n• Image alt-text lacks the high-intent keywords Rufus pulls from.\n\nBuilt a quick 2-page PDF breakdown showing how to claw those citations back. \n\nShould I send the margin-recovery checklist over?\n\nBest,\nYahya`,
@@ -304,7 +304,7 @@ Output your response as JSON in the following format:
 }
 
 async function main() {
-  // Query analyzed prospects who have listing analysis reports and valid Apollo contact IDs
+  // Query analyzed prospects who have valid Apollo Contact IDs and belong to Class_A or Class_B campaigns
   const query = `
     SELECT p.*, l.brand, l.category, a.rufusScore, a.cosmoScore, a.copySimulatorScenarios, a.copyHeroHeadline, a.copyHeroSubheadline, a.id as analysisId
     FROM prospects p
@@ -314,19 +314,20 @@ async function main() {
       AND p.apolloContactId != '' 
       AND p.apolloContactId NOT LIKE 'mock-%'
       AND p.status = 'analyzed'
+      AND p.apolloSequenceId IN ('6a3005fee287cb000c007e03', '6a300617700f6b000cee5416')
     ORDER BY p.id ASC
   `;
 
   const targets = sqliteDb.prepare(query).all() as any[];
-  console.log(`\nFound ${targets.length} analyzed prospects ready to sync to Apollo.`);
+  console.log(`\nFound ${targets.length} high-value (Class_A/B) analyzed prospects ready to deploy.`);
 
   if (targets.length === 0) {
-    console.log("🎉 No prospects found waiting to be synced!");
+    console.log("🎉 No high-value prospects found waiting to be deployed!");
     return;
   }
 
   const toProcess = targets.slice(0, LIMIT);
-  console.log(`Preparing to sync ${toProcess.length} contacts.`);
+  console.log(`Deploying ${toProcess.length} contacts...`);
 
   let successCount = 0;
   let failCount = 0;
@@ -335,9 +336,8 @@ async function main() {
     const p = toProcess[idx];
     const progress = `[${idx + 1}/${toProcess.length}]`;
     
-    // Parse listing diagnostics
     const rufusScore = p.rufusScore || 45;
-    const auditUrl = `https://optimusrufus.com/audit/${p.slug}`;
+    const auditUrl = `https://optimusrufus.com/api/pdf/${p.slug}`;
     const category = p.category || "product listing";
     
     const topGap = parseSemanticGaps(p.copySimulatorScenarios);
@@ -347,69 +347,72 @@ async function main() {
     }
     const sequenceId = p.apolloSequenceId;
 
-    console.log(`\n${progress} Processing: ${p.firstName || ""} ${p.lastName || ""} @ ${p.company || "No Company"}`);
+    console.log(`\n${progress} Deploying: ${p.firstName || ""} ${p.lastName || ""} @ ${p.company || "No Company"}`);
     console.log(`  - ASIN: ${p.asin || "N/A"}`);
     console.log(`  - Rufus Score: ${rufusScore}/100`);
     console.log(`  - Top Gap: "${topGap}"`);
     console.log(`  - Competitor: "${competitorName}"`);
-    console.log(`  - Assigned Sequence ID: ${sequenceId || "None"}`);
+    console.log(`  - Sequence ID: ${sequenceId}`);
 
-    // Generate custom threaded 5-touch copywriting
-    console.log(`  Generating custom AI threaded 5-touch outreach copy...`);
+    // Generate copy
+    console.log(`  Generating copy drafts...`);
     const copy = await generateThreadedOutreachCopy(p, rufusScore, topGap, competitorName, sequenceId);
-    console.log(`  Generated Subject 1: "${copy.subject_1}"`);
+    console.log(`  Generated Subject: "${copy.subject_1}"`);
 
     if (DRY_RUN) {
-      console.log("\n  [Dry-Run] Threaded 5-Touch Outreach Previews:");
+      console.log("\n  [Dry-Run] Threaded Outreach Preview:");
       console.log(`  ==================================================`);
-      console.log(`  ✉️ TOUCH 1 (New Thread)`);
       console.log(`  Subject: ${copy.subject_1}`);
-      console.log(`  Body:\n${copy.body_1}`);
+      console.log(`  Body 1:\n${copy.body_1}`);
       console.log(`  --------------------------------------------------`);
-      console.log(`  ✉️ TOUCH 2 (Threaded Reply)`);
-      console.log(`  Body:\n${copy.body_2}`);
-      console.log(`  --------------------------------------------------`);
-      console.log(`  ✉️ TOUCH 3 (Threaded Reply)`);
-      console.log(`  Body:\n${copy.body_3}`);
-      console.log(`  --------------------------------------------------`);
-      console.log(`  ✉️ TOUCH 4 (Threaded Reply)`);
-      console.log(`  Body:\n${copy.body_4}`);
-      console.log(`  --------------------------------------------------`);
-      console.log(`  ✉️ TOUCH 5 (Threaded Reply)`);
-      console.log(`  Body:\n${copy.body_5}`);
+      console.log(`  Body 2:\n${copy.body_2}`);
       console.log(`  ==================================================\n`);
       successCount++;
       continue;
     }
 
-    try {
-      // 1. Sync fields directly to the contact in Apollo (including custom subject & 5 bodies!)
-      await syncCustomFieldsToApollo(p.apolloContactId, {
-        rufusScore,
-        topGap,
-        competitorName,
-        auditUrl,
-        category,
-        
-        customSubject1: copy.subject_1,
-        customBody1: copy.body_1,
-        customBody2: copy.body_2,
-        customBody3: copy.body_3,
-        customBody4: copy.body_4,
-        customBody5: copy.body_5
-      });
-      console.log(`  ✅ Successfully updated threaded custom fields in Apollo.`);
+    let apolloSuccess = false;
+    if (apolloFailedPermanently) {
+      console.log(`  Skipping Apollo sync (permanent auth failure detected).`);
+    } else {
+      try {
+        // 1. Sync fields to Apollo
+        console.log(`  Syncing custom fields to Apollo contact ${p.apolloContactId}...`);
+        await syncCustomFieldsToApollo(p.apolloContactId, {
+          rufusScore,
+          topGap,
+          competitorName,
+          auditUrl,
+          category,
+          
+          customSubject1: copy.subject_1,
+          customBody1: copy.body_1,
+          customBody2: copy.body_2,
+          customBody3: copy.body_3,
+          customBody4: copy.body_4,
+          customBody5: copy.body_5
+        });
+        console.log(`  ✅ Synced successfully.`);
 
-      // 2. Save generated subject and body in local DB for reference
-      // Touch 1 maps to copy_autopsy, Touch 2 maps to copy_bleed, Touch 3 maps to copy_roadmap,
-      // Touch 4 maps to copy_problem_narrative, Touch 5 maps to copy_urgency_cta
+        // 2. Enroll in Sequence in Apollo
+        console.log(`  Enrolling in Apollo Sequence ${sequenceId}...`);
+        await enrollContactInSequence(p.apolloContactId, sequenceId);
+        console.log(`  ✅ Enrolled successfully.`);
+        apolloSuccess = true;
+      } catch (err: any) {
+        console.warn(`  ⚠️ Apollo API calls failed: ${err.message}. Proceeding with local draft creation.`);
+      }
+    }
+
+    try {
+      // 3. Save copy locally
       sqliteDb.prepare(`
         UPDATE listing_analyses
-        SET copy_autopsy_headline = ?, copy_autopsy_body = ?,
-            copy_bleed_headline = ?, copy_bleed_body = ?,
-            copy_roadmap_headline = ?, copy_roadmap_body = ?,
-            copy_personalized_hook = ?, copy_problem_narrative = ?,
-            copy_solution_pitch = ?, copy_urgency_cta = ?
+        SET copyAutopsyHeadline = ?, copyAutopsyBody = ?,
+            copyBleedHeadline = ?, copyBleedBody = ?,
+            copyRoadmapHeadline = ?, copyRoadmapBody = ?,
+            copyPersonalizedHook = ?, copyProblemNarrative = ?,
+            copySolutionPitch = ?, copyUrgencyCTA = ?
         WHERE id = ?
       `).run(
         copy.subject_1, copy.body_1, 
@@ -419,38 +422,29 @@ async function main() {
         `Re: ${copy.subject_1}`, copy.body_5, 
         p.analysisId
       );
-      console.log(`  ✅ Logged 5-touch generated copies in local database.`);
 
-      // 3. Enroll contact in sequence if assigned
-      if (sequenceId) {
-        await enrollContactInSequence(p.apolloContactId, sequenceId);
-        console.log(`  ✅ Successfully enrolled contact in sequence ${sequenceId}.`);
-      } else {
-        console.log(`  ⚠️ No sequence assigned in DB. Skipping campaign enrollment.`);
-      }
-
-      // 4. Update status in local database so they don't get processed next run
+      // 4. Update status in local DB
       sqliteDb.prepare(`
         UPDATE prospects
         SET status = 'drafted'
         WHERE id = ?
       `).run(p.id);
-
-      console.log(`  ✅ Marked status as 'drafted' in database.`);
+      
+      console.log(`  ✅ Completed. status updated to 'drafted'${apolloSuccess ? ' (Live Enrolled)' : ' (Local draft only)'}.`);
       successCount++;
       
       // Delay to avoid hitting Apollo rate limits (1.5 seconds)
       await sleep(1500);
     } catch (err: any) {
-      console.error(`  ❌ Failed to sync Apollo contact for ID ${p.id}:`, err.message);
+      console.error(`  ❌ Failed to save local draft for prospect ${p.id}:`, err.message);
       failCount++;
     }
   }
 
   console.log("\n=================================================");
-  console.log("📊 APOLLO DRAFT SYNC COMPLETE");
-  console.log(`- Successfully Synced: ${successCount}`);
-  console.log(`- Failed:              ${failCount}`);
+  console.log("📊 CAMPAIGN DEPLOYMENT COMPLETE");
+  console.log(`- Successfully Deployed: ${successCount}`);
+  console.log(`- Failed:               ${failCount}`);
   console.log("=================================================");
 }
 

@@ -66,6 +66,15 @@ export async function generateOutreachCopy(prospectId: number): Promise<Outreach
     }
   }
 
+  if (!competitorName || competitorName.toLowerCase() === "your top rival" || competitorName.toLowerCase() === "unknown") {
+    competitorName = "your direct competitor";
+  }
+
+  const lowerCat = category.toLowerCase();
+  const isSupplements = lowerCat.includes("supplement") || lowerCat.includes("vitamin") || lowerCat.includes("dietary") || lowerCat.includes("health") || lowerCat.includes("gummy") || lowerCat.includes("capsule") || lowerCat.includes("protein");
+  const isBeauty = lowerCat.includes("beauty") || lowerCat.includes("skin") || lowerCat.includes("cosmetic") || lowerCat.includes("serum") || lowerCat.includes("shampoo") || lowerCat.includes("cream");
+  const nicheType = isSupplements ? "supplements" : (isBeauty ? "beauty" : "general");
+
   // Get sequence id to determine tier guidelines
   const sequenceId = prospect.apolloSequenceId;
   let tierDescription = "Starter supplements/beauty brand (GMV <$100k). They care about basic Rufus visibility, conversational bullet point structuring, and gaining initial traction. Keep it highly practical and accessible.";
@@ -75,45 +84,57 @@ export async function generateOutreachCopy(prospectId: number): Promise<Outreach
     tierDescription = "Growth supplements/beauty brand (GMV $100k-$1M). They care about organic search visibility vs. expensive PPC ad costs, listing structure gaps, and customer Q&As. Focus on ad cost reduction and efficiency.";
   }
 
-  const systemPrompt = `You are an elite B2B cold email copywriter specializing in high-converting outreach to Amazon FBA private-label sellers.
-Your task is to write a 5-touch cold email sequence targeting an Amazon supplements or health/beauty seller.
+  const systemPrompt = `You are an elite direct-response copywriter writing cold outreach to e-commerce founders regarding their Amazon Rufus conversational search indexing.
+Your tone must sound like an informal Slack message or an email sent from an iPhone while walking to get coffee. Avoid all agency-style formal fluff.
 
-The entire sequence (Touch 1 to 5) will be threaded under a single email thread (Touch 2, 3, 4, and 5 are sent as replies to Touch 1).
-This means you must write ONE subject line for the first email, and FIVE custom email bodies.
-The goal of the sequence is to get them to reply so we can send them a custom interactive Rufus Compatibility Autopsy report we generated for their brand.
+CRITICAL DIRECTIVES:
+1. SENDER PERSONA: Write as an independent technical listing scientist or technical consultant. Never sound like a sales representative, agency, or software tool.
+2. CASUAL PUNCTUATION & CAPITALIZATION: Use natural casual formatting. Keep sentences short and punchy. Touch 1 starts with a warm, casual greeting ("Hey ${firstName},").
+3. FOLLOW-UPS: Follow-up touches (Touch 2 to 5) are threaded replies (replies to Touch 1). Do NOT include greetings, intro statements, or generic signature blocks in follow-up touches. They must read like natural mobile replies (under 40 words).
+4. COMPETITOR SANITIZATION: If competitorName is "your top competitor" or similar placeholder, rewrite it naturally (e.g., "your direct competitor").
+5. micro-CTAs: CTAs must be low-friction questions asking if you should send a quick doc or checklist (e.g., "Should I send the margin-recovery checklist over?", "Reply 'PDF' and I'll drop the file over?").
+6. SIGNATURE: Sign Touch 1 naturally using "Yahya" or "Yahya @ RufusReady".
+7. PROSPECT CONTEXT:
+   - Category: ${category}
+   - Niche: ${nicheType}
+   - ASIN: ${asin}
+   - Competitor: ${competitorName}
+   - Listing gaps identified: ${topGap}
 
-Target Brand Tier Context:
-${tierDescription}
+BANNED TERMS LIST (Strictly Enforced):
+- Banned terms: "are lacking", "is deficient", "impacting your visibility", "optimize your listing", "optimize", "custom PDF audit report", "report", "Would you like to reply...", "visibility", "deficient", "audit", "weaknesses".
+- Replace with: "you're missing", "isn't there", "stealing your sales", "taking your traffic", "fix this", "claw back citations", "2-page PDF breakdown", "checklist", "Should I send it over?", "Drop it here?".
 
-Outreach Rules (Strictly Enforced):
-- Subject line must be under 7 words. Use all lowercase, casual, pattern-interrupt style.
-- Email bodies must be direct, short, conversational, and highly specific. Use simple, non-corporate language.
-- Deliverability: Do NOT include any URLs or links (no Calendly, no audit link) in any of the emails.
-- CTA: Always end with a question/request asking them to reply to get the audit, playbook, or checklist.
-- Placeholder Constraint: Never include bracketed placeholders like [Your Name], [top rival], or brackets of any kind. All copy must be 100% complete and ready to send.
-- Signature: Sign all emails naturally using "Yahya" or "Yahya @ RufusReady".
-- Competitor formatting: If the competitor name is "your top rival" or unknown, do not use the phrase "your top rival" literally in the email. Instead, write naturally using terms like "your top category competitor" or "your direct rivals".
-
-Thread Continuity Rules:
-- Touch 1 starts the thread. Touch 2 to 5 are replies.
-- Do NOT include generic greetings like "Hi [Name]" or "Hope you are well" in Touch 2, 3, 4, or 5. Since they are threaded replies, start directly with the point.
-- Keep follow-up email bodies extremely brief (under 60 words for follow-ups).
-
-Trigger facts to integrate:
-- Prospect First Name: ${firstName}
-- Company: ${company}
-- Category: ${category}
-- ASIN: ${asin}
-- Rufus Compatibility Score: ${rufusScore}/100
-- Top Competitor: ${competitorName}
-- Gaps: ${topGap}
-
-Touch Guidelines:
-- Touch 1 (Curiosity Hook - Max 85 words): Introduce their low Rufus Compatibility Score (${rufusScore}/100) and how competitor ${competitorName} is stealing citations due to gaps in ${topGap}. Ask if they want the audit report.
-- Touch 2 (Competitor Agitation - Max 60 words): Quick reply follow-up. Highlight how ${competitorName} comparison formatting or Q&A scaffolding is stealing search share of voice. Ask if they want the recovery playbook.
-- Touch 3 (Quick Consult Offer - Max 50 words): Quick reply follow-up. Offer a free 10-minute slot this week to show them the gaps and competitor map directly. 
-- Touch 4 (Margin Squeeze Angle - Max 70 words): Quick reply follow-up. Reference the 3.5% FBA fuel surcharge Amazon added in April 2026. Explain that improving organic Rufus visibility offsets PPC dependency and recovers margins. Ask if they want the margin-saving checklist.
-- Touch 5 (Scarcity Nudge - Max 45 words): Quick reply follow-up. Final breakup nudge. Let them know we'll archive their custom report by the end of the week. Ask if they want the link before we close the ticket.
+Touch Guidelines & Niche-Specific Copy Templates (Adapt dynamically for ${company}):
+- Subject Line: Casual, pattern-interrupt, under 7 words, all lowercase. E.g. "quick scorecard for ${company.toLowerCase()}".
+- Touch 1 (The Scorecard - Max 85 words):
+  Hey ${firstName},
+  Was looking at your Amazon listing for ${category} (${asin}) and noticed ${competitorName} is capturing the primary Rufus citations instead of you. 
+  Ran a quick diagnostic on your listing. A few gaps:
+  ${nicheType === "supplements" ? `• You're missing ${topGap} in your attribute tables.
+  • Semantic overlap in your bullet points is confusing the LLM crawler.
+  • Your customer Q&As don't address the high-intent keywords Rufus index looks for.` : nicheType === "beauty" ? `• You're missing ${topGap} in your listing text.
+  • Rufus crawler isn't indexing your image alt-text for conversational queries.
+  • Review sentiment mapping is highlighting competitors for key buyer search terms.` : `• You're missing ${topGap}.
+  • Semantic overlap in your bullet points is confusing the LLM crawler.
+  • Image alt-text lacks the high-intent keywords Rufus pulls from.`}
+  Built a quick 2-page PDF breakdown showing how to claw those citations back.
+  Should I send the margin-recovery checklist over?
+  Best,
+  Yahya
+- Touch 2 (The Mobile Bump - Max 30 words):
+  Hey ${firstName} - just checking if you saw this?
+  No worries if you're swamped, but wanted to make sure it didn't get buried. Reply 'PDF' and I'll drop the file over?
+- Touch 3 (The Competitor Shift - Max 40 words):
+  Hey ${firstName}, quick update on this.
+  Looks like ${competitorName} just picked up another comparison citation for your main search term. It's actively pulling traffic from your detail page.
+  Still want that margin-recovery checklist?
+- Touch 4 (Margin Squeeze Angle - Max 60 words):
+  ${nicheType === "supplements" ? `With Amazon's 3.5% FBA surcharge added in April, margins on dietary supplements are getting squeezed. Organic Rufus citations convert at 4x higher than standard search ads, so fixing this directly cuts your ad spend.` : `Margins on e-commerce are getting tighter this quarter. Winning organic citations in Rufus search chat helps drive zero-cost traffic to your brand, directly offsetting rising PPC costs.`}
+  Should I send the checklist showing how to fix it?
+- Touch 5 (Scarcity Nudge - Max 40 words):
+  I'm cleaning up my drive and will archive that 2-page PDF breakdown for ${company} by Friday.
+  If you want a copy before it's gone, just reply "PDF" and I'll send it over.
 
 Output your response as JSON in the following format:
 {
@@ -152,12 +173,12 @@ Output your response as JSON in the following format:
     logger.warn(`AI copywriter failed for prospect ${prospect.email}: ${err.message}. Using defaults.`);
     // Fallback defaults
     return {
-      subject: `question about ${company} (${asin})`,
-      body1: `Hi ${firstName},\n\nYour Amazon Rufus compatibility score is ${rufusScore}/100.\nAmazon's shopping AI is steering buyers to ${competitorName} due to listing gaps in: ${topGap}.\n\nReply to this email if you want me to send you the full interactive compatibility autopsy report we generated.`,
-      body2: `Just following up on this. We simulated several Rufus questions for ${category} and noticed ${competitorName} is dominating the citations because of their Q&A section.\n\nI have the 3-step listing recovery playbook ready. Let me know if you want me to drop the link.`,
-      body3: `Would you be open to a quick 10-minute check this week to review the Rufus gaps and competitor data? I have slots Tuesday at 2pm ET and Thursday at 10am ET.\n\nWhich works better?`,
-      body4: `That 3.5% FBA surcharge Amazon added in April is hurting margins for ${category}. One lever most brands miss is reducing PPC ad dependency by gaining organic Rufus visibility.\n\nI created a Rufus margin-recovery checklist showing how. Reply if you want a copy.`,
-      body5: `I'm going to archive the interactive Rufus compatibility audit I generated for ${company} by the end of the week.\n\nIf you want the link to check it out before it's deleted, let me know.`
+      subject: `quick scorecard for ${company.toLowerCase()}`,
+      body1: `Hey ${firstName},\n\nWas looking at your Amazon listing for ${category} (${asin}) and noticed ${competitorName} is capturing the primary Rufus citations instead of you. \n\nRan a quick diagnostic on your listing. A few gaps:\n• You're missing ${topGap}.\n• Semantic overlap in your bullet points is confusing the LLM crawler.\n• Image alt-text lacks the high-intent keywords Rufus pulls from.\n\nBuilt a quick 2-page PDF breakdown showing how to claw those citations back. \n\nShould I send the margin-recovery checklist over?\n\nBest,\nYahya`,
+      body2: `Hey ${firstName} - just checking if you saw this? \n\nNo worries if you're swamped, but wanted to make sure it didn't get buried. Reply 'PDF' and I'll drop the file over?`,
+      body3: `Hey ${firstName}, quick update on this. \n\nLooks like ${competitorName} just picked up another comparison citation for your main search term. It's actively pulling traffic from your detail page. \n\nStill want that margin-recovery checklist?`,
+      body4: `${nicheType === "supplements" ? `With Amazon's 3.5% FBA surcharge added in April, margins on dietary supplements are getting squeezed. Organic Rufus citations convert at 4x higher than standard search ads, so fixing this directly cuts your ad spend.` : `Margins on e-commerce are getting tighter this quarter. Winning organic citations in Rufus search chat helps drive zero-cost traffic to your brand, directly offsetting rising PPC costs.`}\n\nShould I send the checklist showing how to fix it?`,
+      body5: `I'm cleaning up my drive and will archive that 2-page PDF breakdown for ${company} by Friday. \n\nIf you want a copy before it's gone, just reply "PDF" and I'll send it over.`
     };
   }
 }

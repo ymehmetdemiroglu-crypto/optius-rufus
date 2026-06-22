@@ -30,7 +30,6 @@ RUN apk add --no-cache curl
 # Copy compiled files, database schemas/migrations, and production dependencies
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/api ./api
-COPY --from=builder /app/db ./db
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 

@@ -3,6 +3,32 @@ import { Pool, type PoolConfig } from "pg";
 import * as schema from "./schema.js";
 import { logger } from "../infra/logger.js";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
+import fs from "fs";
+import path from "path";
+
+// Self-load .env configuration if present
+try {
+  const envPath = path.resolve(process.cwd(), ".env");
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, "utf-8");
+    for (const line of envContent.split("\n")) {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith("#") && trimmed.includes("=")) {
+        const index = trimmed.indexOf("=");
+        const key = trimmed.substring(0, index).trim();
+        let val = trimmed.substring(index + 1).trim();
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+          val = val.substring(1, val.length - 1);
+        }
+        if (!process.env[key]) {
+          process.env[key] = val;
+        }
+      }
+    }
+  }
+} catch (e) {
+  // Ignored
+}
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -57,10 +83,9 @@ if (databaseUrl) {
   // Create a proxy dbInstance that logs a warning on query execution instead of crashing at import time
   dbInstance = new Proxy({} as NodePgDatabase<typeof schema>, {
     get(_target, prop) {
-      return (...args: unknown[]) => {
+      return (..._args: unknown[]) => {
         logger.error(
-          `❌ Database query failed: DATABASE_URL is not set. Cannot perform "${String(prop)}" operation.`,
-          { args }
+          `❌ Database query failed: DATABASE_URL is not set. Cannot perform "${String(prop)}" operation.`
         );
         throw new Error("Database not connected. DATABASE_URL environment variable is missing.");
       };
