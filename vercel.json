@@ -1,22 +1,13 @@
 {
-  "cleanUrls": true,
   "buildCommand": "npm run build:client",
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/p/:path*",
-      "destination": "/index.html"
+      "source": "/api/(.*)",
+      "destination": "/api"
     },
     {
-      "source": "/admin/:path*",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/admin",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/((?!api/|assets/|favicon.svg|icons.svg).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
