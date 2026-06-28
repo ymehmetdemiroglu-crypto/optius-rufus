@@ -22,18 +22,25 @@ export default function ReportNotFound(): JSX.Element {
           </p>
         </div>
 
-        <div className="border-[3px] border-white/10 bg-white/5 p-6 md:p-8 space-y-3 backdrop-blur-sm">
-          <p className="text-sm text-white/70 font-medium leading-relaxed">
-            We couldn&apos;t find a listing analysis for this link. If this is a mistake, please verify the URL or contact us to request an audit.
+        <div className="border-[3px] border-white/10 bg-white/5 p-6 md:p-8 space-y-4 backdrop-blur-sm">
+          <p className="text-sm text-white/80 font-medium leading-relaxed">
+            This diagnostic link may have expired or contains a typo. Don't worry—you can generate an instant Rufus listing overhaul directly on our terminal.
           </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <a 
+              href="/#stage-book"
+              className="w-full sm:w-auto bg-brand-gold text-brand-dark font-black px-6 py-3.5 border-[3px] border-brand-dark shadow-brutal hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all uppercase font-mono text-xs tracking-wider text-center"
+            >
+              INITIALIZE AUDIT NOW →
+            </a>
+            <a 
+              href="/"
+              className="w-full sm:w-auto bg-white/10 text-white font-bold px-6 py-3.5 border-[2px] border-white/20 hover:bg-white/20 transition-all uppercase font-mono text-xs tracking-wider text-center"
+            >
+              Return to Home
+            </a>
+          </div>
         </div>
-
-        <a 
-          href="/"
-          className="inline-block bg-brand-gold text-brand-dark font-bold px-6 py-3 border-[3px] border-brand-dark shadow-brutal hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-brutal-hover active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-100 uppercase font-mono text-xs tracking-wider"
-        >
-          Go to Home
-        </a>
       </div>
     </div>
   );
