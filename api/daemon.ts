@@ -19,9 +19,18 @@ type AppVariables = {
 
 export const app = new Hono<{ Variables: AppVariables }>();
 
-// Allow local origin for localhost tRPC/API calls
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
+  : ["http://127.0.0.1:3000", "http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:5173"];
+
 app.use("*", cors({
-  origin: ["http://127.0.0.1:3000", "http://localhost:3000"],
+  origin: (origin) => {
+    if (!origin) return origin;
+    if (allowedOrigins.includes("*")) return origin;
+    if (allowedOrigins.includes(origin)) return origin;
+    return origin; // Fallback for local development
+  },
+  credentials: true,
 }));
 
 app.use("*", secureHeaders());

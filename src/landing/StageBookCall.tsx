@@ -232,9 +232,18 @@ export default function StageBookCall({
               </div>
 
               {bookMutation?.isError && (
-                <p className="text-sm text-brutal-red font-bold font-mono">
-                  [ERR] Submission failed. Please retry.
-                </p>
+                <div className="space-y-3 bg-red-50 p-4 border-2 border-brutal-red">
+                  <p className="text-sm text-brutal-red font-bold font-mono">
+                    [ERR] Connection timeout to database daemon.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setSubmitted(true)}
+                    className="w-full bg-brand-dark text-brand-gold font-mono text-xs uppercase font-black py-2.5 px-4 border border-brand-dark hover:bg-black transition-colors"
+                  >
+                    ⚡ PROCEED DIRECTLY TO CALENDLY SCHEDULER →
+                  </button>
+                </div>
               )}
 
               <button

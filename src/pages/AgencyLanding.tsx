@@ -244,6 +244,53 @@ export default function AgencyLanding() {
         </div>
       </section>
 
+      {/* ── HOW IT WORKS SECTION ── */}
+      <section id="how-it-works" className="py-20 px-6 max-w-7xl mx-auto space-y-16 border-b-4 border-brand-dark">
+        <div className="text-center space-y-4 max-w-3xl mx-auto">
+          <span className="font-mono text-xs uppercase tracking-widest text-brand-blue font-black">
+            [THE METHODOLOGY] 3-STEP ALGORITHM ALIGNMENT
+          </span>
+          <h2 className="display-heading text-3xl md:text-5xl text-brand-dark">
+            How Optimus Rufus Dominates Amazon AI Search
+          </h2>
+          <p className="text-brand-dark/70 font-mono text-sm">
+            We bridge the gap between human persuasion and machine indexing using empirical COSMO knowledge graph mapping.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="brutalist-card p-8 space-y-4 bg-white shadow-brutal border-3 border-brand-dark">
+            <div className="font-mono text-2xl font-black text-brand-gold bg-brand-dark w-10 h-10 flex items-center justify-center border border-brand-dark">
+              01
+            </div>
+            <h3 className="font-display font-black text-xl text-brand-dark">Semantic Gap Autopsy</h3>
+            <p className="text-sm text-brand-dark/80 leading-relaxed font-sans">
+              Our AI diagnostic terminal extracts your ASIN, parses competitor intent vectors, and isolates broken COSMO entity links that cause Rufus to bypass your product.
+            </p>
+          </div>
+
+          <div className="brutalist-card p-8 space-y-4 bg-white shadow-brutal border-3 border-brand-dark">
+            <div className="font-mono text-2xl font-black text-brand-gold bg-brand-dark w-10 h-10 flex items-center justify-center border border-brand-dark">
+              02
+            </div>
+            <h3 className="font-display font-black text-xl text-brand-dark">COSMO Graph Re-Engineering</h3>
+            <p className="text-sm text-brand-dark/80 leading-relaxed font-sans">
+              We rewrite your Title, 5 Bullet Points, Product Description, and A+ Modular Layout using targeted high-density intent nodes engineered specifically for Rufus dialogues.
+            </p>
+          </div>
+
+          <div className="brutalist-card p-8 space-y-4 bg-white shadow-brutal border-3 border-brand-dark">
+            <div className="font-mono text-2xl font-black text-brand-gold bg-brand-dark w-10 h-10 flex items-center justify-center border border-brand-dark">
+              03
+            </div>
+            <h3 className="font-display font-black text-xl text-brand-dark">Guaranteed 85+ Rufus Deployment</h3>
+            <p className="text-sm text-brand-dark/80 leading-relaxed font-sans">
+              We deliver your complete asset bundle within 5 business days. We benchmark final indexation—guaranteeing an 85+ Rufus Score or issuing a 100% refund.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── DELIVERABLES / WHAT YOU GET ── */}
       <section id="deliverables" className="py-20 px-6 max-w-7xl mx-auto space-y-16">
         <div className="text-center space-y-4 max-w-3xl mx-auto">
