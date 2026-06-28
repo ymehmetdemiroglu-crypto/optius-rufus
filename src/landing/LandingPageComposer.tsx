@@ -12,10 +12,12 @@ import StagePPCPlanner from './StagePPCPlanner';
 import StageBundlingBlueprint from './StageBundlingBlueprint';
 import StageAEOPDFAudit from './StageAEOPDFAudit';
 import StageRoadmap from './StageRoadmap';
-import StageProofWall from './StageProofWall';
+import StageSocialProof from './StageSocialProof';
 import StageBookCall from './StageBookCall';
 import FloatingCTA from './FloatingCTA';
 import BrandStyleInjector from './BrandStyleInjector';
+import HemorrhageCounter from './HemorrhageCounter';
+import CountdownTimer from './CountdownTimer';
 import { STAGES } from '../shared/lib/stages';
 
 const TOTAL_STAGES = STAGES.length;
@@ -68,6 +70,18 @@ export default function LandingPageComposer({
           currentStage={currentStage}
           totalStages={TOTAL_STAGES}
           visible={scanComplete}
+        />
+      )}
+
+      {!isPrint && (
+        <HemorrhageCounter
+          price={prospect.listing.price}
+          reviewCount={prospect.listing.reviewCount}
+          rufusScore={prospect.scores.rufusScore}
+          overallScore={prospect.scores.overallScore}
+          category={prospect.listing.category}
+          visible={scanComplete}
+          onScrollToBooking={scrollToBooking}
         />
       )}
 
@@ -169,9 +183,15 @@ export default function LandingPageComposer({
           </div>
 
           <div id="stage-proof">
-            <StageProofWall
+            <CountdownTimer
+              slug={prospect.slug}
+              visible={isPrint || maxStage >= 8}
+              onScrollToBooking={scrollToBooking}
+            />
+            <StageSocialProof
               headline={stageCopy.socialProofHeadline}
               urgencyCTA={stageCopy.urgencyCTA}
+              category={prospect.listing.category}
               onOpenBooking={scrollToBooking}
               visible={isPrint || maxStage >= 8}
             />

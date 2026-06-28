@@ -390,6 +390,14 @@ async function handleTelegramCallback(callbackQuery: {
       // Enroll contact in Apollo reply sequence
       await enrollInSequence(prospect.apolloContactId, replySequenceId);
 
+      // Trigger direct backup email failsafe
+      try {
+        const { sendAuditLinkFallbackEmail } = await import("./email.js");
+        await sendAuditLinkFallbackEmail(prospectId);
+      } catch (emailErr) {
+        logger.error("Fallback audit link email error:", { error: String(emailErr) });
+      }
+
       // Update local db status
       await db
         .update(schema.prospects)
@@ -399,17 +407,17 @@ async function handleTelegramCallback(callbackQuery: {
       if (chatId) {
         await replyToChat(
           chatId,
-          `🚀 *[Success]* PDF successfully delivered via Apollo!\n\n` +
+          `🚀 *[Success]* Multi-channel delivery triggered (Apollo + Direct Email)!\n\n` +
           `• *Prospect:* ${prospect.company || "N/A"} (${prospect.email})\n` +
           `• *Apollo Contact:* \`${prospect.apolloContactId}\`\n` +
           `• *Enrolled in Sequence:* \`${replySequenceId}\`\n` +
-          `• *PDF Link:* ${auditUrl}`
+          `• *Audit Link:* ${auditUrl}`
         );
       }
     } catch (err) {
       logger.error("Failed to execute reply approval:", { error: String(err) });
       if (chatId) {
-        await replyToChat(chatId, `❌ Failed to approve and send PDF: ${String(err)}`);
+        await replyToChat(chatId, `❌ Failed to approve and send audit link: ${String(err)}`);
       }
     }
   }

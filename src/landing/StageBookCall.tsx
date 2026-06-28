@@ -62,7 +62,7 @@ export default function StageBookCall({
     headline.startsWith("Book Your Free") ||
     headline.includes("Listing Audit")
   ) {
-    displayHeadline = prospectName ? `Initialize Your Listing Overhaul, ${prospectName}` : `Initialize Your Listing Overhaul`;
+    displayHeadline = prospectName ? `[CRITICAL] ${prospectName}, Your Window Is Closing` : `[CRITICAL] Your Window Is Closing`;
   }
 
   const bookMutation = trpc.booking?.create?.useMutation({
@@ -161,6 +161,30 @@ export default function StageBookCall({
               </p>
             </div>
 
+            {/* ── Sales Call Hype & Live Demo Agenda Box ── */}
+            <div className="border-[3px] border-brand-dark bg-brand-dark text-white p-6 md:p-8 space-y-4 shadow-brutal-lg font-mono">
+              <div className="flex items-center gap-3 border-b border-white/20 pb-3">
+                <span className="bg-brand-gold text-brand-dark text-xs font-black uppercase px-2.5 py-1">[LIVE SESSION]</span>
+                <h3 className="font-display font-black text-lg md:text-xl text-brand-gold uppercase tracking-wide">
+                  WHAT HAPPENS ON YOUR 15-MINUTE BRIEFING:
+                </h3>
+              </div>
+              <ul className="space-y-3 text-xs md:text-sm text-white/90 leading-relaxed font-sans font-medium">
+                <li className="flex items-start gap-2.5">
+                  <span className="text-brand-gold font-bold shrink-0 text-base">⚡</span>
+                  <span><strong>Live Threat Assessment:</strong> We run your listing through our Rufus sandbox in real-time — you watch your competitors steal your traffic, then watch the patched version reclaim it.</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="text-brand-gold font-bold shrink-0 text-base">📊</span>
+                  <span><strong>Competitor Kill Map:</strong> We identify every intent node your rivals are intercepting and build a 48-hour blitz plan to systematically recapture your organic market share.</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="text-brand-gold font-bold shrink-0 text-base">🎯</span>
+                  <span><strong>Zero-Friction Deployment:</strong> Walk away with production-ready copy, 15 structured Q&A seed nodes, and a PPC keyword map — ready to publish to Seller Central immediately.</span>
+                </li>
+              </ul>
+            </div>
+
             <div className="brutalist-card p-6 md:p-8 space-y-5 shadow-brutal-lg">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -245,7 +269,7 @@ export default function StageBookCall({
                     <span>INITIALIZING...</span>
                   </>
                 ) : (
-                  <span>INITIALIZE ONBOARDING SEQUENCE →</span>
+                  <span>DEPLOY FIX NOW →</span>
                 )}
               </button>
             </div>
@@ -260,7 +284,7 @@ export default function StageBookCall({
                   [GUARANTEE] RISK ELIMINATION PROTOCOL
                 </h4>
                 <p className="text-sm font-bold text-brand-dark/90 leading-relaxed">
-                  {displayGuarantee}
+                  85+ Rufus Score in 48 hours or full refund. No calls, no forms, no friction. Your listing hits the target or you pay nothing.
                 </p>
               </div>
             </div>

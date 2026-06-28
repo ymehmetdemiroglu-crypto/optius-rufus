@@ -455,7 +455,7 @@ export async function approveAndEnroll(
   }
 
   const rufusScore = analysis?.rufusScore ?? 45;
-  const auditUrl = `https://optimusrufus.com/audit/${prospect.slug}`;
+  const auditUrl = `https://optimusrufus.com/p/${prospect.slug}`;
   const category = listing?.category || "product listing";
 
   // Parse gaps and competitor from copySimulatorScenarios

@@ -196,7 +196,7 @@ export async function generateOutreachCopy(prospectId: number): Promise<Outreach
 
   const category = cleanCategory(listing?.category ?? null);
   const shortTitle = cleanProductTitle(listing?.title ?? null, category);
-  const auditUrl = `https://optimusrufus.com/audit/${prospect.slug}`;
+  const auditUrl = `https://optimusrufus.com/p/${prospect.slug}`;
 
   const rufusScore = analysis?.rufusScore ?? 0;
   const overallScore = analysis?.overallScore ?? 60;

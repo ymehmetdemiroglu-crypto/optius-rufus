@@ -19,16 +19,14 @@ export const app = new Hono<{ Variables: AppVariables }>();
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
-  : process.env.NODE_ENV === "production"
-    ? []
-    : ["*"];
+  : ["*"];
 
 app.use("*", cors({
   origin: (origin) => {
-    if (!origin) return origin;
+    if (!origin) return "*";
     if (allowedOrigins.includes("*")) return origin;
     if (allowedOrigins.includes(origin)) return origin;
-    return null;
+    return origin;
   },
 }));
 

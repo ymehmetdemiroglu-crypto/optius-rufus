@@ -104,3 +104,76 @@ export async function sendAuditReadyEmail(prospectId: number): Promise<void> {
     logger.error(`Failed to send audit ready email for prospect ${prospectId}: ${msg}`, { error: err });
   }
 }
+
+export async function sendAuditLinkFallbackEmail(prospectId: number): Promise<void> {
+  try {
+    const prospect = await prospectRepo.getById(prospectId);
+    if (!prospect) {
+      throw new Error(`Prospect not found: ${prospectId}`);
+    }
+
+    const listing = await listingRepo.getLatestByProspectId(prospectId);
+    const appUrl = process.env.APP_URL || "http://localhost:3000";
+    const reportUrl = `${appUrl}/p/${prospect.slug}`;
+    const name = prospect.firstName || "there";
+    const brand = listing?.brand || prospect.company || "your brand";
+
+    const subject = `Your Requested Interactive Listing Audit — ${brand}`;
+
+    const htmlBody = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 2px solid #000000; border-radius: 4px; background-color: #ffffff; color: #1a202c; box-shadow: 6px 6px 0px #b8860b;">
+        <h2 style="color: #000000; border-bottom: 3px solid #b8860b; padding-bottom: 10px; font-size: 22px; font-weight: 900; margin-top: 0; tracking: 1px;">OPTIMUS RUFUS DIAGNOSTIC TERMINAL</h2>
+        <p style="font-size: 16px; line-height: 1.6; margin-top: 20px;">Hi ${name},</p>
+        <p style="font-size: 16px; line-height: 1.6;">Thanks for requesting your interactive listing audit for <strong>${brand}</strong>.</p>
+        
+        <p style="font-size: 16px; line-height: 1.6;">We built a live interactive teardown environment mapping your listing's exact Rufus AI retrieval gaps, COSMO intent graph bottlenecks, and daily revenue leakage to competing brands.</p>
+        
+        <div style="text-align: center; margin: 35px 0;">
+          <a href="${reportUrl}" style="background-color: #b8860b; color: #000000; padding: 16px 36px; font-size: 18px; font-weight: 900; text-decoration: none; border-radius: 2px; border: 3px solid #000000; box-shadow: 4px 4px 0px #000000; display: inline-block; text-transform: uppercase;">Launch Live Interactive Terminal →</a>
+        </div>
+
+        <p style="font-size: 14px; color: #4a5568; line-height: 1.5;">You can also download your full 10-page clinical PDF diagnostic report directly inside the terminal.</p>
+
+        <p style="font-size: 14px; color: #718096; line-height: 1.5; margin-top: 30px; border-top: 2px solid #e2e8f0; padding-top: 15px;">
+          Best regards,<br/>
+          <strong>Optimus Rufus Lead Diagnostics Team</strong><br/>
+          <span style="font-size: 12px; font-family: monospace;">optimusrufus.com</span>
+        </p>
+      </div>
+    `;
+
+    if (RESEND_API_KEY) {
+      logger.info(`Sending fallback audit link email to ${prospect.email}...`);
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${RESEND_API_KEY}`,
+        },
+        body: JSON.stringify({
+          from: DEFAULT_SENDER,
+          to: [prospect.email],
+          subject: subject,
+          html: htmlBody,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Resend email delivery failed: ${response.status} ${await response.text()}`);
+      }
+      logger.info(`Fallback audit email sent successfully to ${prospect.email}`);
+    } else {
+      console.log("\n----------------================ [FALLBACK AUDIT EMAIL LOG] ================----------------");
+      console.log(`From:    ${DEFAULT_SENDER}`);
+      console.log(`To:      ${prospect.email}`);
+      console.log(`Subject: ${subject}`);
+      console.log(`Link:    ${reportUrl}`);
+      console.log("--------------------------------------------------------------------------------------------\n");
+      logger.info(`Dev mode: Fallback outbound email logged to terminal console.`);
+    }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    logger.error(`Failed to send audit link fallback email for prospect ${prospectId}: ${msg}`, { error: err });
+  }
+}
+

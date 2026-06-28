@@ -13,7 +13,7 @@ async function sendTelegramNotification(booking: BookingRecord) {
   try {
     const prospect = await prospectRepo.getById(booking.prospectId);
     const slug = prospect?.slug || "";
-    const auditUrl = slug ? `https://optimusrufus.com/audit/${slug}` : "N/A";
+    const auditUrl = slug ? `https://optimusrufus.com/p/${slug}` : "N/A";
 
     const text = `🚨 *New Rufus Audit Booking!* 🚨\n\n` +
       `👤 *Name:* ${booking.name}\n` +

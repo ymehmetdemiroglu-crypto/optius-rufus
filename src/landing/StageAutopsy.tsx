@@ -48,8 +48,15 @@ function AnimatedScore({ label, score, description, delay, animate, isPrint }: A
     return () => clearTimeout(timeout);
   }, [animate, score, delay, isPrint]);
 
+  const dangerClass =
+    level === 'critical'
+      ? 'danger-zone-critical'
+      : level === 'warning'
+        ? 'danger-zone-warning'
+        : 'danger-zone-good';
+
   return (
-    <div className="brutalist-card brutalist-card-hover space-y-3 bg-white">
+    <div className={`brutalist-card brutalist-card-hover space-y-3 bg-white ${dangerClass}`}>
       <p className="font-mono text-xs uppercase tracking-widest text-brand-dark/50 font-black">
         {label}
       </p>
