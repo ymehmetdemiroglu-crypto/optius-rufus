@@ -76,6 +76,9 @@ export default function StageBookCall({
     e.preventDefault();
     if (!form.name || !form.email) return;
 
+    // Transition immediately to Calendly scheduler for frictionless onboarding
+    setSubmitted(true);
+
     bookMutation?.mutate({
       prospectId: prospectId || undefined,
       name: form.name,
@@ -230,21 +233,6 @@ export default function StageBookCall({
                   placeholder="Number of ASINs, specific concerns, etc."
                 />
               </div>
-
-              {bookMutation?.isError && (
-                <div className="space-y-3 bg-red-50 p-4 border-2 border-brutal-red">
-                  <p className="text-sm text-brutal-red font-bold font-mono">
-                    [ERR] Connection timeout to database daemon.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setSubmitted(true)}
-                    className="w-full bg-brand-dark text-brand-gold font-mono text-xs uppercase font-black py-2.5 px-4 border border-brand-dark hover:bg-black transition-colors"
-                  >
-                    ⚡ PROCEED DIRECTLY TO CALENDLY SCHEDULER →
-                  </button>
-                </div>
-              )}
 
               <button
                 type="submit"
