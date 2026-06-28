@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { TRPCProvider } from './shared/providers/trpc';
 import { ErrorBoundary } from './shared/ErrorBoundary';
 
+const AgencyLanding = lazy(() => import('./pages/AgencyLanding'));
 const ProspectLanding = lazy(() => import('./pages/ProspectLanding'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 
@@ -29,11 +30,11 @@ export default function App() {
               {/* Personalized prospect landing pages */}
               <Route path="/p/:slug" element={<ProspectLanding />} />
 
-              {/* Root: Main landing (using mock-prospect as default) */}
-              <Route path="/" element={<ProspectLanding />} />
+              {/* Root: Agency Main Landing Page */}
+              <Route path="/" element={<AgencyLanding />} />
 
               {/* Catch-all */}
-              <Route path="*" element={<ProspectLanding />} />
+              <Route path="*" element={<AgencyLanding />} />
             </Routes>
           </Suspense>
         </ErrorBoundary>
@@ -41,4 +42,5 @@ export default function App() {
     </TRPCProvider>
   );
 }
+
 

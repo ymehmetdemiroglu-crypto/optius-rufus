@@ -45,7 +45,7 @@ async function sendTelegramNotification(booking: BookingRecord) {
 }
 
 export interface CreateBookingInput {
-  prospectId: number;
+  prospectId?: number;
   name: string;
   email: string;
   company?: string;
@@ -57,8 +57,35 @@ export interface CreateBookingInput {
 export async function createBooking(
   input: CreateBookingInput
 ): Promise<BookingRecord> {
+  let targetProspectId = input.prospectId;
+
+  if (!targetProspectId) {
+    try {
+      const existing = await prospectRepo.getByEmail(input.email);
+      if (existing) {
+        targetProspectId = existing.id;
+      } else {
+        const slug = `organic-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+        const nameParts = input.name.trim().split(" ");
+        const newProspect = await prospectRepo.create({
+          slug,
+          email: input.email,
+          firstName: nameParts[0] || input.name,
+          lastName: nameParts.slice(1).join(" ") || undefined,
+          company: input.company,
+          expectedRevenue: input.revenue,
+          status: "organic_lead",
+        });
+        targetProspectId = newProspect.id;
+      }
+    } catch (err) {
+      console.warn("Could not query/create organic prospect, proceeding with fallback ID 1:", err);
+      targetProspectId = 1;
+    }
+  }
+
   const insertInput: InsertBookingInput = {
-    prospectId: input.prospectId,
+    prospectId: targetProspectId,
     name: input.name,
     email: input.email,
     company: input.company,
@@ -80,6 +107,7 @@ export async function createBooking(
     throw new Error("Failed to create booking", { cause: err });
   }
 }
+
 
 export async function getBookingsByProspectId(
   prospectId: number

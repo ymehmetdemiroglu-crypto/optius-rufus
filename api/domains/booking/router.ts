@@ -6,7 +6,7 @@ export const bookingRouter = router({
   create: publicProcedure
     .input(
       z.object({
-        prospectId: z.number().int(),
+        prospectId: z.number().int().optional(),
         name: z.string(),
         email: z.string().email(),
         company: z.string().optional(),

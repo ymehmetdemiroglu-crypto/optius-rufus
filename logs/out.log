@@ -6673,3 +6673,83 @@
 2026-06-28 11:41:33 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:41:33.393Z"}
 2026-06-28 11:41:59 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:41:59.139Z"}
 2026-06-28 11:41:59 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:41:59.143Z"}
+2026-06-28 11:42:24 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:42:24.982Z"}
+2026-06-28 11:42:24 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:42:24.986Z"}
+2026-06-28 11:42:50 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:42:50.598Z"}
+2026-06-28 11:42:50 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:42:50.601Z"}
+2026-06-28 11:43:16 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:43:16.189Z"}
+2026-06-28 11:43:16 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:43:16.192Z"}
+2026-06-28 11:43:41 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:43:41.773Z"}
+2026-06-28 11:43:41 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:43:41.775Z"}
+2026-06-28 11:44:07 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:44:07.323Z"}
+2026-06-28 11:44:07 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:44:07.325Z"}
+2026-06-28 11:44:32 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:44:32.923Z"}
+2026-06-28 11:44:32 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:44:32.925Z"}
+2026-06-28 11:44:58 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:44:58.573Z"}
+2026-06-28 11:44:58 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:44:58.575Z"}
+2026-06-28 11:45:24 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:45:24.149Z"}
+2026-06-28 11:45:24 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:45:24.151Z"}
+2026-06-28 11:45:49 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:45:49.789Z"}
+2026-06-28 11:45:49 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:45:49.791Z"}
+2026-06-28 11:46:15 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:46:15.375Z"}
+2026-06-28 11:46:15 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:46:15.378Z"}
+2026-06-28 11:46:40 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:46:40.948Z"}
+2026-06-28 11:46:40 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:46:40.951Z"}
+2026-06-28 11:47:06 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:47:06.499Z"}
+2026-06-28 11:47:06 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:47:06.502Z"}
+2026-06-28 11:47:32 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:47:32.139Z"}
+2026-06-28 11:47:32 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:47:32.142Z"}
+2026-06-28 11:47:57 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:47:57.714Z"}
+2026-06-28 11:47:57 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:47:57.717Z"}
+2026-06-28 11:48:23 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:48:23.367Z"}
+2026-06-28 11:48:23 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:48:23.369Z"}
+2026-06-28 11:48:49 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:48:49.073Z"}
+2026-06-28 11:48:49 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:48:49.077Z"}
+2026-06-28 11:49:14 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:49:14.699Z"}
+2026-06-28 11:49:14 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:49:14.701Z"}
+2026-06-28 11:49:40 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:49:40.293Z"}
+2026-06-28 11:49:40 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:49:40.295Z"}
+2026-06-28 11:50:05 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:50:05.879Z"}
+2026-06-28 11:50:05 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:50:05.882Z"}
+2026-06-28 11:50:31 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:50:31.442Z"}
+2026-06-28 11:50:31 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:50:31.445Z"}
+2026-06-28 11:51:01 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:51:01.020Z"}
+2026-06-28 11:51:01 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:51:01.024Z"}
+2026-06-28 11:51:06 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:51:06.708Z"}
+2026-06-28 11:51:06 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:51:06.712Z"}
+2026-06-28 11:51:32 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:51:32.293Z"}
+2026-06-28 11:51:32 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:51:32.295Z"}
+2026-06-28 11:51:37 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:51:37.858Z"}
+2026-06-28 11:51:37 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:51:37.860Z"}
+2026-06-28 11:52:03 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:52:03.427Z"}
+2026-06-28 11:52:03 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:52:03.429Z"}
+2026-06-28 11:52:08 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:52:08.973Z"}
+2026-06-28 11:52:08 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:52:08.975Z"}
+2026-06-28 11:52:14 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:52:14.523Z"}
+2026-06-28 11:52:14 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:52:14.525Z"}
+2026-06-28 11:52:20 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:52:20.052Z"}
+2026-06-28 11:52:20 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:52:20.055Z"}
+2026-06-28 11:52:25 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:52:25.623Z"}
+2026-06-28 11:52:25 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:52:25.625Z"}
+2026-06-28 11:52:31 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:52:31.167Z"}
+2026-06-28 11:52:31 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:52:31.170Z"}
+2026-06-28 11:52:36 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:52:36.908Z"}
+2026-06-28 11:52:36 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:52:36.911Z"}
+2026-06-28 11:53:03 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:53:03.588Z"}
+2026-06-28 11:53:03 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:53:03.596Z"}
+2026-06-28 11:53:29 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:53:29.383Z"}
+2026-06-28 11:53:29 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:53:29.386Z"}
+2026-06-28 11:53:55 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:53:55.192Z"}
+2026-06-28 11:53:55 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:53:55.196Z"}
+2026-06-28 11:54:20 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:54:20.919Z"}
+2026-06-28 11:54:20 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:54:20.924Z"}
+2026-06-28 11:54:46 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:54:46.542Z"}
+2026-06-28 11:54:46 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:54:46.545Z"}
+2026-06-28 11:55:12 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:55:12.173Z"}
+2026-06-28 11:55:12 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:55:12.176Z"}
+2026-06-28 11:55:38 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:55:38.387Z"}
+2026-06-28 11:55:38 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:55:38.393Z"}
+2026-06-28 11:56:04 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:56:04.108Z"}
+2026-06-28 11:56:04 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:56:04.111Z"}
+2026-06-28 11:56:30 +03:00: {"level":"info","message":"Initializing Optimus Rufus headless daemon...","timestamp":"2026-06-28T08:56:30.624Z"}
+2026-06-28 11:56:30 +03:00: {"level":"info","message":"Starting database migrations...","timestamp":"2026-06-28T08:56:30.630Z"}

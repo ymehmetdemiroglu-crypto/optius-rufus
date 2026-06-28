@@ -6,13 +6,14 @@ import { trpc } from '../shared/providers/trpc';
 interface StageBookCallProps {
   headline: string;
   guarantee: string;
-  prospectId: number;
-  prospectName: string;
-  prospectEmail: string;
+  prospectId?: number;
+  prospectName?: string;
+  prospectEmail?: string;
   visible: boolean;
   packageType?: string;
   pricePoint?: number;
 }
+
 
 const revenueOptions = [
   '<$10k/mo',
@@ -61,7 +62,7 @@ export default function StageBookCall({
     headline.startsWith("Book Your Free") ||
     headline.includes("Listing Audit")
   ) {
-    displayHeadline = `Initialize Your Listing Overhaul, ${prospectName}`;
+    displayHeadline = prospectName ? `Initialize Your Listing Overhaul, ${prospectName}` : `Initialize Your Listing Overhaul`;
   }
 
   const bookMutation = trpc.booking?.create?.useMutation({
@@ -76,7 +77,7 @@ export default function StageBookCall({
     if (!form.name || !form.email) return;
 
     bookMutation?.mutate({
-      prospectId,
+      prospectId: prospectId || undefined,
       name: form.name,
       email: form.email,
       company: form.company || undefined,
@@ -84,6 +85,7 @@ export default function StageBookCall({
       notes: form.notes || undefined,
     });
   };
+
 
   const update = (field: keyof BookingFormData, value: string) => {
     setForm((f) => ({ ...f, [field]: value }));
