@@ -3,7 +3,7 @@ loadEnv();
 
 import { db } from "../../api/db/drizzle.js";
 import * as schema from "../../api/db/schema.js";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, sql, desc } from "drizzle-orm";
 
 async function run() {
   const args = process.argv.slice(2);
@@ -44,7 +44,7 @@ async function run() {
       })
       .from(schema.prospects)
       .where(whereClause)
-      .orderBy(sql`${schema.prospects.createdAt} DESC`)
+      .orderBy(desc(schema.prospects.createdAt))
       .limit(limitFilter);
 
     if (jsonMode) {
@@ -73,7 +73,7 @@ async function run() {
     }
     console.log("");
   } catch (err) {
-    console.error(`❌ Failed to list prospects:`, (err as Error).message);
+    console.error(`❌ Failed to list prospects:`, err);
   }
 }
 

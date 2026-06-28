@@ -108,7 +108,9 @@ async function boot() {
   process.on("SIGINT", () => shutdown("SIGINT"));
 }
 
-boot().catch((err) => {
-  logger.error("Fatal boot error", { error: String(err), stack: err instanceof Error ? err.stack : undefined });
-  process.exit(1);
-});
+if (!process.env.VERCEL) {
+  boot().catch((err) => {
+    logger.error("Fatal boot error", { error: String(err), stack: err instanceof Error ? err.stack : undefined });
+    process.exit(1);
+  });
+}

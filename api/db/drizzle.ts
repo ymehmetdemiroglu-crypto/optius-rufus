@@ -42,12 +42,14 @@ function buildPoolConfig(): PoolConfig {
   const maxConnections = parseInt(process.env.DATABASE_POOL_MAX || "20", 10);
   const sslMode = process.env.DATABASE_SSL_MODE;
 
+  const isCloudDb = databaseUrl.includes("supabase") || databaseUrl.includes("pooler") || databaseUrl.includes("neon");
+
   const ssl: PoolConfig["ssl"] =
     sslMode === "disable" || sslMode === "false"
       ? undefined
-      : sslMode === "require" || sslMode === "true" || process.env.NODE_ENV === "production"
+      : sslMode === "require"
         ? { rejectUnauthorized: true }
-        : sslMode === "prefer"
+        : isCloudDb || process.env.NODE_ENV === "production" || sslMode === "prefer" || sslMode === "true"
           ? { rejectUnauthorized: false }
           : undefined;
 
