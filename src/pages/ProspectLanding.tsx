@@ -4,7 +4,6 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { trpc } from '../shared/providers/trpc';
 import { mapBackendToProspectData } from '../shared/lib/prospectMapper';
 import type { ProspectData } from '../dtos/prospect.dto';
-import { MOCK_PROSPECT_DATA } from '../shared/lib/mockProspectData';
 import { useActivityTracker } from '../shared/hooks/useActivityTracker';
 import { STAGE_NAMES, STAGE_IDS } from '../shared/lib/stages';
 import SkeletonLoader from '../landing/SkeletonLoader';
@@ -15,7 +14,7 @@ import { usePipeline } from '../shared/hooks/usePipeline';
 
 export default function ProspectLanding(): JSX.Element {
   const { slug: urlSlug } = useParams<{ slug: string }>();
-  const slug = urlSlug || 'mock-prospect';
+  const slug = urlSlug || '';
   const [searchParams] = useSearchParams();
   const isPrint = searchParams.get('print') === 'true';
 
@@ -23,19 +22,17 @@ export default function ProspectLanding(): JSX.Element {
   const [currentStage, setCurrentStage] = useState(0);
   const hasIncremented = useRef(false);
 
-  const isMock = slug === 'mock-prospect';
-
   const { data, isLoading, refetch } = trpc.prospects.getBySlug.useQuery(
     { slug: slug || '' },
-    { enabled: !!slug && !isMock }
+    { enabled: !!slug }
   );
 
   const { data: brandData } = trpc.branding.getSettings.useQuery();
 
   const incrementViews = trpc.prospects.incrementViews.useMutation();
 
-  const prospectId = isMock ? 5 : (data?.prospect?.id as number ?? 0);
-  const isAuditPending = !isMock && data?.prospect && data.prospect.status !== 'analyzed';
+  const prospectId = data?.prospect?.id as number ?? 0;
+  const isAuditPending = data?.prospect && data.prospect.status !== 'analyzed';
 
   // Live pipeline update hook via Server-Sent Events (SSE)
   const { job, isConnected, error } = usePipeline({
@@ -72,11 +69,11 @@ export default function ProspectLanding(): JSX.Element {
   }, []);
 
   useEffect(() => {
-    if (slug && !isMock && incrementViews && !hasIncremented.current) {
+    if (slug && incrementViews && !hasIncremented.current) {
       hasIncremented.current = true;
       incrementViews.mutate({ slug });
     }
-  }, [slug, incrementViews, isMock]);
+  }, [slug, incrementViews]);
 
   useEffect(() => {
     if (!scanComplete) return;
@@ -132,11 +129,11 @@ export default function ProspectLanding(): JSX.Element {
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
-  if (isLoading && !isMock) {
+  if (isLoading) {
     return <SkeletonLoader />;
   }
 
-  if (!data && !isMock) {
+  if (!data) {
     return <ReportNotFound />;
   }
 
@@ -153,7 +150,7 @@ export default function ProspectLanding(): JSX.Element {
     );
   }
 
-  const prospect: ProspectData = isMock ? MOCK_PROSPECT_DATA : mapBackendToProspectData(data);
+  const prospect: ProspectData = mapBackendToProspectData(data);
 
   return (
     <LandingPageComposer

@@ -44,8 +44,8 @@ export default function StageHero({
       <div className="max-w-4xl w-full mx-auto relative z-10 space-y-8">
         {/* Badge */}
         <div className="inline-flex items-center gap-2 bg-brutal-red text-white border-[3px] border-white/20 px-4 py-2 font-mono text-xs uppercase tracking-widest font-black shadow-[3px_3px_0px_rgba(255,255,255,0.2)]">
-          <AlertTriangle className="h-4 w-4" />
-          <span>DIAGNOSTIC REPORT FOR {listing.brand?.toUpperCase() || 'YOUR BRAND'}</span>
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          <span>[SYS] DIAGNOSTIC TERMINAL — {listing.brand?.toUpperCase() || 'YOUR BRAND'} {listing.asin ? `// ASIN: ${listing.asin}` : ''}</span>
         </div>
 
         {/* Headline */}
@@ -85,11 +85,11 @@ export default function StageHero({
               onClick={() => setScanStarted(true)}
               className="brutalist-btn bg-brand-gold text-brand-dark text-base md:text-lg"
             >
-              <span>RUN FREE AUTOPSY ON {listing.asin || 'YOUR LISTING'}</span>
+              <span>INITIALIZE DIAGNOSTIC</span>
               <span className="text-xl">→</span>
             </button>
             <p className="text-xs font-mono text-white/40 uppercase tracking-widest">
-              Takes 4 seconds • No signup required • 100% free
+              Runtime: ~4s • No credentials required • Read-only scan
             </p>
           </div>
         ) : (

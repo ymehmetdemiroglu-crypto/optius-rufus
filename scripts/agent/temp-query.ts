@@ -3,34 +3,59 @@ loadEnv();
 
 import { db } from "../../api/db/drizzle.js";
 import * as schema from "../../api/db/schema.js";
-import { and, eq, isNotNull, not } from "drizzle-orm";
+import { and, eq, isNotNull, not, sql, like, or, ilike, ne } from "drizzle-orm";
+
+import { inArray } from "drizzle-orm";
+
+import { syncCustomFieldsToApollo } from "../../api/domains/apollo/service.js";
+
+import { getProspectById } from "../../api/domains/prospect/service.js";
+
+async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+import { generateOutreachCopy } from "../../api/domains/prospect/outreach.js";
 
 async function run() {
   try {
-    const list = await db
-      .select({
-        id: schema.prospects.id,
-        firstName: schema.prospects.firstName,
-        lastName: schema.prospects.lastName,
-        asin: schema.prospects.asin,
-        status: schema.prospects.status,
-        company: schema.prospects.company,
-      })
+    const totalEmailed = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.prospects)
+      .where(eq(schema.prospects.status, "emailed"));
+
+    const withWebsite = await db
+      .select({ count: sql<number>`count(*)` })
       .from(schema.prospects)
       .where(
         and(
-          isNotNull(schema.prospects.asin),
-          not(eq(schema.prospects.asin, "N/A")),
-          not(eq(schema.prospects.asin, ""))
+          eq(schema.prospects.status, "emailed"),
+          isNotNull(schema.prospects.websiteUrl),
+          ne(schema.prospects.websiteUrl, "")
         )
-      )
-      .limit(10);
+      );
 
-    console.log("PROSPECTS_WITH_ASIN_RESULT:");
-    console.log(JSON.stringify(list, null, 2));
-  } catch (err) {
-    console.error("Error querying:", err);
+    const withRealEmail = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.prospects)
+      .where(
+        and(
+          eq(schema.prospects.status, "emailed"),
+          not(like(schema.prospects.email, "no-email-%"))
+        )
+      );
+
+    console.log("=== EMAILED PROSPECTS STATUS ===");
+    console.log(`Total Emailed: ${totalEmailed[0].count}`);
+    console.log(`With Website URL: ${withWebsite[0].count}`);
+    console.log(`With Real Emails: ${withRealEmail[0].count}`);
+    process.exit(0);
+  } catch (err: any) {
+    console.error("Failed to run inspection:", err.message);
+    process.exit(1);
   }
 }
 
 run();
+
+

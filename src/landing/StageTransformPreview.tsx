@@ -79,7 +79,7 @@ export default function StageTransformPreview({
       <div className="max-w-5xl w-full mx-auto space-y-10">
         <div className="text-center space-y-3">
           <p className="font-mono text-xs uppercase tracking-widest text-brand-blue font-black">
-            OPTIMIZATION PREVIEW
+            [DIFF] OPTIMIZATION OUTPUT
           </p>
           <h2 className="display-heading text-3xl md:text-5xl text-brand-dark">
             {headline}
@@ -103,13 +103,13 @@ export default function StageTransformPreview({
               onClick={() => setShowAfter(false)}
               className={`transform-toggle-option ${!showAfter ? 'active' : 'text-brand-dark'}`}
             >
-              Current
+              [CURRENT] BROKEN
             </button>
             <button
               onClick={() => setShowAfter(true)}
               className={`transform-toggle-option ${showAfter ? 'active' : 'text-brand-dark'}`}
             >
-              Optimized
+              [PATCHED] OPTIMIZED
             </button>
           </div>
         </div>
@@ -129,7 +129,7 @@ export default function StageTransformPreview({
                 </span>
                 {showAfter && (
                   <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-green-600 bg-green-50 px-2 py-0.5 border border-green-300">
-                    OPTIMIZED
+                    [PATCHED]
                   </span>
                 )}
               </div>
@@ -155,10 +155,10 @@ export default function StageTransformPreview({
         <div className="border-[3px] border-brand-dark bg-brand-bg p-6 shadow-brutal space-y-4 mt-12">
           <div className="flex items-center gap-2">
             <Play className="h-5 w-5 text-brand-blue fill-brand-blue" />
-            <h3 className="font-display font-black text-xl text-brand-dark">Rufus Compatibility Sandbox</h3>
+            <h3 className="font-display font-black text-xl text-brand-dark">[LIVE] Semantic Gap Closure Sandbox</h3>
           </div>
-          <p className="text-sm text-brand-dark/80 font-medium leading-relaxed">
-            Test how adding usage timing, ingredient purity, and safety guidelines closes semantic gaps. Update the bullet point text below and click "Test Optimization".
+          <p className="text-sm text-brand-dark/80 font-medium leading-relaxed font-mono text-xs">
+            Modify the listing copy below. Our engine scores semantic gap closure in real time.
           </p>
 
           <div className="space-y-4">
@@ -181,7 +181,7 @@ export default function StageTransformPreview({
                 {successMsg && sandboxScore > contentScore && (
                   <span className="text-green-600 font-mono text-xs font-black animate-bounce flex items-center gap-1">
                     <CheckCircle className="h-3.5 w-3.5" />
-                    <span>+{sandboxScore - contentScore} points! Gaps Closed</span>
+                    <span>[OK] +{sandboxScore - contentScore} pts // gaps sealed</span>
                   </span>
                 )}
               </div>
@@ -193,7 +193,7 @@ export default function StageTransformPreview({
                   isTesting ? 'opacity-65 pointer-events-none' : ''
                 }`}
               >
-                {isTesting ? 'Analyzing Semantic Gaps...' : 'Test Optimization'}
+                {isTesting ? 'Analyzing Semantic Gaps...' : 'RUN DIAGNOSTIC →'}
               </button>
             </div>
           </div>

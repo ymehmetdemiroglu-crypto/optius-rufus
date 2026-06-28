@@ -38,11 +38,9 @@ export async function scrapeAmazonListing(
     try {
       console.log(`[Scraper] Attempting Rainforest API scrape...`);
       const domain = DOMAIN_MAP[marketplace.toUpperCase()] || "amazon.com";
-      const url = `https://api.rainforestapi.com/request?type=product&asin=${asin}&amazon_domain=${domain}`;
+      const url = `https://api.rainforestapi.com/request?api_key=${RAINFOREST_API_KEY}&type=product&asin=${asin}&amazon_domain=${domain}`;
 
-      const response = await fetch(url, {
-        headers: { "Authorization": `Bearer ${RAINFOREST_API_KEY}` },
-      });
+      const response = await fetch(url);
       if (response.ok) {
         const json = await response.json();
         if (json.request_info?.success && json.product) {

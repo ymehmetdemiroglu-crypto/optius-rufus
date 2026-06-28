@@ -246,20 +246,25 @@ async function persistAnalysis(
     });
   }
   try {
-    await prospectRepo.updateStatus(prospect.id, "analyzed");
-    
-    // Auto-generate AI outreach email drafts
-    try {
-      const { generateOutreachCopy } = await import("../prospect/outreach.js");
-      const outreachEmails = await generateOutreachCopy(prospect.id);
-      await prospectRepo.updateOutreachEmails(prospect.id, outreachEmails);
-      await prospectRepo.updateStatus(prospect.id, "drafted");
-    } catch (outreachErr) {
-      logger.error("Failed to generate cold outreach email drafts during analysis pipeline:", {
-        prospectId: prospect.id,
-        error: outreachErr instanceof Error ? outreachErr.message : String(outreachErr),
-      });
-      // Do not throw so that the main analysis pipeline succeeds
+    if (prospect.repliedAt !== null) {
+      await prospectRepo.updateStatus(prospect.id, "reply_audit_ready");
+      logger.info(`Prospect ${prospect.id} is a replied lead; setting status to reply_audit_ready`);
+    } else {
+      await prospectRepo.updateStatus(prospect.id, "analyzed");
+      
+      // Auto-generate AI outreach email drafts
+      try {
+        const { generateOutreachCopy } = await import("../prospect/outreach.js");
+        const outreachEmails = await generateOutreachCopy(prospect.id);
+        await prospectRepo.updateOutreachEmails(prospect.id, outreachEmails);
+        await prospectRepo.updateStatus(prospect.id, "drafted");
+      } catch (outreachErr) {
+        logger.error("Failed to generate cold outreach email drafts during analysis pipeline:", {
+          prospectId: prospect.id,
+          error: outreachErr instanceof Error ? outreachErr.message : String(outreachErr),
+        });
+        // Do not throw so that the main analysis pipeline succeeds
+      }
     }
   } catch (err) {
     throw new Error("Failed to update prospect status after analysis", {

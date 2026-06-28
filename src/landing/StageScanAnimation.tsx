@@ -7,13 +7,13 @@ interface StageScanAnimationProps {
 }
 
 const SCAN_LINES = [
-  { text: '> Connecting to Amazon search index...', delay: 0 },
-  { text: '> Extracting listing semantic signature...', delay: 600 },
-  { text: '> Running Rufus compatibility check...', delay: 1200 },
-  { text: '> Analyzing COSMO intent graph...', delay: 1800 },
-  { text: '> Benchmarking against top 5 competitors...', delay: 2400 },
-  { text: '> Compiling diagnostic report...', delay: 3000 },
-  { text: '> ⚠ CRITICAL ISSUES FOUND', delay: 3600, isWarning: true },
+  { text: '> [INIT] Establishing connection to Amazon search index...', delay: 0 },
+  { text: '> [SCAN] Extracting listing semantic signature...', delay: 600 },
+  { text: '> [DIAG] Running Rufus compatibility matrix...', delay: 1200 },
+  { text: '> [COSM] Mapping COSMO intent graph nodes...', delay: 1800 },
+  { text: '> [COMP] Benchmarking against category leaders...', delay: 2400 },
+  { text: '> [COMP] Compiling diagnostic output...', delay: 3000 },
+  { text: '> [ERR-041] ⚠ CRITICAL SYSTEM INCOMPATIBILITIES DETECTED', delay: 3600, isWarning: true },
 ];
 
 export default function StageScanAnimation({ asin, brand, onComplete }: StageScanAnimationProps) {
@@ -53,13 +53,13 @@ export default function StageScanAnimation({ asin, brand, onComplete }: StageSca
           <div className="w-3 h-3 bg-brand-gold border border-brand-dark/30" />
           <div className="w-3 h-3 bg-terminal-green border border-brand-dark/30" />
         </div>
-        <span className="text-xs text-terminal-green/60">
-          OPTIMUS RUFUS v3.1 — LISTING AUTOPSY ENGINE
+        <span className="text-xs text-terminal-green/60 font-mono">
+          OPTIMUS RUFUS DIAGNOSTIC v4.0 — TERMINAL SESSION ACTIVE
         </span>
       </div>
 
-      <div className="mb-2 text-terminal-green/70 text-xs">
-        TARGET: {asin} | BRAND: {brand.toUpperCase()} | STATUS: SCANNING
+      <div className="mb-2 text-terminal-green/70 text-xs font-mono">
+        TARGET: {asin} | BRAND: {brand.toUpperCase()} | STATUS: DIAGNOSING
       </div>
 
       <div className="border-t border-terminal-green/20 pt-3 space-y-2">
@@ -83,7 +83,7 @@ export default function StageScanAnimation({ asin, brand, onComplete }: StageSca
         {complete && (
           <div className="mt-4 border-t border-terminal-green/20 pt-3">
             <div className="text-terminal-green font-bold animate-pulse-red text-brutal-red">
-              DIAGNOSTIC COMPLETE — SCROLL TO VIEW RESULTS ↓
+              OUTPUT READY — SCROLL FOR FULL DIAGNOSTIC ↓
             </div>
           </div>
         )}

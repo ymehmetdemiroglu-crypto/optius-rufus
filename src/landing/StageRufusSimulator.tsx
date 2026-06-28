@@ -84,10 +84,10 @@ export default function StageRufusSimulator({ intro, scenarios, visible, competi
       <div className="max-w-5xl w-full mx-auto space-y-10">
         <div className="text-center space-y-3">
           <p className="font-mono text-xs uppercase tracking-widest text-brand-dark/60 font-black">
-            RUFUS SIMULATION
+            [SIM] LIVE RETRIEVAL SIMULATION
           </p>
           <h2 className="display-heading text-3xl md:text-5xl text-brand-dark">
-            Watch Amazon's AI Send Your Buyers Away
+            Watch Rufus Route Your Revenue to Competitors
           </h2>
           <p className="text-base md:text-lg text-brand-dark/70 font-medium max-w-2xl mx-auto leading-relaxed">
             {intro}
@@ -106,7 +106,7 @@ export default function StageRufusSimulator({ intro, scenarios, visible, competi
                   : 'bg-white text-brand-dark shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none'
               }`}
             >
-              Scenario {i + 1}
+              [SIM-0{i + 1}]
             </button>
           ))}
         </div>
@@ -117,7 +117,7 @@ export default function StageRufusSimulator({ intro, scenarios, visible, competi
           <div className="chat-header">
             <Bot className="h-4 w-4" />
             <span>Amazon Rufus AI</span>
-            <span className="ml-auto text-[10px] text-white/50">LIVE SIMULATION</span>
+            <span className="ml-auto text-[10px] text-white/50 font-mono">LIVE SIMULATION</span>
           </div>
 
           {/* Chat Body */}
@@ -185,15 +185,15 @@ export default function StageRufusSimulator({ intro, scenarios, visible, competi
           <div className="max-w-2xl mx-auto border-[3px] border-brand-dark bg-white p-5 shadow-brutal animate-slide-up mt-6 space-y-4">
             <div className="flex items-center gap-2 text-brand-blue font-black font-display text-lg uppercase border-b-2 border-brand-dark pb-2">
               <ArrowRightLeft className="h-5 w-5 text-brand-blue" />
-              <span>Competitor Loss Audit vs. {audit.competitorName}</span>
+              <span>[AUDIT] SEMANTIC GAP ANALYSIS vs. {audit.competitorName}</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
               <div className="border-2 border-brutal-red bg-brutal-red/5 p-3 space-y-2">
-                <p className="font-black text-brutal-red uppercase text-[10px] tracking-widest">YOUR SEMANTIC GAP:</p>
+                <p className="font-black text-brutal-red uppercase text-[10px] tracking-widest">[YOUR LISTING] MISSING ATTRIBUTE:</p>
                 <p className="text-brand-dark leading-relaxed font-bold">{audit.yourGap}</p>
               </div>
               <div className="border-2 border-green-500 bg-green-500/5 p-3 space-y-2">
-                <p className="font-black text-green-700 uppercase text-[10px] tracking-widest">COMPETITOR ADVANTAGE:</p>
+                <p className="font-black text-green-700 uppercase text-[10px] tracking-widest">[{audit.competitorName.toUpperCase()}] INDEXED ATTRIBUTE:</p>
                 <p className="text-brand-dark leading-relaxed font-bold">{audit.competitorAdvantage}</p>
               </div>
             </div>
@@ -219,10 +219,8 @@ export default function StageRufusSimulator({ intro, scenarios, visible, competi
         {/* Summary after all scenarios */}
         {phase === 'fail' && activeScenario === scenarios.length - 1 && (
           <div className="border-[3px] border-brutal-red bg-brutal-red/5 p-6 text-center animate-fade-in max-w-lg mx-auto">
-            <p className="text-lg font-black text-brand-dark">
-              Your listing failed <span className="text-brutal-red">{scenarios.length} out of {scenarios.length}</span> common buyer questions.
-              <br />
-              <span className="text-brand-dark/60 text-base font-bold">Every failed question = lost sale.</span>
+            <p className="text-lg font-black text-brand-dark font-mono">
+              [RESULT] <span className="text-brutal-red">{scenarios.length}/{scenarios.length}</span> retrieval queries failed. Each failure = revenue routed to competitor.
             </p>
           </div>
         )}

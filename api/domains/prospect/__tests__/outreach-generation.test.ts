@@ -55,22 +55,17 @@ describe('Outreach Campaign Copy Generation Test', () => {
     // Assertions
     expect(emails.subject).toBeDefined();
     expect(emails.body1).toContain("NutraWell"); // Competitor Name
-    expect(emails.body1).toContain("dosage"); // Gaps
+    expect(emails.body3).toContain("dosage"); // Gaps in Body 3
     
-    // Check no links
+    // Check no links in permission emails (Body 1 & 2)
     expect(emails.body1).not.toContain("http");
     expect(emails.body2).not.toContain("http");
-    expect(emails.body3).not.toContain("http");
-    expect(emails.body4).not.toContain("http");
-    expect(emails.body5).not.toContain("http");
 
-    // Check CTA in first email is reply-focused or conversational
+    // Check CTA in first email is permission-focused
     const body1Lower = emails.body1.toLowerCase();
-    const hasCta = body1Lower.includes("reply") || 
+    const hasCta = body1Lower.includes("permission") || 
                    body1Lower.includes("send") || 
-                   body1Lower.includes("drop") || 
-                   body1Lower.includes("checklist") || 
-                   body1Lower.includes("pdf");
+                   body1Lower.includes("reply");
     expect(hasCta).toBe(true);
   });
 });

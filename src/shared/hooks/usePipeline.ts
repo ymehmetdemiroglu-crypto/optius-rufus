@@ -68,7 +68,8 @@ export function usePipeline({ jobId, prospectId, pollingInterval = 3000, enableS
   useEffect(() => {
     if (!resolvedJobId || !enableSse) return;
 
-    const sseUrl = `/api/sse/pipeline/${resolvedJobId}`;
+    const backendUrl = import.meta.env.VITE_API_URL || '';
+    const sseUrl = `${backendUrl}/api/sse/pipeline/${resolvedJobId}`;
     const es = new EventSource(sseUrl);
     eventSourceRef.current = es;
 

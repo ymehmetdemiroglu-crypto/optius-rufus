@@ -131,7 +131,7 @@ export default function StageAutopsy({
         {/* Header */}
         <div className={`text-center space-y-3 ${hasAnimated ? 'animate-slide-up' : 'opacity-0'}`}>
           <p className="font-mono text-xs uppercase tracking-widest text-brutal-red font-black">
-            DIAGNOSTIC RESULTS
+            [OUTPUT] DIAGNOSTIC RESULTS
           </p>
           <h2 className="display-heading text-3xl md:text-5xl text-brand-dark">
             {headline}
@@ -153,7 +153,7 @@ export default function StageAutopsy({
             style={{ marginBottom: '-3px' }}
           >
             <BarChart3 className="h-4 w-4" />
-            <span>AI Compatibility Scores</span>
+            <span>[SCAN] AI COMPATIBILITY MATRIX</span>
           </button>
           <button
             onClick={() => setActiveTab('cosmo')}
@@ -165,7 +165,7 @@ export default function StageAutopsy({
             style={{ marginBottom: '-3px' }}
           >
             <Network className="h-4 w-4" />
-            <span>COSMO Intent Graph</span>
+            <span>[MAP] COSMO INTENT TOPOLOGY</span>
           </button>
           <button
             onClick={() => setActiveTab('reviews')}
@@ -177,7 +177,7 @@ export default function StageAutopsy({
             style={{ marginBottom: '-3px' }}
           >
             <MessageSquare className="h-4 w-4" />
-            <span>Review Sentiment Audit</span>
+            <span>[AUDIT] REVIEW CORPUS ANALYSIS</span>
           </button>
         </div>
 
@@ -186,7 +186,7 @@ export default function StageAutopsy({
           {activeTab === 'scores' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in">
               <AnimatedScore
-                label="Rufus Score"
+                label="[R-SCR] RUFUS COMPAT."
                 score={scores.rufusScore}
                 description="How well Amazon's AI can answer buyer questions from your listing."
                 delay={200}
@@ -194,7 +194,7 @@ export default function StageAutopsy({
                 isPrint={isPrint}
               />
               <AnimatedScore
-                label="COSMO Score"
+                label="[C-SCR] COSMO COMPAT."
                 score={scores.cosmoScore}
                 description="How Amazon's knowledge graph connects your product to buyer intent."
                 delay={400}
@@ -202,7 +202,7 @@ export default function StageAutopsy({
                 isPrint={isPrint}
               />
               <AnimatedScore
-                label="Semantic Density"
+                label="[S-DEN] SEMANTIC DENSITY"
                 score={scores.semanticScore}
                 description="How complete your semantic coverage is across all buyer queries."
                 delay={600}
@@ -210,7 +210,7 @@ export default function StageAutopsy({
                 isPrint={isPrint}
               />
               <AnimatedScore
-                label="Content Quality"
+                label="[C-QAL] CONTENT QUALITY"
                 score={scores.contentScore}
                 description="Conversion-readiness of your title, bullets, and description."
                 delay={800}
@@ -327,15 +327,15 @@ export default function StageAutopsy({
                         </span>
                         {item.status === 'good' ? (
                           <span className="bg-green-100 text-green-800 border border-green-300 font-mono text-[10px] font-black px-2 py-0.5 uppercase">
-                            OPTIMIZED
+                            [OK] INDEXED
                           </span>
                         ) : item.status === 'warning' ? (
                           <span className="bg-yellow-100 text-yellow-800 border border-yellow-300 font-mono text-[10px] font-black px-2 py-0.5 uppercase">
-                            RUFUS WARNING
+                            [WARN] DEGRADED
                           </span>
                         ) : (
                           <span className="bg-red-100 text-red-800 border border-red-300 font-mono text-[10px] font-black px-2 py-0.5 uppercase animate-pulse">
-                            CRITICAL RISK
+                            [ERR] CRITICAL FAILURE
                           </span>
                         )}
                       </div>

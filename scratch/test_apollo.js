@@ -14,35 +14,30 @@ if (!APOLLO_API_KEY) {
   process.exit(1);
 }
 
-async function test() {
-  const url = 'https://api.apollo.io/api/v1/emailer_campaigns/search';
+async function testEnrollment() {
+  const sequenceId = "6a30063082147b001cd1f361"; // Amazon Rufus Outreach - Starter Brands
+  const contactId = "6a3970e59e11c1000c5e7edf";  // The contact we created successfully (dpalame@saltwrap.com)
+  const emailAccountId = "69eb608b9f3f200021f45855"; // nexgenoptimusprime email account id
+  const url = `https://api.apollo.io/v1/emailer_campaigns/${sequenceId}/add_contact_ids`;
+  
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': APOLLO_API_KEY,
-        'Authorization': `Api-Token ${APOLLO_API_KEY}`
+        'X-Api-Key': APOLLO_API_KEY
       },
       body: JSON.stringify({
-        page: 1,
-        per_page: 100
+        contact_ids: [contactId],
+        send_email_from_email_account_id: emailAccountId
       })
     });
     console.log(`URL: ${url} -> Status: ${response.status}`);
     const data = await response.json();
-    console.log('Campaigns count:', data.emailer_campaigns ? data.emailer_campaigns.length : 'none');
-    if (data.emailer_campaigns) {
-      console.log('Campaigns:');
-      data.emailer_campaigns.forEach(c => {
-        console.log(`- ID: ${c.id}, Name: ${c.name}, Active: ${c.active}`);
-      });
-    } else {
-      console.log('Data:', JSON.stringify(data, null, 2));
-    }
+    console.log('Response:', JSON.stringify(data, null, 2));
   } catch (err) {
     console.error(`Error:`, err);
   }
 }
 
-test();
+testEnrollment();

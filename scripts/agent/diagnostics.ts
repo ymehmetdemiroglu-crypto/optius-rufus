@@ -17,14 +17,24 @@ async function run() {
   }
 
   // 2. Validate API Keys
-  const keysToVerify = [
-    { name: "OPENROUTER_API_KEY", optional: true },
-    { name: "OPENAI_API_KEY", optional: false },
+  const openrouterKey = process.env.OPENROUTER_API_KEY;
+  const openaiKey = process.env.OPENAI_API_KEY;
+  
+  const hasOpenRouter = openrouterKey && openrouterKey.trim() !== "" && !openrouterKey.includes("your-");
+  const hasOpenAI = openaiKey && openaiKey.trim() !== "" && !openaiKey.includes("your-");
+  
+  if (hasOpenRouter || hasOpenAI) {
+    console.log(`[PASS] 🔑 LLM API Configuration (${hasOpenRouter ? "OpenRouter" : "OpenAI"} key found)`);
+  } else {
+    console.error(`[FAIL] 🔑 LLM API Configuration: Both OPENROUTER_API_KEY and OPENAI_API_KEY are missing/invalid!`);
+  }
+
+  const otherKeys = [
     { name: "APOLLO_API_KEY", optional: false },
     { name: "APIFY_API_TOKEN", optional: false },
   ];
 
-  for (const key of keysToVerify) {
+  for (const key of otherKeys) {
     const val = process.env[key.name];
     if (val && val.trim() !== "" && !val.includes("your-") && !val.includes("sk-your")) {
       console.log(`[PASS] 🔑 ${key.name} is configured`);

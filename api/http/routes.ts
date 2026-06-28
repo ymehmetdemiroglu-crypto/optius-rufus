@@ -106,6 +106,11 @@ export function registerHttpRoutes(app: Hono<{ Variables: AppVariables }>) {
 
   app.get("/api/sse/pipeline/:jobId", (c) => pipelineSseHandler(c));
 
+  app.get("/api/pdf-report/:slug", async (c) => {
+    const { renderPdfReportHtml } = await import("./pdfReport.js");
+    return renderPdfReportHtml(c);
+  });
+
   app.post("/api/webhooks/apollo", async (c) => {
     try {
       const body = await c.req.json();
@@ -129,7 +134,7 @@ export function registerHttpRoutes(app: Hono<{ Variables: AppVariables }>) {
       const pdfBuffer = await generatePdf(slug);
       c.header("Content-Type", "application/pdf");
       c.header("Content-Disposition", `attachment; filename="${slug}-rufus-audit.pdf"`);
-      return c.body(pdfBuffer);
+      return c.body(pdfBuffer as any);
     } catch (err: any) {
       logger.error("Failed to generate PDF", { error: err.message, slug });
       return c.json({ error: "Failed to generate PDF: " + err.message }, 500);

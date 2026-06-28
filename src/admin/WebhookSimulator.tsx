@@ -46,7 +46,7 @@ export default function WebhookSimulator(): JSX.Element {
 
     try {
       addLog(`Posting simulated email reply event to HTTP webhook endpoint...`);
-      const response = await fetch('/api/webhooks/apollo', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/webhooks/apollo`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

@@ -11,8 +11,7 @@ async function apolloFetch(path: string, options: RequestInit = {}) {
     ...options,
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Api-Token ${APOLLO_API_KEY}`,
-      "x-api-key": APOLLO_API_KEY,
+      "X-Api-Key": APOLLO_API_KEY,
       ...options.headers,
     },
   });
@@ -38,6 +37,25 @@ export async function createContact(data: {
   return { id: result.contact?.id || result.id || `mock-contact-${Date.now()}` };
 }
 
+export async function getActiveEmailAccountId(): Promise<string> {
+  if (!APOLLO_API_KEY) {
+    return "mock-email-account-id";
+  }
+  try {
+    const res = (await apolloFetch("/email_accounts", { method: "GET" })) as {
+      email_accounts?: Array<{ id: string; active?: boolean; default?: boolean }>;
+    };
+    const accounts = res.email_accounts || [];
+    const activeAccount = accounts.find((a) => a.active || a.default) || accounts[0];
+    if (activeAccount) {
+      return activeAccount.id;
+    }
+  } catch (err) {
+    console.error("Failed to fetch active email account from Apollo, falling back:", err);
+  }
+  return "69eb608b9f3f200021f45855"; // Safe default/fallback
+}
+
 export async function enrollInSequence(
   contactId: string,
   sequenceId: string
@@ -45,25 +63,34 @@ export async function enrollInSequence(
   if (!APOLLO_API_KEY || contactId.toLowerCase().startsWith("mock")) {
     return { id: `mock-enrollment-${Date.now()}` };
   }
-  const result = (await apolloFetch("/emailer_campaigns/enroll_contact", {
+  const emailAccountId = await getActiveEmailAccountId();
+  const result = (await apolloFetch(`/emailer_campaigns/${sequenceId}/add_contact_ids`, {
     method: "POST",
-    body: JSON.stringify({ contact_id: contactId, emailer_campaign_id: sequenceId }),
-  })) as { emailer_campaign_membership?: { id: string }; id?: string };
-  return { id: result.emailer_campaign_membership?.id || result.id || `mock-enrollment-${Date.now()}` };
+    body: JSON.stringify({
+      contact_ids: [contactId],
+      emailer_campaign_id: sequenceId,
+      send_email_from_email_account_id: emailAccountId,
+    }),
+  })) as { contacts?: Array<{ id: string }>; id?: string };
+  return { id: result.id || (result.contacts && result.contacts[0]?.id) || `enrollment-${Date.now()}` };
 }
 
 const FIELD_KEYS = {
-  rufusScore: process.env.APOLLO_FIELD_RUFUS_SCORE || "rufus_score",
-  topGap: process.env.APOLLO_FIELD_TOP_GAP || "top_gap",
-  competitorName: process.env.APOLLO_FIELD_COMPETITOR_NAME || "competitor_name",
-  auditUrl: process.env.APOLLO_FIELD_AUDIT_URL || "audit_url",
-  category: process.env.APOLLO_FIELD_CATEGORY || "product_category",
-  customSubject1: process.env.APOLLO_FIELD_CUSTOM_SUBJECT_1 || "custom_subject_1",
-  customBody1: process.env.APOLLO_FIELD_CUSTOM_BODY_1 || "custom_body_1",
-  customBody2: process.env.APOLLO_FIELD_CUSTOM_BODY_2 || "custom_body_2",
-  customBody3: process.env.APOLLO_FIELD_CUSTOM_BODY_3 || "custom_body_3",
-  customBody4: process.env.APOLLO_FIELD_CUSTOM_BODY_4 || "custom_body_4",
-  customBody5: process.env.APOLLO_FIELD_CUSTOM_BODY_5 || "custom_body_5",
+  rufusScore: process.env.APOLLO_FIELD_RUFUS_SCORE || "69f49e822757330015d1be1b",
+  topGap: process.env.APOLLO_FIELD_TOP_GAP || "6a3007c00d56290018e42d88",
+  competitorName: process.env.APOLLO_FIELD_COMPETITOR_NAME || "6a3007dc941e87000cd78083",
+  auditUrl: process.env.APOLLO_FIELD_AUDIT_URL || "6a3007fbefe572000c613b37",
+  category: process.env.APOLLO_FIELD_CATEGORY || "69f49eecf2c36100198f0a2e",
+  customSubject1: process.env.APOLLO_FIELD_CUSTOM_SUBJECT_1 || "69ff4cce23dda3001151249a",
+  customBody1: process.env.APOLLO_FIELD_CUSTOM_BODY_1 || "69ff4cea6773a8001d7ce96f",
+  customSubject2: process.env.APOLLO_FIELD_CUSTOM_SUBJECT_2 || "69ff4cf6daf243001915a73d",
+  customBody2: process.env.APOLLO_FIELD_CUSTOM_BODY_2 || "69ff4d02289e8900199a1251",
+  customSubject3: process.env.APOLLO_FIELD_CUSTOM_SUBJECT_3 || "69ff4d0e931ed200110c3db3",
+  customBody3: process.env.APOLLO_FIELD_CUSTOM_BODY_3 || "69ff4d199fb3c10019bbc38a",
+  customSubject4: process.env.APOLLO_FIELD_CUSTOM_SUBJECT_4 || "69ff4d24b01ad500216000fd",
+  customBody4: process.env.APOLLO_FIELD_CUSTOM_BODY_4 || "69ff4d2eac43360019e2034d",
+  customSubject5: process.env.APOLLO_FIELD_CUSTOM_SUBJECT_5 || "69ff4d3b64f7970011414239",
+  customBody5: process.env.APOLLO_FIELD_CUSTOM_BODY_5 || "69ff4d471d6fd20015390405",
 };
 
 export async function syncCustomFieldsToApollo(

@@ -285,7 +285,7 @@ export default function ProspectDetailPanel({ prospectId }: ProspectDetailPanelP
             <ExternalLink size={14} /> Live Landing Page
           </a>
           <a
-            href={`/api/pdf/${prospect.slug}`}
+            href={`${import.meta.env.VITE_API_URL || ''}/api/pdf/${prospect.slug}`}
             className="bg-brand-gold text-brand-dark font-mono text-xs font-black uppercase px-4 py-2 border-2 border-brand-dark hover:translate-x-[1px] hover:translate-y-[1px] cursor-pointer flex items-center gap-2"
             download
           >

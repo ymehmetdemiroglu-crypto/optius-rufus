@@ -53,7 +53,7 @@ export default function StageBookCall({
 
   // Resolve dynamic package pricing and guarantees
   let displayHeadline = headline;
-  let displayGuarantee = guarantee;
+  let displayGuarantee = `Your listing hits 85+ Rufus Score or you pay nothing. Full refund, no questions.`;
 
   // If using default / fallback copywriting, customize based on selected package
   if (
@@ -61,28 +61,12 @@ export default function StageBookCall({
     headline.startsWith("Book Your Free") ||
     headline.includes("Listing Audit")
   ) {
-    if (packageType === 'package_1') {
-      displayHeadline = `Book Your Rufus Conquest & SOV Consultation, ${prospectName}`;
-      displayGuarantee = `If we can't find at least 3 high-intent search queries where your competitors are stealing your sales, the consultation call is 100% free. No credit card required.`;
-    } else if (packageType === 'package_2') {
-      displayHeadline = `Secure Your Full-Funnel Listing & A+ Overhaul, ${prospectName}`;
-      displayGuarantee = `We will rewrite your Core Listing, A+ modules, and Storefront SEO. If this doesn't pass our 7-agent AI audit with a score above 85, we'll rewrite it until it does.`;
-    } else if (packageType === 'package_3') {
-      displayHeadline = `Secure Your PPC & AEO Intent Alignment Setup, ${prospectName}`;
-      displayGuarantee = `Get your COSMO-optimized listing and semantic PPC keyword map. If we don't lower your ACOS by at least 15% in the first 30 days, we'll work with you for free until we do.`;
-    } else if (packageType === 'package_4') {
-      displayHeadline = `Claim Your COSMO Catalog & Bundling Blueprint, ${prospectName}`;
-      displayGuarantee = `We'll build your catalog relationship map and virtual bundles. If we don't find at least 2 highly profitable product bundles to link, you pay nothing.`;
-    }
+    displayHeadline = `Initialize Your Listing Overhaul, ${prospectName}`;
   }
 
   const bookMutation = trpc.booking?.create?.useMutation({
     onSuccess: () => {
       setSubmitted(true);
-      const calendlyUrl = import.meta.env.VITE_CALENDLY_URL || 'https://calendly.com/optimusrufus';
-      setTimeout(() => {
-        window.location.href = calendlyUrl;
-      }, 3000);
     },
     onError: (err) => console.error('Booking failed:', err),
   });
@@ -117,31 +101,33 @@ export default function StageBookCall({
     >
       <div className="max-w-2xl w-full mx-auto space-y-8">
         {submitted ? (
-          /* ── Success State ── */
-          <div className="brutalist-card bg-brand-dark text-white p-10 text-center space-y-6 shadow-brutal-lg">
-            <div className="flex justify-center">
-              <div className="h-20 w-20 bg-brand-gold border-[3px] border-white/20 flex items-center justify-center">
-                <CheckCircle2 className="h-10 w-10 text-brand-dark" />
+          /* ── Success State with Inline Calendly ── */
+          <div className="space-y-6">
+            <div className="brutalist-card bg-brand-dark text-white p-6 text-center space-y-4 shadow-brutal-lg">
+              <div className="flex justify-center">
+                <div className="h-14 w-14 bg-brand-gold border-[3px] border-white/20 flex items-center justify-center">
+                  <CheckCircle2 className="h-7 w-7 text-brand-dark" />
+                </div>
+              </div>
+              <div className="space-y-1 font-mono">
+                <h3 className="display-heading text-xl md:text-2xl text-white">
+                  [OK] INITIALIZATION CONFIRMED
+                </h3>
+                <p className="text-sm text-white/80 font-medium">
+                  {form.name}, your onboarding sequence is queued. Select a deployment window below:
+                </p>
               </div>
             </div>
-            <div className="space-y-2">
-              <h3 className="display-heading text-2xl md:text-3xl text-white">
-                Details Confirmed!
-              </h3>
-              <p className="text-base text-white/80 font-medium">
-                {form.name}, your information is saved.
-              </p>
-              <p className="text-sm text-brand-gold font-mono uppercase tracking-wider font-bold">
-                Redirecting to select your call time...
-              </p>
-            </div>
-            <div className="flex items-center justify-center gap-2">
-              <a
-                href={import.meta.env.VITE_CALENDLY_URL || 'https://calendly.com/optimusrufus'}
-                className="inline-block bg-brand-gold text-brand-dark px-6 py-2.5 font-bold uppercase tracking-wider text-xs border-[3px] border-brand-dark shadow-brutal-sm hover:bg-white hover:text-brand-dark transition-colors"
-              >
-                Click here if not redirected →
-              </a>
+            
+            <div className="brutalist-card bg-white p-2 border-[3px] border-brand-dark shadow-brutal-lg min-h-[650px] overflow-hidden">
+              <iframe
+                src={`${import.meta.env.VITE_CALENDLY_URL || 'https://calendly.com/optimusrufus'}?embed_domain=${window.location.hostname}&embed_type=Inline&name=${encodeURIComponent(form.name)}&email=${encodeURIComponent(form.email)}`}
+                width="100%"
+                height="650px"
+                frameBorder="0"
+                title="Calendly Scheduler"
+                className="w-full h-[650px]"
+              />
             </div>
           </div>
         ) : (
@@ -149,20 +135,24 @@ export default function StageBookCall({
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="text-center space-y-3">
               <p className="font-mono text-xs uppercase tracking-widest text-brand-blue font-black">
-                FINAL STEP
+                [SYS] SYSTEM ACTIVATION
               </p>
               <h2 className="display-heading text-3xl md:text-5xl text-brand-dark">
                 {displayHeadline}
               </h2>
               {/* Package Badge */}
               <div className="inline-block bg-brand-dark text-brand-gold font-mono text-xs uppercase px-3 py-1.5 border-[2px] border-brand-dark font-black tracking-wider">
-                {packageType === 'package_1' && `Package 1: Rufus SOV & Conquesting — $${pricePoint.toLocaleString()}`}
-                {packageType === 'package_2' && `Package 2: Full-Funnel Listing Optimization — $${pricePoint.toLocaleString()}`}
-                {packageType === 'package_3' && `Package 3: AEO & PPC Intent Alignment — $${pricePoint.toLocaleString()}`}
-                {packageType === 'package_4' && `Package 4: COSMO Bundling & Catalog — $${pricePoint.toLocaleString()}`}
+                Full-Funnel Listing Optimization — $1,500
               </div>
+
+              <div className="block pt-1">
+                <div className="inline-block bg-white border-2 border-brand-dark px-3 py-1.5 font-mono text-xs font-bold text-brand-dark">
+                  [INCLUDED] A+ Content Layout • Semantic PPC Keyword Map • COSMO Bundling Blueprint — $0 additional
+                </div>
+              </div>
+
               <p className="font-mono text-xs uppercase tracking-widest text-brand-dark/50 pt-2">
-                Next available slot: {getTomorrowDate()} • 10:00 AM ET
+                Next deployment window: {getTomorrowDate()} • 10:00 AM ET
               </p>
             </div>
 
@@ -240,8 +230,8 @@ export default function StageBookCall({
               </div>
 
               {bookMutation?.isError && (
-                <p className="text-sm text-brutal-red font-bold">
-                  Something went wrong. Please try again.
+                <p className="text-sm text-brutal-red font-bold font-mono">
+                  [ERR] Submission failed. Please retry.
                 </p>
               )}
 
@@ -253,22 +243,22 @@ export default function StageBookCall({
                 {bookMutation?.isPending ? (
                   <>
                     <Loader2 className="h-5 w-5 animate-spin" />
-                    <span>Confirming...</span>
+                    <span>INITIALIZING...</span>
                   </>
                 ) : (
-                  <span>Confirm My Free Audit Call →</span>
+                  <span>INITIALIZE ONBOARDING SEQUENCE →</span>
                 )}
               </button>
             </div>
 
             {/* Guarantee */}
-            <div className="border-[3px] border-brand-dark bg-brand-gold p-5 md:p-6 flex items-start gap-4 shadow-brutal">
+            <div className="border-[3px] border-brand-dark bg-brand-gold p-5 md:p-6 flex items-start gap-4 shadow-brutal font-mono">
               <div className="h-12 w-12 bg-brand-dark border-[3px] border-brand-dark text-brand-gold flex items-center justify-center shrink-0">
                 <Shield className="h-6 w-6" />
               </div>
               <div className="space-y-1">
                 <h4 className="font-display font-black text-base uppercase tracking-wide text-brand-dark">
-                  Our Guarantee
+                  [GUARANTEE] RISK ELIMINATION PROTOCOL
                 </h4>
                 <p className="text-sm font-bold text-brand-dark/90 leading-relaxed">
                   {displayGuarantee}

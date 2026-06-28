@@ -11,22 +11,22 @@ const steps = [
   {
     icon: Phone,
     number: '01',
-    title: 'Book a 15-Min Call',
-    description: "Free, no strings. We'll walk through your diagnostic report and show you exactly what's costing you sales.",
+    title: 'INITIALIZE: 15-Min System Briefing',
+    description: 'We walk through your diagnostic output. You confirm the gaps. We scope the fix. No pitch. No pressure. Just data review.',
     detail: 'No credit card. No commitment.',
   },
   {
     icon: Wrench,
     number: '02',
-    title: 'We Optimize For You',
-    description: 'Our 7-agent AI engine + human review rewrites your entire listing for Rufus, COSMO, and semantic search.',
+    title: 'EXECUTE: 7-Agent AI Overhaul',
+    description: 'Our engine rewrites your listing for Rufus retrieval, COSMO graph indexing, and semantic gap closure. Human QA review included.',
     detail: '48-hour turnaround.',
   },
   {
     icon: FileDown,
     number: '03',
-    title: 'Download Your File',
-    description: 'You receive a ready-to-paste optimized listing file. Copy into Seller Central. Done.',
+    title: 'DEPLOY: Paste & Publish',
+    description: 'You receive a production-ready listing file. Copy into Seller Central. Your Rufus compatibility score updates within 48-72 hours.',
     detail: 'No software to install.',
   },
 ];
@@ -41,7 +41,7 @@ export default function StageRoadmap({ headline, body, visible }: StageRoadmapPr
       <div className="max-w-5xl w-full mx-auto space-y-12">
         <div className="text-center space-y-3">
           <p className="font-mono text-xs uppercase tracking-widest text-brand-gold font-black">
-            HOW IT WORKS
+            [SYS] DEPLOYMENT PROTOCOL
           </p>
           <h2 className="display-heading text-3xl md:text-5xl text-white">
             {headline}
@@ -94,9 +94,10 @@ export default function StageRoadmap({ headline, body, visible }: StageRoadmapPr
 
         {/* Key Message */}
         <div className="border-[3px] border-brand-gold bg-brand-gold/10 p-6 text-center">
-          <p className="text-lg font-black text-white">
-            Most of our clients see ranking improvements within{' '}
-            <span className="text-brand-gold">7-14 days</span> of updating their listings.
+          <p className="text-lg font-black text-white font-mono text-sm md:text-base">
+            Average time-to-indexing after deployment:{' '}
+            <span className="text-brand-gold font-black">48-72 hours</span>. Average Rufus Score improvement:{' '}
+            <span className="text-brand-gold font-black">+34 points</span>.
           </p>
         </div>
       </div>

@@ -1,3 +1,4 @@
+import { logger } from "../../infra/logger.js";
 import * as prospectRepo from "./repository.js";
 import * as listingRepo from "../listing/repository.js";
 import * as analysisRepo from "../analysis/repository.js";
@@ -241,6 +242,8 @@ export async function handleApolloReply(payload: ApolloWebhookPayload): Promise<
       });
       auditTriggered = true;
       await prospectRepo.updateStatus(prospect.id, "analyzing");
+    } else {
+      await prospectRepo.updateStatus(prospect.id, "reply_audit_ready");
     }
   }
 
@@ -419,13 +422,36 @@ export async function approveAndEnroll(
 ): Promise<void> {
   const data = await getProspectById(id);
   const { prospect, listing, analysis } = data;
-  if (!prospect.apolloContactId) {
-    throw new Error(`Prospect ${id} has no associated Apollo Contact ID.`);
-  }
 
   const emails = prospect.outreachEmails;
   if (!emails) {
     throw new Error(`Prospect ${id} has no drafted outreach emails to send.`);
+  }
+
+  const { syncCustomFieldsToApollo, enrollInSequence, createContact } = await import("../apollo/service.js");
+
+  let currentContactId = prospect.apolloContactId;
+  if (!currentContactId) {
+    logger.info(`Autonomous Agent: Contact ID missing for prospect ${prospect.email}. Re-creating/matching contact...`);
+    try {
+      const createRes = await createContact({
+        email: prospect.email,
+        firstName: prospect.firstName || undefined,
+        lastName: prospect.lastName || undefined,
+        company: prospect.company || undefined,
+      });
+      if (createRes && createRes.id) {
+        currentContactId = createRes.id;
+        logger.info(`Autonomous Agent: Successfully created/matched contact for ${prospect.email}. ID: ${currentContactId}`);
+        await prospectRepo.updateApolloFields(id, {
+          apolloContactId: currentContactId,
+        });
+      } else {
+        throw new Error(`No ID returned from createContact`);
+      }
+    } catch (createErr: any) {
+      throw new Error(`Prospect ${id} has no associated Apollo Contact ID and failed to create one: ${createErr.message}`);
+    }
   }
 
   const rufusScore = analysis?.rufusScore ?? 45;
@@ -454,23 +480,62 @@ export async function approveAndEnroll(
   }
 
   // 1. Sync custom fields to Apollo
-  const { syncCustomFieldsToApollo, enrollInSequence } = await import("../apollo/service.js");
-  await syncCustomFieldsToApollo(prospect.apolloContactId, {
-    rufusScore,
-    topGap,
-    competitorName,
-    auditUrl,
-    category,
-    customSubject1: emails.subject,
-    customBody1: emails.body1,
-    customBody2: emails.body2,
-    customBody3: emails.body3,
-    customBody4: emails.body4,
-    customBody5: emails.body5,
-  });
+  try {
+    await syncCustomFieldsToApollo(currentContactId, {
+      rufusScore,
+      topGap,
+      competitorName,
+      auditUrl,
+      category,
+      customSubject1: emails.subject,
+      customBody1: emails.body1,
+      customBody2: emails.body2,
+      customBody3: emails.body3,
+      customBody4: emails.body4,
+      customBody5: emails.body5,
+    });
+  } catch (syncErr: any) {
+    if (syncErr.message.includes("Contact does not exist") || syncErr.message.includes("422")) {
+      logger.info(`Autonomous Agent: Contact ID ${currentContactId} not found in Apollo workspace. Re-creating/matching contact for email ${prospect.email}...`);
+      const createRes = await createContact({
+        email: prospect.email,
+        firstName: prospect.firstName || undefined,
+        lastName: prospect.lastName || undefined,
+        company: prospect.company || undefined,
+      });
+      if (createRes && createRes.id) {
+        currentContactId = createRes.id;
+        logger.info(`Autonomous Agent: Successfully created/matched contact in current Apollo workspace. New ID: ${currentContactId}`);
+        
+        // Update local DB with new apolloContactId
+        await prospectRepo.updateApolloFields(id, {
+          apolloContactId: currentContactId,
+        });
+
+        // Retry sync
+        await syncCustomFieldsToApollo(currentContactId, {
+          rufusScore,
+          topGap,
+          competitorName,
+          auditUrl,
+          category,
+          customSubject1: emails.subject,
+          customBody1: emails.body1,
+          customBody2: emails.body2,
+          customBody3: emails.body3,
+          customBody4: emails.body4,
+          customBody5: emails.body5,
+        });
+      } else {
+        throw new Error(`Failed to recreate/match contact for email ${prospect.email}`);
+      }
+    } else {
+      throw syncErr;
+    }
+  }
 
   // 2. Enroll in sequence
-  await enrollInSequence(prospect.apolloContactId, sequenceId);
+  await enrollInSequence(currentContactId, sequenceId);
 
   // 3. Update local DB fields
   await prospectRepo.updateApolloFields(id, {

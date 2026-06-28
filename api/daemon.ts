@@ -10,6 +10,7 @@ import { startWorkers, stopWorkers } from "./workers/bootstrap.js";
 import { runMigrations } from "./db/migrate.js";
 import { logger } from "./infra/logger.js";
 import { startWatchdog, stopWatchdog } from "./infra/watchdog.js";
+import { startAutonomousAgent, stopAutonomousAgent } from "./services/autonomousAgent.js";
 import "./db/schema.js";
 
 type AppVariables = {
@@ -92,6 +93,7 @@ async function boot() {
   // Start background processes
   startWorkers();
   startWatchdog();
+  startAutonomousAgent();
 
   // Log memory stats every 5 minutes (300,000ms)
   const memoryStatsInterval = setInterval(() => {
@@ -119,6 +121,9 @@ async function boot() {
 
     stopWatchdog();
     logger.info("Daemon watchdog stopped");
+
+    stopAutonomousAgent();
+    logger.info("Daemon autonomous agent stopped");
 
     logger.info("Daemon shutdown complete. Goodbye!");
     process.exit(0);

@@ -136,6 +136,47 @@
     animation: blink 1s step-end infinite;
   }
 
+  /* Terminal-style microcopy labels & status indicators */
+  .terminal-label {
+    @apply font-mono text-xs uppercase tracking-widest font-black;
+  }
+
+  .terminal-err {
+    @apply terminal-label text-brutal-red;
+  }
+
+  .terminal-warn {
+    @apply terminal-label text-brand-gold;
+  }
+
+  .terminal-ok {
+    @apply terminal-label text-terminal-green;
+  }
+
+  .terminal-sys {
+    @apply terminal-label text-brand-blue;
+  }
+
+  .status-blink {
+    animation: blink 1.2s step-end infinite;
+  }
+
+  .err-code {
+    @apply font-mono text-[10px] font-black tracking-wider px-1.5 py-0.5 border inline-block;
+  }
+
+  .err-code-critical {
+    @apply err-code bg-brutal-red/10 text-brutal-red border-brutal-red;
+  }
+
+  .err-code-warn {
+    @apply err-code bg-brand-gold/10 text-brand-gold border-brand-gold;
+  }
+
+  .err-code-ok {
+    @apply err-code bg-green-100 text-green-800 border-green-300;
+  }
+
   /* ── Score Gauge ── */
   .gauge-bar {
     @apply h-5 bg-brand-bg border-[3px] border-brand-dark relative overflow-hidden;

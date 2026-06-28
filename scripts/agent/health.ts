@@ -61,8 +61,20 @@ async function run() {
     } catch (dbErr) {
       console.log(`Database:    🔴 UNREACHABLE (${(dbErr as Error).message})`);
     }
-    console.log(`\n❌ Could not connect to the running daemon. Check if it is started via PM2.`);
-    console.log(`   Command to start: npm run daemon:start\n`);
+
+    if (process.argv.includes("--heal")) {
+      console.log("\n🔄 Unhealthy status detected with --heal flag. Initiating auto-heal...");
+      try {
+        const { execSync } = await import("child_process");
+        execSync("npx tsx scripts/agent/auto-heal.ts", { stdio: "inherit" });
+      } catch (healErr) {
+        console.error("❌ Auto-heal execution failed:", healErr);
+      }
+    } else {
+      console.log(`\n❌ Could not connect to the running daemon. Check if it is started via PM2 or Docker.`);
+      console.log(`   Command to start (Docker): docker compose up -d`);
+      console.log(`   Command to start (PM2): npm run daemon:start\n`);
+    }
   }
 }
 

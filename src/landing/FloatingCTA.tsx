@@ -14,7 +14,7 @@ export default function FloatingCTA({ visible, onClick }: FloatingCTAProps) {
         onClick={onClick}
         className="w-full bg-brutal-red text-white border-t-[3px] border-brand-dark px-6 py-4 font-display font-black text-base uppercase tracking-wide flex items-center justify-center gap-2 active:bg-brand-dark transition-colors"
       >
-        <span>Book Your Free Audit Call</span>
+        <span>INITIALIZE SYSTEM UPGRADE</span>
         <ArrowRight className="h-5 w-5" />
       </button>
     </div>

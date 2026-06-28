@@ -5,11 +5,7 @@ import puppeteer from "puppeteer";
  */
 export async function generatePdf(slug: string): Promise<Buffer> {
   const port = process.env.PORT || "3000";
-  // Vite dev server runs on 5173, production binds to 3000
-  const appUrl = process.env.APP_URL || 
-    (process.env.NODE_ENV === "production" ? `http://127.0.0.1:${port}` : "http://127.0.0.1:5173");
-  
-  const url = `${appUrl}/p/${slug}?print=true`;
+  const url = `http://127.0.0.1:${port}/api/pdf-report/${slug}`;
   console.log(`🖨️ [PDFService] Generating PDF for slug: ${slug} at URL: ${url}`);
 
   const launchOptions: Parameters<typeof puppeteer.launch>[0] = {

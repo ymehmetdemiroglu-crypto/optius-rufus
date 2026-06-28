@@ -62,7 +62,7 @@ export default function StageBleedCalculator({
       <div className="max-w-5xl w-full mx-auto space-y-10">
         <div className="text-center space-y-3">
           <p className="font-mono text-xs uppercase tracking-widest text-brutal-red font-black">
-            REVENUE IMPACT
+            [CALC] REVENUE HEMORRHAGE MODEL
           </p>
           <h2 className="display-heading text-3xl md:text-5xl text-white">
             {headline}
@@ -137,7 +137,7 @@ export default function StageBleedCalculator({
           <div className="flex items-center justify-center gap-3">
             <TrendingDown className="h-8 w-8 text-brutal-red" />
             <p className="font-mono text-xs uppercase tracking-widest text-brutal-red font-black">
-              ESTIMATED MONTHLY LOSS
+              [ERR-092] MONTHLY REVENUE LEAK DETECTED
             </p>
           </div>
           <div className="flex items-center justify-center gap-1">
@@ -146,9 +146,8 @@ export default function StageBleedCalculator({
               {displayLoss.toLocaleString()}
             </span>
           </div>
-          <p className="font-mono text-sm text-white/60">
-            That's <span className="font-black text-brutal-red">${annualLoss.toLocaleString()}</span> per year.
-            Enough to fund your entire Q4 ad budget.
+          <p className="font-mono text-sm text-white/70">
+            <span className="font-black text-brutal-red">[ANNUAL PROJECTION] ${annualLoss.toLocaleString()}/yr</span> in unrecovered revenue. This is not a forecast. This is arithmetic.
           </p>
         </div>
       </div>
