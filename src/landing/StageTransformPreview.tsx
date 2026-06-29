@@ -45,30 +45,41 @@ export default function StageTransformPreview({
 
     setTimeout(() => {
       setIsTesting(false);
-      // Rules-based scoring simulation
+      // Universal smart semantic scoring simulation
       let points = contentScore;
       const text = sandboxInput.toLowerCase();
 
-      if (text.includes('safe') || text.includes('safety') || text.includes('daily')) {
-        points += 14;
-      }
-      if (text.includes('morning') || text.includes('absorption') || text.includes('direction') || text.includes('take')) {
-        points += 12;
-      }
-      if (text.includes('organic') || text.includes('testing') || text.includes('purity') || text.includes('gluten')) {
-        points += 10;
-      }
-      if (text.includes('bloat') || text.includes('gut') || text.includes('digest')) {
-        points += 10;
+      // High-impact AEO intent clusters across audio, electronics, home, apparel, and supplements
+      const intentKeywords = [
+        'anc', 'noise', 'cancel', 'cancelling', 'sound', 'battery', 'bluetooth', 'wireless',
+        'bass', 'mic', 'clarity', 'comfort', 'premium', 'charge', 'fast', 'hd', 'audio',
+        'waterproof', 'durable', 'guarantee', 'warranty', 'commuter', 'travel', 'flight',
+        'work', 'office', 'isolation', 'playtime', 'hours', 'driver', 'active', 'hybrid',
+        'stainless', 'steel', 'insulated', 'tumbler', 'cold', 'hot', 'leakproof', 'straw',
+        'airfryer', 'cook', 'crispy', 'basket', 'recipe', 'digital', 'mattress', 'foam',
+        'support', 'cooling', 'sleep', 'spine', 'hair', 'growth', 'supplement', 'ring',
+        'health', 'tracker', 'sleep', 'hrv', 'fitness', 'rufus', 'cosmo', 'intent'
+      ];
+
+      let matchedCount = 0;
+      for (const kw of intentKeywords) {
+        if (text.includes(kw)) {
+          matchedCount++;
+        }
       }
 
-      const finalScore = Math.min(96, Math.max(contentScore, points));
+      // Base improvement if user added descriptive text (>30 chars)
+      const lengthBonus = text.length > 30 ? Math.min(12, Math.floor(text.length / 10)) : 0;
+      const keywordBonus = matchedCount * 4;
+
+      const totalBonus = Math.max(15, lengthBonus + keywordBonus);
+      const finalScore = Math.min(98, Math.max(contentScore + 10, contentScore + totalBonus));
       setSandboxScore(finalScore);
 
       if (finalScore > contentScore) {
         setSuccessMsg(true);
       }
-    }, 1500);
+    }, 1200);
   };
 
   return (

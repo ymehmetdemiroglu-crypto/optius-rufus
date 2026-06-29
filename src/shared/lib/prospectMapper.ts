@@ -127,21 +127,35 @@ export function mapBackendToProspectData(data: any): ProspectData {
     simulatorIntro:
       (analysis?.copySimulatorIntro as string) ||
       `Watch Amazon's AI send your buyers to competitors. This is happening right now:`,
-    simulatorScenarios: safeJsonParse(
-      analysis?.copySimulatorScenarios as string,
-      getDefaultSimulatorScenarios()
-    ),
+    simulatorScenarios: (() => {
+      const parsed = safeJsonParse(analysis?.copySimulatorScenarios as string, getDefaultSimulatorScenarios());
+      const arr = Array.isArray(parsed) ? parsed : getDefaultSimulatorScenarios();
+      return arr.map((item: any) => ({
+        buyerQuestion: item.buyerQuestion || item.scenario || 'Shopper conversational query',
+        rufusAnswer: item.rufusAnswer || `Amazon Rufus recommends alternative options based on missing intent tags.`,
+        competitorName: item.competitorName || 'Top Category Competitor',
+        failReason: item.failReason || item.beforeRank || 'Unstructured bullet metadata',
+      }));
+    })(),
     transformHeadline:
       (analysis?.copyTransformHeadline as string) ||
       `Here's What a Rufus-Optimized Listing Looks Like`,
-    transformBefore: safeJsonParse(
-      analysis?.copyTransformBefore as string,
-      getDefaultTransformBefore(mappedListing.title, bullets)
-    ),
-    transformAfter: safeJsonParse(
-      analysis?.copyTransformAfter as string,
-      getDefaultTransformAfter()
-    ),
+    transformBefore: (() => {
+      const parsed = safeJsonParse(analysis?.copyTransformBefore as string, getDefaultTransformBefore(mappedListing.title, bullets));
+      const arr = Array.isArray(parsed) ? parsed : getDefaultTransformBefore(mappedListing.title, bullets);
+      return arr.map((item: any, idx: number) => {
+        if (typeof item === 'string') return { section: `Current Element ${idx + 1}`, content: item };
+        return { section: item.section || `Current Element ${idx + 1}`, content: item.content || String(item) };
+      });
+    })(),
+    transformAfter: (() => {
+      const parsed = safeJsonParse(analysis?.copyTransformAfter as string, getDefaultTransformAfter());
+      const arr = Array.isArray(parsed) ? parsed : getDefaultTransformAfter();
+      return arr.map((item: any, idx: number) => {
+        if (typeof item === 'string') return { section: `Optimized Element ${idx + 1}`, content: item };
+        return { section: item.section || `Optimized Element ${idx + 1}`, content: item.content || String(item) };
+      });
+    })(),
     roadmapHeadline:
       (analysis?.copyRoadmapHeadline as string) ||
       `3 Steps. 48 Hours. Fully Optimized Listing.`,
@@ -163,26 +177,26 @@ export function mapBackendToProspectData(data: any): ProspectData {
       `If we can't find at least $5,000/year in hidden revenue, we'll send you $100 for wasting your time.`,
 
     // Advanced upgrades mapping with fallbacks
-    freeQAs: safeJsonParse(
-      analysis?.copyFreeQAs as string,
-      getDefaultFreeQAs(mappedListing.category)
-    ),
-    reviewSentiment: safeJsonParse(
-      analysis?.copyReviewSentiment as string,
-      getDefaultReviewSentiment()
-    ),
-    competitorAudit: safeJsonParse(
-      analysis?.copyCompetitorAudit as string,
-      getDefaultCompetitorAudit(mappedListing.category)
-    ),
-    ppcKeywords: safeJsonParse(
-      analysis?.copyPpcKeywords as string,
-      getDefaultPpcKeywords(mappedListing.category)
-    ),
-    cosmoBundling: safeJsonParse(
-      analysis?.copyCosmoBundling as string,
-      getDefaultCosmoBundling(mappedListing.brand)
-    ),
+    freeQAs: (() => {
+      const parsed = safeJsonParse(analysis?.copyFreeQAs as string, getDefaultFreeQAs(mappedListing.category));
+      return Array.isArray(parsed) ? parsed : getDefaultFreeQAs(mappedListing.category);
+    })(),
+    reviewSentiment: (() => {
+      const parsed = safeJsonParse(analysis?.copyReviewSentiment as string, getDefaultReviewSentiment());
+      return Array.isArray(parsed) ? parsed : getDefaultReviewSentiment();
+    })(),
+    competitorAudit: (() => {
+      const parsed = safeJsonParse(analysis?.copyCompetitorAudit as string, getDefaultCompetitorAudit(mappedListing.category));
+      return Array.isArray(parsed) ? parsed : getDefaultCompetitorAudit(mappedListing.category);
+    })(),
+    ppcKeywords: (() => {
+      const parsed = safeJsonParse(analysis?.copyPpcKeywords as string, getDefaultPpcKeywords(mappedListing.category));
+      return Array.isArray(parsed) ? parsed : getDefaultPpcKeywords(mappedListing.category);
+    })(),
+    cosmoBundling: (() => {
+      const parsed = safeJsonParse(analysis?.copyCosmoBundling as string, getDefaultCosmoBundling(mappedListing.brand));
+      return Array.isArray(parsed) ? parsed : getDefaultCosmoBundling(mappedListing.brand);
+    })(),
     cosmoGraphData: safeJsonParse(
       analysis?.copyCosmoGraphData as string,
       getDefaultCosmoGraphData(mappedListing.brand)

@@ -4,6 +4,7 @@ import { logger as honoLogger } from "hono/logger";
 import { bodyLimit } from "hono/body-limit";
 import { secureHeaders } from "hono/secure-headers";
 import { serve } from "@hono/node-server";
+import { serveStatic } from "@hono/node-server/serve-static";
 import { registerHttpRoutes } from "./http/routes.js";
 import { registerTrpcHandler } from "./trpc/handler.js";
 import { startWorkers, stopWorkers } from "./workers/bootstrap.js";
@@ -55,6 +56,12 @@ app.use("*", async (c, next) => {
 
 registerHttpRoutes(app);
 registerTrpcHandler(app);
+
+// Serve static frontend assets from ./dist
+app.use("/*", serveStatic({ root: "./dist" }));
+
+// SPA Fallback for client routes (/p/:slug, /admin, etc.)
+app.get("*", serveStatic({ path: "./dist/index.html" }));
 
 // Global error handler
 app.onError((err, c) => {
